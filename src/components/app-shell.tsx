@@ -97,7 +97,7 @@ export function AppShell({ children, title, subtitle, rightPanel, headerActions 
               <div className="space-y-0.5">
                 {group.items.map((item) => {
                   const Icon = item.icon;
-                  const active = isActive(item.to, item.exact);
+                  const active = isActive(item.to, "exact" in item ? item.exact : false);
                   return (
                     <Link
                       key={item.to}
