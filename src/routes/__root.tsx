@@ -93,6 +93,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "PXOne — Sistema Operacional Corporativo do Grupo PX" },
+      { name: "description", content: "Joyful Tests is a web application for creating and managing tests." },
+      { property: "og:description", content: "Joyful Tests is a web application for creating and managing tests." },
+      { name: "twitter:description", content: "Joyful Tests is a web application for creating and managing tests." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/VxPT82q3qRdTjrzYPMXj21iynmg1/social-images/social-1782064526172-ChatGPT_Image_21_de_jun._de_2026,_14_53_17.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/VxPT82q3qRdTjrzYPMXj21iynmg1/social-images/social-1782064526172-ChatGPT_Image_21_de_jun._de_2026,_14_53_17.webp" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
