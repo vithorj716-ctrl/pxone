@@ -22,6 +22,7 @@ import { Route as AuthenticatedInvestorRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedGrowthRouteImport } from './routes/_authenticated/growth'
 import { Route as AuthenticatedDocumentsRouteImport } from './routes/_authenticated/documents'
 import { Route as AuthenticatedDecisionsRouteImport } from './routes/_authenticated/decisions'
+import { Route as AuthenticatedCustosRouteImport } from './routes/_authenticated/custos'
 import { Route as AuthenticatedBusinessPlanRouteImport } from './routes/_authenticated/business-plan'
 import { Route as AuthenticatedAiAnalystRouteImport } from './routes/_authenticated/ai-analyst'
 
@@ -89,6 +90,11 @@ const AuthenticatedDecisionsRoute = AuthenticatedDecisionsRouteImport.update({
   path: '/decisions',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCustosRoute = AuthenticatedCustosRouteImport.update({
+  id: '/custos',
+  path: '/custos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedBusinessPlanRoute =
   AuthenticatedBusinessPlanRouteImport.update({
     id: '/business-plan',
@@ -106,6 +112,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/ai-analyst': typeof AuthenticatedAiAnalystRoute
   '/business-plan': typeof AuthenticatedBusinessPlanRoute
+  '/custos': typeof AuthenticatedCustosRoute
   '/decisions': typeof AuthenticatedDecisionsRoute
   '/documents': typeof AuthenticatedDocumentsRoute
   '/growth': typeof AuthenticatedGrowthRoute
@@ -121,6 +128,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/ai-analyst': typeof AuthenticatedAiAnalystRoute
   '/business-plan': typeof AuthenticatedBusinessPlanRoute
+  '/custos': typeof AuthenticatedCustosRoute
   '/decisions': typeof AuthenticatedDecisionsRoute
   '/documents': typeof AuthenticatedDocumentsRoute
   '/growth': typeof AuthenticatedGrowthRoute
@@ -139,6 +147,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/ai-analyst': typeof AuthenticatedAiAnalystRoute
   '/_authenticated/business-plan': typeof AuthenticatedBusinessPlanRoute
+  '/_authenticated/custos': typeof AuthenticatedCustosRoute
   '/_authenticated/decisions': typeof AuthenticatedDecisionsRoute
   '/_authenticated/documents': typeof AuthenticatedDocumentsRoute
   '/_authenticated/growth': typeof AuthenticatedGrowthRoute
@@ -158,6 +167,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/ai-analyst'
     | '/business-plan'
+    | '/custos'
     | '/decisions'
     | '/documents'
     | '/growth'
@@ -173,6 +183,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/ai-analyst'
     | '/business-plan'
+    | '/custos'
     | '/decisions'
     | '/documents'
     | '/growth'
@@ -190,6 +201,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/ai-analyst'
     | '/_authenticated/business-plan'
+    | '/_authenticated/custos'
     | '/_authenticated/decisions'
     | '/_authenticated/documents'
     | '/_authenticated/growth'
@@ -301,6 +313,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDecisionsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/custos': {
+      id: '/_authenticated/custos'
+      path: '/custos'
+      fullPath: '/custos'
+      preLoaderRoute: typeof AuthenticatedCustosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/business-plan': {
       id: '/_authenticated/business-plan'
       path: '/business-plan'
@@ -321,6 +340,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAiAnalystRoute: typeof AuthenticatedAiAnalystRoute
   AuthenticatedBusinessPlanRoute: typeof AuthenticatedBusinessPlanRoute
+  AuthenticatedCustosRoute: typeof AuthenticatedCustosRoute
   AuthenticatedDecisionsRoute: typeof AuthenticatedDecisionsRoute
   AuthenticatedDocumentsRoute: typeof AuthenticatedDocumentsRoute
   AuthenticatedGrowthRoute: typeof AuthenticatedGrowthRoute
@@ -337,6 +357,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAiAnalystRoute: AuthenticatedAiAnalystRoute,
   AuthenticatedBusinessPlanRoute: AuthenticatedBusinessPlanRoute,
+  AuthenticatedCustosRoute: AuthenticatedCustosRoute,
   AuthenticatedDecisionsRoute: AuthenticatedDecisionsRoute,
   AuthenticatedDocumentsRoute: AuthenticatedDocumentsRoute,
   AuthenticatedGrowthRoute: AuthenticatedGrowthRoute,
