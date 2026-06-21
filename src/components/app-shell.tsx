@@ -34,6 +34,7 @@ const navGroups = [
   {
     label: "Operação",
     items: [
+      { to: "/empresas", label: "Empresas", icon: Building2 },
       { to: "/custos", label: "Central de Custos", icon: Wallet },
     ],
   },
