@@ -12,7 +12,18 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedValuationRouteImport } from './routes/_authenticated/valuation'
+import { Route as AuthenticatedTimelineRouteImport } from './routes/_authenticated/timeline'
+import { Route as AuthenticatedRiskRouteImport } from './routes/_authenticated/risk'
+import { Route as AuthenticatedPaybackRouteImport } from './routes/_authenticated/payback'
+import { Route as AuthenticatedOkrRouteImport } from './routes/_authenticated/okr'
+import { Route as AuthenticatedKpisRouteImport } from './routes/_authenticated/kpis'
+import { Route as AuthenticatedInvestorRouteImport } from './routes/_authenticated/investor'
+import { Route as AuthenticatedGrowthRouteImport } from './routes/_authenticated/growth'
+import { Route as AuthenticatedDocumentsRouteImport } from './routes/_authenticated/documents'
+import { Route as AuthenticatedDecisionsRouteImport } from './routes/_authenticated/decisions'
 import { Route as AuthenticatedBusinessPlanRouteImport } from './routes/_authenticated/business-plan'
+import { Route as AuthenticatedAiAnalystRouteImport } from './routes/_authenticated/ai-analyst'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -28,40 +39,167 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedValuationRoute = AuthenticatedValuationRouteImport.update({
+  id: '/valuation',
+  path: '/valuation',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTimelineRoute = AuthenticatedTimelineRouteImport.update({
+  id: '/timeline',
+  path: '/timeline',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedRiskRoute = AuthenticatedRiskRouteImport.update({
+  id: '/risk',
+  path: '/risk',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPaybackRoute = AuthenticatedPaybackRouteImport.update({
+  id: '/payback',
+  path: '/payback',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedOkrRoute = AuthenticatedOkrRouteImport.update({
+  id: '/okr',
+  path: '/okr',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedKpisRoute = AuthenticatedKpisRouteImport.update({
+  id: '/kpis',
+  path: '/kpis',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedInvestorRoute = AuthenticatedInvestorRouteImport.update({
+  id: '/investor',
+  path: '/investor',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedGrowthRoute = AuthenticatedGrowthRouteImport.update({
+  id: '/growth',
+  path: '/growth',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDocumentsRoute = AuthenticatedDocumentsRouteImport.update({
+  id: '/documents',
+  path: '/documents',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDecisionsRoute = AuthenticatedDecisionsRouteImport.update({
+  id: '/decisions',
+  path: '/decisions',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedBusinessPlanRoute =
   AuthenticatedBusinessPlanRouteImport.update({
     id: '/business-plan',
     path: '/business-plan',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAiAnalystRoute = AuthenticatedAiAnalystRouteImport.update({
+  id: '/ai-analyst',
+  path: '/ai-analyst',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/auth': typeof AuthRoute
+  '/ai-analyst': typeof AuthenticatedAiAnalystRoute
   '/business-plan': typeof AuthenticatedBusinessPlanRoute
+  '/decisions': typeof AuthenticatedDecisionsRoute
+  '/documents': typeof AuthenticatedDocumentsRoute
+  '/growth': typeof AuthenticatedGrowthRoute
+  '/investor': typeof AuthenticatedInvestorRoute
+  '/kpis': typeof AuthenticatedKpisRoute
+  '/okr': typeof AuthenticatedOkrRoute
+  '/payback': typeof AuthenticatedPaybackRoute
+  '/risk': typeof AuthenticatedRiskRoute
+  '/timeline': typeof AuthenticatedTimelineRoute
+  '/valuation': typeof AuthenticatedValuationRoute
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
+  '/ai-analyst': typeof AuthenticatedAiAnalystRoute
   '/business-plan': typeof AuthenticatedBusinessPlanRoute
+  '/decisions': typeof AuthenticatedDecisionsRoute
+  '/documents': typeof AuthenticatedDocumentsRoute
+  '/growth': typeof AuthenticatedGrowthRoute
+  '/investor': typeof AuthenticatedInvestorRoute
+  '/kpis': typeof AuthenticatedKpisRoute
+  '/okr': typeof AuthenticatedOkrRoute
+  '/payback': typeof AuthenticatedPaybackRoute
+  '/risk': typeof AuthenticatedRiskRoute
+  '/timeline': typeof AuthenticatedTimelineRoute
+  '/valuation': typeof AuthenticatedValuationRoute
   '/': typeof AuthenticatedIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/ai-analyst': typeof AuthenticatedAiAnalystRoute
   '/_authenticated/business-plan': typeof AuthenticatedBusinessPlanRoute
+  '/_authenticated/decisions': typeof AuthenticatedDecisionsRoute
+  '/_authenticated/documents': typeof AuthenticatedDocumentsRoute
+  '/_authenticated/growth': typeof AuthenticatedGrowthRoute
+  '/_authenticated/investor': typeof AuthenticatedInvestorRoute
+  '/_authenticated/kpis': typeof AuthenticatedKpisRoute
+  '/_authenticated/okr': typeof AuthenticatedOkrRoute
+  '/_authenticated/payback': typeof AuthenticatedPaybackRoute
+  '/_authenticated/risk': typeof AuthenticatedRiskRoute
+  '/_authenticated/timeline': typeof AuthenticatedTimelineRoute
+  '/_authenticated/valuation': typeof AuthenticatedValuationRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/business-plan'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/ai-analyst'
+    | '/business-plan'
+    | '/decisions'
+    | '/documents'
+    | '/growth'
+    | '/investor'
+    | '/kpis'
+    | '/okr'
+    | '/payback'
+    | '/risk'
+    | '/timeline'
+    | '/valuation'
   fileRoutesByTo: FileRoutesByTo
-  to: '/auth' | '/business-plan' | '/'
+  to:
+    | '/auth'
+    | '/ai-analyst'
+    | '/business-plan'
+    | '/decisions'
+    | '/documents'
+    | '/growth'
+    | '/investor'
+    | '/kpis'
+    | '/okr'
+    | '/payback'
+    | '/risk'
+    | '/timeline'
+    | '/valuation'
+    | '/'
   id:
     | '__root__'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/ai-analyst'
     | '/_authenticated/business-plan'
+    | '/_authenticated/decisions'
+    | '/_authenticated/documents'
+    | '/_authenticated/growth'
+    | '/_authenticated/investor'
+    | '/_authenticated/kpis'
+    | '/_authenticated/okr'
+    | '/_authenticated/payback'
+    | '/_authenticated/risk'
+    | '/_authenticated/timeline'
+    | '/_authenticated/valuation'
     | '/_authenticated/'
   fileRoutesById: FileRoutesById
 }
@@ -93,6 +231,76 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/valuation': {
+      id: '/_authenticated/valuation'
+      path: '/valuation'
+      fullPath: '/valuation'
+      preLoaderRoute: typeof AuthenticatedValuationRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/timeline': {
+      id: '/_authenticated/timeline'
+      path: '/timeline'
+      fullPath: '/timeline'
+      preLoaderRoute: typeof AuthenticatedTimelineRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/risk': {
+      id: '/_authenticated/risk'
+      path: '/risk'
+      fullPath: '/risk'
+      preLoaderRoute: typeof AuthenticatedRiskRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/payback': {
+      id: '/_authenticated/payback'
+      path: '/payback'
+      fullPath: '/payback'
+      preLoaderRoute: typeof AuthenticatedPaybackRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/okr': {
+      id: '/_authenticated/okr'
+      path: '/okr'
+      fullPath: '/okr'
+      preLoaderRoute: typeof AuthenticatedOkrRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/kpis': {
+      id: '/_authenticated/kpis'
+      path: '/kpis'
+      fullPath: '/kpis'
+      preLoaderRoute: typeof AuthenticatedKpisRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/investor': {
+      id: '/_authenticated/investor'
+      path: '/investor'
+      fullPath: '/investor'
+      preLoaderRoute: typeof AuthenticatedInvestorRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/growth': {
+      id: '/_authenticated/growth'
+      path: '/growth'
+      fullPath: '/growth'
+      preLoaderRoute: typeof AuthenticatedGrowthRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/documents': {
+      id: '/_authenticated/documents'
+      path: '/documents'
+      fullPath: '/documents'
+      preLoaderRoute: typeof AuthenticatedDocumentsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/decisions': {
+      id: '/_authenticated/decisions'
+      path: '/decisions'
+      fullPath: '/decisions'
+      preLoaderRoute: typeof AuthenticatedDecisionsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/business-plan': {
       id: '/_authenticated/business-plan'
       path: '/business-plan'
@@ -100,16 +308,45 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedBusinessPlanRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/ai-analyst': {
+      id: '/_authenticated/ai-analyst'
+      path: '/ai-analyst'
+      fullPath: '/ai-analyst'
+      preLoaderRoute: typeof AuthenticatedAiAnalystRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAiAnalystRoute: typeof AuthenticatedAiAnalystRoute
   AuthenticatedBusinessPlanRoute: typeof AuthenticatedBusinessPlanRoute
+  AuthenticatedDecisionsRoute: typeof AuthenticatedDecisionsRoute
+  AuthenticatedDocumentsRoute: typeof AuthenticatedDocumentsRoute
+  AuthenticatedGrowthRoute: typeof AuthenticatedGrowthRoute
+  AuthenticatedInvestorRoute: typeof AuthenticatedInvestorRoute
+  AuthenticatedKpisRoute: typeof AuthenticatedKpisRoute
+  AuthenticatedOkrRoute: typeof AuthenticatedOkrRoute
+  AuthenticatedPaybackRoute: typeof AuthenticatedPaybackRoute
+  AuthenticatedRiskRoute: typeof AuthenticatedRiskRoute
+  AuthenticatedTimelineRoute: typeof AuthenticatedTimelineRoute
+  AuthenticatedValuationRoute: typeof AuthenticatedValuationRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAiAnalystRoute: AuthenticatedAiAnalystRoute,
   AuthenticatedBusinessPlanRoute: AuthenticatedBusinessPlanRoute,
+  AuthenticatedDecisionsRoute: AuthenticatedDecisionsRoute,
+  AuthenticatedDocumentsRoute: AuthenticatedDocumentsRoute,
+  AuthenticatedGrowthRoute: AuthenticatedGrowthRoute,
+  AuthenticatedInvestorRoute: AuthenticatedInvestorRoute,
+  AuthenticatedKpisRoute: AuthenticatedKpisRoute,
+  AuthenticatedOkrRoute: AuthenticatedOkrRoute,
+  AuthenticatedPaybackRoute: AuthenticatedPaybackRoute,
+  AuthenticatedRiskRoute: AuthenticatedRiskRoute,
+  AuthenticatedTimelineRoute: AuthenticatedTimelineRoute,
+  AuthenticatedValuationRoute: AuthenticatedValuationRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
 }
 
