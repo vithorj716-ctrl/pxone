@@ -20,6 +20,7 @@ import { Route as AuthenticatedOkrRouteImport } from './routes/_authenticated/ok
 import { Route as AuthenticatedKpisRouteImport } from './routes/_authenticated/kpis'
 import { Route as AuthenticatedInvestorRouteImport } from './routes/_authenticated/investor'
 import { Route as AuthenticatedGrowthRouteImport } from './routes/_authenticated/growth'
+import { Route as AuthenticatedEmpresasRouteImport } from './routes/_authenticated/empresas'
 import { Route as AuthenticatedDocumentsRouteImport } from './routes/_authenticated/documents'
 import { Route as AuthenticatedDecisionsRouteImport } from './routes/_authenticated/decisions'
 import { Route as AuthenticatedCustosRouteImport } from './routes/_authenticated/custos'
@@ -80,6 +81,11 @@ const AuthenticatedGrowthRoute = AuthenticatedGrowthRouteImport.update({
   path: '/growth',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedEmpresasRoute = AuthenticatedEmpresasRouteImport.update({
+  id: '/empresas',
+  path: '/empresas',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDocumentsRoute = AuthenticatedDocumentsRouteImport.update({
   id: '/documents',
   path: '/documents',
@@ -115,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/custos': typeof AuthenticatedCustosRoute
   '/decisions': typeof AuthenticatedDecisionsRoute
   '/documents': typeof AuthenticatedDocumentsRoute
+  '/empresas': typeof AuthenticatedEmpresasRoute
   '/growth': typeof AuthenticatedGrowthRoute
   '/investor': typeof AuthenticatedInvestorRoute
   '/kpis': typeof AuthenticatedKpisRoute
@@ -131,6 +138,7 @@ export interface FileRoutesByTo {
   '/custos': typeof AuthenticatedCustosRoute
   '/decisions': typeof AuthenticatedDecisionsRoute
   '/documents': typeof AuthenticatedDocumentsRoute
+  '/empresas': typeof AuthenticatedEmpresasRoute
   '/growth': typeof AuthenticatedGrowthRoute
   '/investor': typeof AuthenticatedInvestorRoute
   '/kpis': typeof AuthenticatedKpisRoute
@@ -150,6 +158,7 @@ export interface FileRoutesById {
   '/_authenticated/custos': typeof AuthenticatedCustosRoute
   '/_authenticated/decisions': typeof AuthenticatedDecisionsRoute
   '/_authenticated/documents': typeof AuthenticatedDocumentsRoute
+  '/_authenticated/empresas': typeof AuthenticatedEmpresasRoute
   '/_authenticated/growth': typeof AuthenticatedGrowthRoute
   '/_authenticated/investor': typeof AuthenticatedInvestorRoute
   '/_authenticated/kpis': typeof AuthenticatedKpisRoute
@@ -170,6 +179,7 @@ export interface FileRouteTypes {
     | '/custos'
     | '/decisions'
     | '/documents'
+    | '/empresas'
     | '/growth'
     | '/investor'
     | '/kpis'
@@ -186,6 +196,7 @@ export interface FileRouteTypes {
     | '/custos'
     | '/decisions'
     | '/documents'
+    | '/empresas'
     | '/growth'
     | '/investor'
     | '/kpis'
@@ -204,6 +215,7 @@ export interface FileRouteTypes {
     | '/_authenticated/custos'
     | '/_authenticated/decisions'
     | '/_authenticated/documents'
+    | '/_authenticated/empresas'
     | '/_authenticated/growth'
     | '/_authenticated/investor'
     | '/_authenticated/kpis'
@@ -299,6 +311,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedGrowthRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/empresas': {
+      id: '/_authenticated/empresas'
+      path: '/empresas'
+      fullPath: '/empresas'
+      preLoaderRoute: typeof AuthenticatedEmpresasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/documents': {
       id: '/_authenticated/documents'
       path: '/documents'
@@ -343,6 +362,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCustosRoute: typeof AuthenticatedCustosRoute
   AuthenticatedDecisionsRoute: typeof AuthenticatedDecisionsRoute
   AuthenticatedDocumentsRoute: typeof AuthenticatedDocumentsRoute
+  AuthenticatedEmpresasRoute: typeof AuthenticatedEmpresasRoute
   AuthenticatedGrowthRoute: typeof AuthenticatedGrowthRoute
   AuthenticatedInvestorRoute: typeof AuthenticatedInvestorRoute
   AuthenticatedKpisRoute: typeof AuthenticatedKpisRoute
@@ -360,6 +380,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCustosRoute: AuthenticatedCustosRoute,
   AuthenticatedDecisionsRoute: AuthenticatedDecisionsRoute,
   AuthenticatedDocumentsRoute: AuthenticatedDocumentsRoute,
+  AuthenticatedEmpresasRoute: AuthenticatedEmpresasRoute,
   AuthenticatedGrowthRoute: AuthenticatedGrowthRoute,
   AuthenticatedInvestorRoute: AuthenticatedInvestorRoute,
   AuthenticatedKpisRoute: AuthenticatedKpisRoute,
