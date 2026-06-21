@@ -70,6 +70,90 @@ export type Database = {
           },
         ]
       }
+      categorias_custo: {
+        Row: {
+          created_at: string
+          descricao: string | null
+          id: string
+          nome: string
+        }
+        Insert: {
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          nome: string
+        }
+        Update: {
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          nome?: string
+        }
+        Relationships: []
+      }
+      custos: {
+        Row: {
+          categoria_id: string | null
+          centro_custo: string | null
+          created_at: string
+          created_by: string | null
+          data: string
+          descricao: string | null
+          empresa_id: string | null
+          id: string
+          nome: string
+          status: string
+          tipo_custo: Database["public"]["Enums"]["tipo_custo"]
+          updated_at: string
+          valor: number
+        }
+        Insert: {
+          categoria_id?: string | null
+          centro_custo?: string | null
+          created_at?: string
+          created_by?: string | null
+          data?: string
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          nome: string
+          status?: string
+          tipo_custo?: Database["public"]["Enums"]["tipo_custo"]
+          updated_at?: string
+          valor?: number
+        }
+        Update: {
+          categoria_id?: string | null
+          centro_custo?: string | null
+          created_at?: string
+          created_by?: string | null
+          data?: string
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          nome?: string
+          status?: string
+          tipo_custo?: Database["public"]["Enums"]["tipo_custo"]
+          updated_at?: string
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "custos_categoria_id_fkey"
+            columns: ["categoria_id"]
+            isOneToOne: false
+            referencedRelation: "categorias_custo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "custos_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       empresas: {
         Row: {
           codigo: string
@@ -221,6 +305,7 @@ export type Database = {
         | "consultor"
         | "auditor"
       plan_horizon: "1_ano" | "3_anos" | "5_anos" | "10_anos"
+      tipo_custo: "fixo" | "variavel" | "unico" | "recorrente"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -357,6 +442,7 @@ export const Constants = {
         "auditor",
       ],
       plan_horizon: ["1_ano", "3_anos", "5_anos", "10_anos"],
+      tipo_custo: ["fixo", "variavel", "unico", "recorrente"],
     },
   },
 } as const
