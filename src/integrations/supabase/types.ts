@@ -14,16 +14,213 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      business_plans: {
+        Row: {
+          ano_inicio: number
+          created_at: string
+          descricao: string | null
+          empresa_id: string | null
+          horizonte: Database["public"]["Enums"]["plan_horizon"]
+          id: string
+          meta_ebitda: number | null
+          meta_receita: number | null
+          meta_valuation: number | null
+          progresso: number | null
+          status: string | null
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          ano_inicio: number
+          created_at?: string
+          descricao?: string | null
+          empresa_id?: string | null
+          horizonte: Database["public"]["Enums"]["plan_horizon"]
+          id?: string
+          meta_ebitda?: number | null
+          meta_receita?: number | null
+          meta_valuation?: number | null
+          progresso?: number | null
+          status?: string | null
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          ano_inicio?: number
+          created_at?: string
+          descricao?: string | null
+          empresa_id?: string | null
+          horizonte?: Database["public"]["Enums"]["plan_horizon"]
+          id?: string
+          meta_ebitda?: number | null
+          meta_receita?: number | null
+          meta_valuation?: number | null
+          progresso?: number | null
+          status?: string | null
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_plans_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      empresas: {
+        Row: {
+          codigo: string
+          cor_tema: string | null
+          created_at: string
+          id: string
+          nome: string
+          setor: string | null
+        }
+        Insert: {
+          codigo: string
+          cor_tema?: string | null
+          created_at?: string
+          id?: string
+          nome: string
+          setor?: string | null
+        }
+        Update: {
+          codigo?: string
+          cor_tema?: string | null
+          created_at?: string
+          id?: string
+          nome?: string
+          setor?: string | null
+        }
+        Relationships: []
+      }
+      kpi_snapshots: {
+        Row: {
+          caixa: number | null
+          capital_giro: number | null
+          contas_pagar: number | null
+          contas_receber: number | null
+          created_at: string
+          ebitda: number | null
+          empresa_id: string | null
+          endividamento: number | null
+          id: string
+          lucro_liquido: number | null
+          periodo: string
+          receita: number | null
+          valuation: number | null
+        }
+        Insert: {
+          caixa?: number | null
+          capital_giro?: number | null
+          contas_pagar?: number | null
+          contas_receber?: number | null
+          created_at?: string
+          ebitda?: number | null
+          empresa_id?: string | null
+          endividamento?: number | null
+          id?: string
+          lucro_liquido?: number | null
+          periodo: string
+          receita?: number | null
+          valuation?: number | null
+        }
+        Update: {
+          caixa?: number | null
+          capital_giro?: number | null
+          contas_pagar?: number | null
+          contas_receber?: number | null
+          created_at?: string
+          ebitda?: number | null
+          empresa_id?: string | null
+          endividamento?: number | null
+          id?: string
+          lucro_liquido?: number | null
+          periodo?: string
+          receita?: number | null
+          valuation?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kpi_snapshots_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_executive: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role:
+        | "master_admin"
+        | "socio"
+        | "diretor"
+        | "gestor"
+        | "consultor"
+        | "auditor"
+      plan_horizon: "1_ano" | "3_anos" | "5_anos" | "10_anos"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +347,16 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: [
+        "master_admin",
+        "socio",
+        "diretor",
+        "gestor",
+        "consultor",
+        "auditor",
+      ],
+      plan_horizon: ["1_ano", "3_anos", "5_anos", "10_anos"],
+    },
   },
 } as const
