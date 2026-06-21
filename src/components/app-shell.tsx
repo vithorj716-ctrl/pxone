@@ -15,6 +15,7 @@ import {
   Clock,
   LogOut,
   Wallet,
+  Building2,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "@tanstack/react-router";
@@ -33,6 +34,7 @@ const navGroups = [
   {
     label: "Operação",
     items: [
+      { to: "/empresas", label: "Empresas", icon: Building2 },
       { to: "/custos", label: "Central de Custos", icon: Wallet },
     ],
   },
