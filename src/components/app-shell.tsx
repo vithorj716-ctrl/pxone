@@ -45,7 +45,9 @@ const navGroups = [
   },
 ] as const;
 
-const ALL_LINKS = navGroups.flatMap((g) => g.items);
+type NavLink = { to: string; label: string; icon: any; exact?: boolean };
+const ALL_LINKS: NavLink[] = navGroups.flatMap((g) => g.items as unknown as NavLink[]);
+
 
 interface AppShellProps {
   children: ReactNode;
@@ -269,13 +271,14 @@ export function AppShell({ children, title, subtitle, rightPanel, headerActions 
                   return (
                     <button
                       key={l.to}
-                      onClick={() => { setShowSearch(false); setSearch(""); navigate({ to: l.to }); }}
+                      onClick={() => { setShowSearch(false); setSearch(""); navigate({ to: l.to as any }); }}
                       className="w-full text-left flex items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-surface-2 text-muted-foreground hover:text-foreground transition-colors"
                     >
                       <Icon className="size-4" /> {l.label}
                     </button>
                   );
                 })
+
               )}
             </div>
           </div>
