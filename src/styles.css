@@ -76,7 +76,7 @@
   --border: oklch(0.27 0 0);
   --input: oklch(0.27 0 0);
   --ring: oklch(0.73 0.17 162);
-  --brand: oklch(0.73 0.17 162); /* emerald */
+  --brand: oklch(0.73 0.17 162);
   --brand-foreground: oklch(0.15 0 0);
   --chart-1: oklch(0.73 0.17 162);
   --chart-2: oklch(0.7 0.14 220);
@@ -91,12 +91,14 @@
   --sidebar-accent-foreground: oklch(0.92 0 0);
   --sidebar-border: oklch(0.24 0 0);
   --sidebar-ring: oklch(0.73 0.17 162);
+
+  --gradient-brand: linear-gradient(135deg, oklch(0.73 0.17 162), oklch(0.65 0.18 200));
+  --gradient-surface: linear-gradient(180deg, oklch(0.2 0 0), oklch(0.16 0 0));
+  --shadow-glow: 0 0 0 1px color-mix(in oklab, var(--brand) 30%, transparent), 0 10px 40px -10px color-mix(in oklab, var(--brand) 25%, transparent);
 }
 
 @layer base {
-  * {
-    border-color: var(--color-border);
-  }
+  * { border-color: var(--color-border); }
   html, body {
     background-color: var(--color-background);
     color: var(--color-foreground);
@@ -105,16 +107,118 @@
   }
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { scrollbar-width: none; }
+
+  /* Custom thin scrollbar */
+  .thin-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+  .thin-scroll::-webkit-scrollbar-track { background: transparent; }
+  .thin-scroll::-webkit-scrollbar-thumb {
+    background: color-mix(in oklab, var(--color-border) 60%, transparent);
+    border-radius: 999px;
+  }
+  .thin-scroll::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in oklab, var(--color-brand) 50%, transparent);
+  }
+
   .input {
     width: 100%;
     padding: 0.5rem 0.75rem;
     background-color: var(--color-background);
-    border-radius: 0.375rem;
+    border-radius: 0.5rem;
     box-shadow: inset 0 0 0 1px var(--color-border);
     font-size: 0.875rem;
     color: var(--color-foreground);
     outline: none;
+    transition: box-shadow 150ms ease, background-color 150ms ease;
   }
-  .input:focus { box-shadow: inset 0 0 0 1px var(--color-brand); }
+  .input:hover { box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--color-border) 70%, var(--color-foreground) 20%); }
+  .input:focus { box-shadow: inset 0 0 0 1.5px var(--color-brand); }
+
+  /* Focus ring for keyboard a11y */
+  :where(button, a, [role="button"]):focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
 }
 
+/* ===== Animation keyframes ===== */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes scaleIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+@keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes pulseGlow { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--color-brand) 35%, transparent); } 50% { box-shadow: 0 0 0 6px color-mix(in oklab, var(--color-brand) 0%, transparent); } }
+@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+@keyframes spinSlow { to { transform: rotate(360deg); } }
+@keyframes gradientShift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+
+/* ===== Animation utilities ===== */
+@utility animate-fade-in { animation: fadeIn 0.35s ease-out both; }
+@utility animate-fade-in-up { animation: fadeInUp 0.45s ease-out both; }
+@utility animate-scale-in { animation: scaleIn 0.2s ease-out both; }
+@utility animate-slide-down { animation: slideDown 0.25s ease-out both; }
+@utility animate-pulse-glow { animation: pulseGlow 2s ease-in-out infinite; }
+@utility animate-spin-slow { animation: spinSlow 3s linear infinite; }
+
+/* Staggered delays for entrance animations */
+@utility stagger-1 { animation-delay: 60ms; }
+@utility stagger-2 { animation-delay: 120ms; }
+@utility stagger-3 { animation-delay: 180ms; }
+@utility stagger-4 { animation-delay: 240ms; }
+@utility stagger-5 { animation-delay: 300ms; }
+@utility stagger-6 { animation-delay: 360ms; }
+
+/* Hover lift effect for cards */
+@utility hover-lift {
+  transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px -14px color-mix(in oklab, black 60%, transparent);
+  }
+}
+
+/* Glow on hover */
+@utility hover-glow {
+  transition: box-shadow 250ms ease, transform 250ms ease;
+  &:hover {
+    box-shadow: var(--shadow-glow);
+  }
+}
+
+/* Shimmer skeleton */
+@utility skeleton {
+  background: linear-gradient(90deg,
+    color-mix(in oklab, var(--color-surface-2) 60%, transparent) 0%,
+    color-mix(in oklab, var(--color-surface-2) 90%, var(--color-foreground) 8%) 50%,
+    color-mix(in oklab, var(--color-surface-2) 60%, transparent) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s linear infinite;
+  border-radius: 0.5rem;
+}
+
+/* Gradient text */
+@utility text-gradient-brand {
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Animated gradient surface */
+@utility surface-animated {
+  background: linear-gradient(120deg, var(--color-surface), var(--color-surface-2), var(--color-surface));
+  background-size: 200% 200%;
+  animation: gradientShift 8s ease infinite;
+}
+
+/* Status pills */
+@utility pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  border: 1px solid color-mix(in oklab, var(--color-border) 80%, transparent);
+}
