@@ -1185,7 +1185,7 @@ async function exportImage(mod: ModuleConfig, data: ModuleData, ai: any, kind: "
     setFont(12, "bold");
     ctx.fillText("ALERTAS", pad + 20, y + 30);
     let yy = y + 55;
-    aList.forEach((it) => {
+    aList.forEach((it: string) => {
       ctx.fillStyle = palette.warn;
       ctx.fillText("⚠", pad + 20, yy + 2);
       ctx.fillStyle = palette.text;
