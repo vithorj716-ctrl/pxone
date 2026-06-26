@@ -2,10 +2,9 @@ import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import {
   LayoutDashboard, Target, Calculator, TrendingUp, Gavel, ShieldAlert,
-  Users, Sparkles, Goal, Rocket, FileText, Clock, LogOut, Wallet, Building2,
+  Users, Sparkles, Goal, Rocket, FileText, Clock, Wallet, Building2,
   PanelLeftClose, PanelLeftOpen, Search, Tag,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 
 const navGroups = [
   {
@@ -102,10 +101,8 @@ export function AppShell({ children, title, subtitle, rightPanel, headerActions 
   const isActive = (to: string, exact?: boolean) =>
     exact ? pathname === to : pathname === to || pathname.startsWith(to + "/");
 
-  async function signOut() {
-    await supabase.auth.signOut();
-    navigate({ to: "/auth", replace: true });
-  }
+
+
 
   const filteredLinks = search.trim()
     ? ALL_LINKS.filter((l) => l.label.toLowerCase().includes(search.toLowerCase()))
