@@ -17,6 +17,7 @@ import { Route as AuthenticatedTimelineRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedRiskRouteImport } from './routes/_authenticated/risk'
 import { Route as AuthenticatedPaybackRouteImport } from './routes/_authenticated/payback'
 import { Route as AuthenticatedOkrRouteImport } from './routes/_authenticated/okr'
+import { Route as AuthenticatedMarkupRouteImport } from './routes/_authenticated/markup'
 import { Route as AuthenticatedKpisRouteImport } from './routes/_authenticated/kpis'
 import { Route as AuthenticatedInvestorRouteImport } from './routes/_authenticated/investor'
 import { Route as AuthenticatedGrowthRouteImport } from './routes/_authenticated/growth'
@@ -64,6 +65,11 @@ const AuthenticatedPaybackRoute = AuthenticatedPaybackRouteImport.update({
 const AuthenticatedOkrRoute = AuthenticatedOkrRouteImport.update({
   id: '/okr',
   path: '/okr',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMarkupRoute = AuthenticatedMarkupRouteImport.update({
+  id: '/markup',
+  path: '/markup',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedKpisRoute = AuthenticatedKpisRouteImport.update({
@@ -125,6 +131,7 @@ export interface FileRoutesByFullPath {
   '/growth': typeof AuthenticatedGrowthRoute
   '/investor': typeof AuthenticatedInvestorRoute
   '/kpis': typeof AuthenticatedKpisRoute
+  '/markup': typeof AuthenticatedMarkupRoute
   '/okr': typeof AuthenticatedOkrRoute
   '/payback': typeof AuthenticatedPaybackRoute
   '/risk': typeof AuthenticatedRiskRoute
@@ -142,6 +149,7 @@ export interface FileRoutesByTo {
   '/growth': typeof AuthenticatedGrowthRoute
   '/investor': typeof AuthenticatedInvestorRoute
   '/kpis': typeof AuthenticatedKpisRoute
+  '/markup': typeof AuthenticatedMarkupRoute
   '/okr': typeof AuthenticatedOkrRoute
   '/payback': typeof AuthenticatedPaybackRoute
   '/risk': typeof AuthenticatedRiskRoute
@@ -162,6 +170,7 @@ export interface FileRoutesById {
   '/_authenticated/growth': typeof AuthenticatedGrowthRoute
   '/_authenticated/investor': typeof AuthenticatedInvestorRoute
   '/_authenticated/kpis': typeof AuthenticatedKpisRoute
+  '/_authenticated/markup': typeof AuthenticatedMarkupRoute
   '/_authenticated/okr': typeof AuthenticatedOkrRoute
   '/_authenticated/payback': typeof AuthenticatedPaybackRoute
   '/_authenticated/risk': typeof AuthenticatedRiskRoute
@@ -183,6 +192,7 @@ export interface FileRouteTypes {
     | '/growth'
     | '/investor'
     | '/kpis'
+    | '/markup'
     | '/okr'
     | '/payback'
     | '/risk'
@@ -200,6 +210,7 @@ export interface FileRouteTypes {
     | '/growth'
     | '/investor'
     | '/kpis'
+    | '/markup'
     | '/okr'
     | '/payback'
     | '/risk'
@@ -219,6 +230,7 @@ export interface FileRouteTypes {
     | '/_authenticated/growth'
     | '/_authenticated/investor'
     | '/_authenticated/kpis'
+    | '/_authenticated/markup'
     | '/_authenticated/okr'
     | '/_authenticated/payback'
     | '/_authenticated/risk'
@@ -288,6 +300,13 @@ declare module '@tanstack/react-router' {
       path: '/okr'
       fullPath: '/okr'
       preLoaderRoute: typeof AuthenticatedOkrRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/markup': {
+      id: '/_authenticated/markup'
+      path: '/markup'
+      fullPath: '/markup'
+      preLoaderRoute: typeof AuthenticatedMarkupRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/kpis': {
@@ -366,6 +385,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedGrowthRoute: typeof AuthenticatedGrowthRoute
   AuthenticatedInvestorRoute: typeof AuthenticatedInvestorRoute
   AuthenticatedKpisRoute: typeof AuthenticatedKpisRoute
+  AuthenticatedMarkupRoute: typeof AuthenticatedMarkupRoute
   AuthenticatedOkrRoute: typeof AuthenticatedOkrRoute
   AuthenticatedPaybackRoute: typeof AuthenticatedPaybackRoute
   AuthenticatedRiskRoute: typeof AuthenticatedRiskRoute
@@ -384,6 +404,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedGrowthRoute: AuthenticatedGrowthRoute,
   AuthenticatedInvestorRoute: AuthenticatedInvestorRoute,
   AuthenticatedKpisRoute: AuthenticatedKpisRoute,
+  AuthenticatedMarkupRoute: AuthenticatedMarkupRoute,
   AuthenticatedOkrRoute: AuthenticatedOkrRoute,
   AuthenticatedPaybackRoute: AuthenticatedPaybackRoute,
   AuthenticatedRiskRoute: AuthenticatedRiskRoute,
