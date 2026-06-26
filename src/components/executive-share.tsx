@@ -667,8 +667,32 @@ function ExportModal({ module: mod, onClose }: { module: ModuleConfig; onClose: 
 }
 
 // ────────────────────────────────────────────────────────────────────────────
-// Format renderers
+// Helpers — pick the most informative rows/columns for "details" sections
 // ────────────────────────────────────────────────────────────────────────────
+
+function pickDetailColumns(data: ModuleData) {
+  // Prefer descriptive text columns + category + value/status
+  const preferred = ["nome", "descricao", "titulo", "produto", "servico", "objetivo", "categoria", "tipo", "centro_custo", "empresa", "status", "valor", "preco", "investimento", "data"];
+  const present = data.columns.filter((c) => preferred.includes(c.key));
+  const ordered = preferred
+    .map((k) => present.find((c) => c.key === k))
+    .filter(Boolean) as ModuleData["columns"];
+  return ordered.length ? ordered.slice(0, 5) : data.columns.slice(0, 5);
+}
+
+function pickDetailRows(data: ModuleData, limit = 15) {
+  // sort by valor desc if column exists
+  const hasValor = data.columns.some((c) => c.key === "valor");
+  const rows = hasValor
+    ? [...data.rows].sort((a, b) => Number(b.valor || 0) - Number(a.valor || 0))
+    : data.rows;
+  return rows.slice(0, limit);
+}
+
+function formatCell(c: ModuleData["columns"][number], v: any) {
+  if (v == null || v === "") return "—";
+  return c.format ? c.format(v) : String(v);
+}
 
 function whatsappText(mod: ModuleConfig, data: ModuleData, ai: any) {
   const lines: string[] = [];
@@ -697,6 +721,25 @@ function whatsappText(mod: ModuleConfig, data: ModuleData, ai: any) {
     ai.recomendacoes.forEach((r: string) => lines.push(`→ ${r}`));
     lines.push("");
   }
+  // Detalhes — descrição + categoria + valor
+  const rows = pickDetailRows(data, 10);
+  if (rows.length) {
+    lines.push("*Principais lançamentos*");
+    const cols = pickDetailColumns(data);
+    rows.forEach((r) => {
+      const nome = r.nome ?? r.titulo ?? r.produto ?? r.servico ?? r.objetivo ?? r.descricao ?? "—";
+      const cat = r.categoria ?? r.tipo ?? r.centro_custo ?? "";
+      const val =
+        r.valor != null ? fmtBRL(Number(r.valor))
+        : r.preco != null ? fmtBRL(Number(r.preco))
+        : r.investimento != null ? fmtBRL(Number(r.investimento))
+        : "";
+      const left = cat ? `${nome} _(${cat})_` : nome;
+      lines.push(val ? `• ${left} — *${val}*` : `• ${left}`);
+      void cols;
+    });
+    lines.push("");
+  }
   lines.push("_Gerado automaticamente pelo PXOne_");
   lines.push("━━━━━━━━━━━━━━━━━━");
   return lines.join("\n");
@@ -708,7 +751,6 @@ async function exportWhatsApp(mod: ModuleConfig, data: ModuleData, ai: any) {
     await navigator.clipboard.writeText(txt);
     toast.success("Relatório WhatsApp copiado para a área de transferência");
   } catch {
-    // fallback: open in a new window
     const w = window.open("", "_blank");
     if (w) { w.document.body.innerText = txt; }
     toast.message("Copie manualmente o texto exibido");
@@ -731,13 +773,11 @@ function exportCSV(mod: ModuleConfig, data: ModuleData) {
 
 function exportExcel(mod: ModuleConfig, data: ModuleData) {
   const wb = XLSX.utils.book_new();
-  // Sheet KPIs
   const kpiSheet = XLSX.utils.aoa_to_sheet([
     ["PXOne", mod.title], ["Gerado em", new Date().toLocaleString("pt-BR")], [],
     ["Indicador", "Valor"], ...data.kpis.map((k) => [k.label, k.value]),
   ]);
   XLSX.utils.book_append_sheet(wb, kpiSheet, "Indicadores");
-  // Sheet dados
   if (data.rows.length) {
     const headers = data.columns.map((c) => c.label);
     const body = data.rows.map((r) => data.columns.map((c) => {
@@ -756,7 +796,7 @@ async function exportPDF(mod: ModuleConfig, data: ModuleData, ai: any, kind: "re
   const H = doc.internal.pageSize.getHeight();
   const M = 40;
 
-  const brand = [16, 122, 87] as const; // sla
+  const brand = [16, 122, 87] as const;
   const fg = [20, 24, 28] as const;
   const muted = [110, 120, 130] as const;
 
@@ -831,8 +871,42 @@ async function exportPDF(mod: ModuleConfig, data: ModuleData, ai: any, kind: "re
     return y + 6;
   }
 
+  function detailsTable(yStart: number, limit = 15, landscape = false) {
+    const rows = pickDetailRows(data, limit);
+    if (!rows.length) return yStart;
+    const cols = pickDetailColumns(data);
+    const usableW = W - M * 2;
+    const colW = usableW / cols.length;
+    let ty = yStart;
+
+    doc.setFont("helvetica", "bold"); doc.setFontSize(11);
+    doc.setTextColor(fg[0], fg[1], fg[2]);
+    doc.text("Detalhamento (descrição e classificação)", M, ty);
+    ty += 12;
+
+    doc.setFillColor(245, 246, 248);
+    doc.rect(M, ty, usableW, 18, "F");
+    doc.setFont("helvetica", "bold"); doc.setFontSize(9);
+    doc.setTextColor(muted[0], muted[1], muted[2]);
+    cols.forEach((c, i) => doc.text(c.label, M + i * colW + 6, ty + 12));
+    ty += 22;
+
+    doc.setFont("helvetica", "normal"); doc.setFontSize(8);
+    doc.setTextColor(fg[0], fg[1], fg[2]);
+    const maxChars = landscape ? 32 : 22;
+    for (const r of rows) {
+      if (ty > H - 50) { doc.addPage(); header(mod.title, "Detalhamento (continuação)"); ty = 100; }
+      cols.forEach((c, j) => {
+        const txt = formatCell(c, r[c.key]);
+        const t = txt.length > maxChars ? txt.slice(0, maxChars - 1) + "…" : txt;
+        doc.text(t, M + j * colW + 6, ty);
+      });
+      ty += 14;
+    }
+    return ty + 8;
+  }
+
   if (kind === "slides") {
-    // Slide 1 — capa
     doc.setFillColor(brand[0], brand[1], brand[2]);
     doc.rect(0, 0, W, H, "F");
     doc.setTextColor(255, 255, 255);
@@ -843,19 +917,16 @@ async function exportPDF(mod: ModuleConfig, data: ModuleData, ai: any, kind: "re
     doc.setFont("helvetica", "normal"); doc.setFontSize(12);
     doc.text(`Apresentação Executiva • ${new Date().toLocaleDateString("pt-BR")}`, M, H / 2 + 30);
 
-    // Slide 2 — KPIs
     doc.addPage();
     header("Indicadores Principais", mod.title);
     kpiGrid(110);
     footer("2");
 
-    // Slide 3 — Resumo
     doc.addPage();
     header("Resumo Executivo", mod.title);
     writeWrapped(ai.resumo || "—", M, 110, W - M * 2, 16, 12);
     footer("3");
 
-    // Slide 4 — Destaques + Alertas
     doc.addPage();
     header("Destaques & Alertas", mod.title);
     let y = 110;
@@ -863,11 +934,15 @@ async function exportPDF(mod: ModuleConfig, data: ModuleData, ai: any, kind: "re
     y = section("Alertas", ai.alertas || [], y, [200, 130, 0]);
     footer("4");
 
-    // Slide 5 — Recomendações
     doc.addPage();
     header("Recomendações da IA", mod.title);
     section("Próximas ações priorizadas", ai.recomendacoes || [], 110, brand);
     footer("5");
+
+    doc.addPage();
+    header("Detalhamento", mod.title);
+    detailsTable(110, 20, true);
+    footer("6");
   } else if (kind === "resumo") {
     header(mod.title, "Resumo Executivo • PXOne");
     let y = kpiGrid(100);
@@ -875,9 +950,13 @@ async function exportPDF(mod: ModuleConfig, data: ModuleData, ai: any, kind: "re
     y = section("Destaques", (ai.destaques || []).slice(0, 4), y);
     y = section("Alertas", (ai.alertas || []).slice(0, 3), y, [200, 130, 0]);
     y = section("Recomendações", (ai.recomendacoes || []).slice(0, 4), y, brand);
-    footer("1/1");
+    if (y < H - 200) {
+      y = detailsTable(y + 4, 10);
+    } else {
+      doc.addPage(); header(mod.title, "Detalhamento"); detailsTable(100, 25);
+    }
+    footer();
   } else {
-    // completo
     header(mod.title, "Relatório Executivo Completo • PXOne");
     let y = kpiGrid(100);
     y = writeWrapped(ai.resumo || "—", M, y + 10, W - M * 2, 14, 10) + 10;
@@ -885,10 +964,13 @@ async function exportPDF(mod: ModuleConfig, data: ModuleData, ai: any, kind: "re
     y = section("Alertas", ai.alertas || [], y, [200, 130, 0]);
     y = section("Recomendações da IA", ai.recomendacoes || [], y, brand);
 
-    // tabela de dados
+    doc.addPage();
+    header("Detalhamento (descrição e classificação)", mod.title);
+    detailsTable(100, 40);
+
     if (data.rows.length && data.columns.length) {
       doc.addPage();
-      header("Dados detalhados", mod.title);
+      header("Dados completos", mod.title);
       const cols = data.columns.slice(0, 6);
       const colW = (W - M * 2) / cols.length;
       let ty = 100;
@@ -898,7 +980,7 @@ async function exportPDF(mod: ModuleConfig, data: ModuleData, ai: any, kind: "re
       cols.forEach((c, i) => doc.text(c.label, M + i * colW + 6, ty));
       ty += 12;
       doc.setFont("helvetica", "normal"); doc.setFontSize(8);
-      const max = Math.min(data.rows.length, 40);
+      const max = Math.min(data.rows.length, 60);
       for (let i = 0; i < max; i++) {
         const r = data.rows[i];
         if (ty > H - 60) { doc.addPage(); header(mod.title, "Dados (continuação)"); ty = 100; }
@@ -910,95 +992,264 @@ async function exportPDF(mod: ModuleConfig, data: ModuleData, ai: any, kind: "re
         });
         ty += 14;
       }
-      footer();
     }
+    footer();
   }
   doc.save(`pxone-${mod.key}-${kind}-${stamp()}.pdf`);
 }
 
+// ────────────────────────────────────────────────────────────────────────────
+// Native Canvas image renderer (avoids html2canvas oklch issue)
+// ────────────────────────────────────────────────────────────────────────────
+
 async function exportImage(mod: ModuleConfig, data: ModuleData, ai: any, kind: "infografico" | "dashboard") {
-  // Render a hidden div, then html2canvas → PNG
-  const host = document.createElement("div");
-  host.style.position = "fixed";
-  host.style.left = "-10000px";
-  host.style.top = "0";
-  host.style.width = kind === "infografico" ? "900px" : "1200px";
-  host.style.background = "#0b0e14";
-  host.style.color = "#e6e8eb";
-  host.style.fontFamily = "Inter, system-ui, sans-serif";
-  host.innerHTML = renderHtml(mod, data, ai, kind);
-  document.body.appendChild(host);
-  try {
-    const canvas = await html2canvas(host, { backgroundColor: "#0b0e14", scale: 2 });
-    const url = canvas.toDataURL("image/png");
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `pxone-${mod.key}-${kind}-${stamp()}.png`;
-    a.click();
-  } finally {
-    document.body.removeChild(host);
+  const W = kind === "infografico" ? 1080 : 1400;
+  const palette = {
+    bg: "#0b0e14",
+    card: "#141923",
+    border: "#1f2630",
+    text: "#e6e8eb",
+    muted: "#7b8595",
+    brand: "#3ddc97",
+    warn: "#e0a020",
+    danger: "#e05a5a",
+    info: "#5aa3ff",
+  };
+
+  // pre-measure to compute height
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d")!;
+  const dpr = 2;
+
+  // helpers
+  function setFont(size: number, weight: "normal" | "bold" = "normal") {
+    ctx.font = `${weight} ${size}px Inter, system-ui, -apple-system, Segoe UI, sans-serif`;
   }
-}
-
-function renderHtml(mod: ModuleConfig, data: ModuleData, ai: any, kind: "infografico" | "dashboard") {
-  const kpisHtml = data.kpis.map((k) => `
-    <div style="background:#141923;border:1px solid #1f2630;border-radius:12px;padding:18px 20px;">
-      <div style="font-size:11px;color:#7b8595;text-transform:uppercase;letter-spacing:.08em">${escape(k.label)}</div>
-      <div style="font-size:26px;font-weight:600;margin-top:8px;color:${k.tone === "warning" ? "#e0a020" : k.tone === "danger" ? "#e05a5a" : k.tone === "brand" ? "#3ddc97" : "#fff"}">${escape(k.value)}</div>
-    </div>`).join("");
-
-  const list = (items: string[], color: string) => items.length
-    ? `<ul style="list-style:none;padding:0;margin:8px 0 0 0">${items.map((i) =>
-        `<li style="padding:6px 0;border-bottom:1px solid #1f2630;font-size:14px"><span style="color:${color};margin-right:8px">●</span>${escape(i)}</li>`).join("")}</ul>` : "";
-
-  if (kind === "infografico") {
-    return `
-      <div style="padding:40px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
-          <div>
-            <div style="font-size:11px;color:#7b8595;letter-spacing:.2em">PXONE • RELATÓRIO EXECUTIVO</div>
-            <div style="font-size:30px;font-weight:600;margin-top:4px">${escape(mod.title)}</div>
-          </div>
-          <div style="font-size:12px;color:#7b8595">${new Date().toLocaleDateString("pt-BR")}</div>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(${Math.min(data.kpis.length, 4) || 1},1fr);gap:14px;margin-bottom:24px">${kpisHtml}</div>
-        <div style="background:#141923;border:1px solid #1f2630;border-radius:12px;padding:20px">
-          <div style="font-size:12px;color:#7b8595;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Análise IA</div>
-          <p style="font-size:15px;line-height:1.6;margin:0">${escape(ai.resumo || "—")}</p>
-          ${ai.destaques?.length ? `<div style="margin-top:14px"><div style="font-size:12px;color:#7b8595;text-transform:uppercase;letter-spacing:.08em">Destaques</div>${list(ai.destaques.slice(0,4), "#3ddc97")}</div>` : ""}
-          ${ai.alertas?.length ? `<div style="margin-top:14px"><div style="font-size:12px;color:#7b8595;text-transform:uppercase;letter-spacing:.08em">Alertas</div>${list(ai.alertas.slice(0,3), "#e0a020")}</div>` : ""}
-          ${ai.recomendacoes?.length ? `<div style="margin-top:14px"><div style="font-size:12px;color:#7b8595;text-transform:uppercase;letter-spacing:.08em">Recomendações</div>${list(ai.recomendacoes.slice(0,4), "#5aa3ff")}</div>` : ""}
-        </div>
-        <div style="margin-top:24px;text-align:center;font-size:11px;color:#7b8595">Gerado automaticamente pelo PXOne</div>
-      </div>`;
+  function wrap(text: string, maxW: number, size: number, weight: "normal" | "bold" = "normal") {
+    setFont(size, weight);
+    const words = String(text || "").split(/\s+/);
+    const lines: string[] = [];
+    let cur = "";
+    for (const w of words) {
+      const test = cur ? cur + " " + w : w;
+      if (ctx.measureText(test).width > maxW) {
+        if (cur) lines.push(cur);
+        cur = w;
+      } else cur = test;
+    }
+    if (cur) lines.push(cur);
+    return lines;
   }
-  // dashboard
-  return `
-    <div style="padding:50px">
-      <div style="font-size:11px;color:#7b8595;letter-spacing:.2em">DASHBOARD EXECUTIVO</div>
-      <div style="font-size:42px;font-weight:700;margin:6px 0 30px">${escape(mod.title)}</div>
-      <div style="display:grid;grid-template-columns:repeat(${Math.min(data.kpis.length, 4) || 1},1fr);gap:18px;margin-bottom:30px">${kpisHtml}</div>
-      <div style="background:#141923;border:1px solid #1f2630;border-radius:14px;padding:30px">
-        <div style="font-size:13px;color:#7b8595;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px">Resumo IA</div>
-        <p style="font-size:18px;line-height:1.6;margin:0">${escape(ai.resumo || "—")}</p>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px">
-        <div style="background:#141923;border:1px solid #1f2630;border-radius:14px;padding:24px">
-          <div style="font-size:12px;color:#7b8595;text-transform:uppercase;letter-spacing:.1em">Destaques</div>${list(ai.destaques || [], "#3ddc97")}
-        </div>
-        <div style="background:#141923;border:1px solid #1f2630;border-radius:14px;padding:24px">
-          <div style="font-size:12px;color:#7b8595;text-transform:uppercase;letter-spacing:.1em">Recomendações</div>${list(ai.recomendacoes || [], "#5aa3ff")}
-        </div>
-      </div>
-      <div style="margin-top:28px;text-align:right;font-size:11px;color:#7b8595">PXOne • ${new Date().toLocaleString("pt-BR")}</div>
-    </div>`;
+  function roundRect(x: number, y: number, w: number, h: number, r: number) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  // Build a logical layout description, compute total height
+  const pad = 50;
+  const kpis = data.kpis;
+  const cols = Math.min(4, Math.max(1, kpis.length));
+  const kpiW = (W - pad * 2 - (cols - 1) * 16) / cols;
+  const kpiH = 110;
+  const kpiRows = Math.ceil(kpis.length / cols);
+
+  const details = pickDetailRows(data, kind === "infografico" ? 8 : 12);
+  const detailCols = pickDetailColumns(data);
+
+  // estimate height
+  let H = pad;
+  H += 90; // header
+  H += kpiRows * (kpiH + 16) + 8;
+
+  // resume card
+  const resumeWidth = W - pad * 2 - 40;
+  const resumeLines = wrap(ai.resumo || "—", resumeWidth, 18);
+  const resumeH = 60 + resumeLines.length * 26 + 20;
+  H += resumeH + 20;
+
+  // destaques / recomendacoes card
+  const colW = (W - pad * 2 - 16) / 2;
+  const innerW = colW - 40;
+  const dList = (ai.destaques || []).slice(0, 5);
+  const rList = (ai.recomendacoes || []).slice(0, 5);
+  const aList = (ai.alertas || []).slice(0, 4);
+  function listH(items: string[]) {
+    let h = 60;
+    items.forEach((it) => { h += wrap(it, innerW - 20, 15).length * 22 + 6; });
+    return h + 20;
+  }
+  const lh = Math.max(listH(dList), listH(rList));
+  H += lh + 20;
+  if (aList.length) H += listH(aList) + 20;
+
+  // details table
+  H += 60 + details.length * 32 + 30;
+
+  // footer
+  H += 40 + pad;
+
+  // setup canvas
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width = W + "px";
+  canvas.style.height = H + "px";
+  ctx.scale(dpr, dpr);
+
+  // bg
+  ctx.fillStyle = palette.bg;
+  ctx.fillRect(0, 0, W, H);
+
+  let y = pad;
+
+  // header
+  ctx.fillStyle = palette.muted;
+  setFont(12, "normal");
+  ctx.fillText(`PXONE • ${kind === "infografico" ? "INFOGRÁFICO EXECUTIVO" : "DASHBOARD EXECUTIVO"}`, pad, y + 14);
+  ctx.fillStyle = palette.text;
+  setFont(34, "bold");
+  ctx.fillText(mod.title, pad, y + 50);
+  ctx.fillStyle = palette.muted;
+  setFont(13, "normal");
+  const dateStr = new Date().toLocaleDateString("pt-BR");
+  const dateW = ctx.measureText(dateStr).width;
+  ctx.fillText(dateStr, W - pad - dateW, y + 50);
+  y += 90;
+
+  // KPIs
+  kpis.forEach((k, i) => {
+    const col = i % cols;
+    const row = Math.floor(i / cols);
+    const x = pad + col * (kpiW + 16);
+    const ky = y + row * (kpiH + 16);
+    ctx.fillStyle = palette.card;
+    roundRect(x, ky, kpiW, kpiH, 14); ctx.fill();
+    ctx.strokeStyle = palette.border; ctx.lineWidth = 1;
+    roundRect(x, ky, kpiW, kpiH, 14); ctx.stroke();
+    ctx.fillStyle = palette.muted;
+    setFont(12, "normal");
+    ctx.fillText(k.label.toUpperCase(), x + 20, ky + 30);
+    const tone = k.tone === "warning" ? palette.warn : k.tone === "danger" ? palette.danger : k.tone === "brand" ? palette.brand : palette.text;
+    ctx.fillStyle = tone;
+    setFont(30, "bold");
+    ctx.fillText(k.value, x + 20, ky + 78);
+  });
+  y += kpiRows * (kpiH + 16) + 8;
+
+  // Resumo card
+  ctx.fillStyle = palette.card;
+  roundRect(pad, y, W - pad * 2, resumeH, 14); ctx.fill();
+  ctx.strokeStyle = palette.border; roundRect(pad, y, W - pad * 2, resumeH, 14); ctx.stroke();
+  ctx.fillStyle = palette.muted;
+  setFont(12, "bold");
+  ctx.fillText("ANÁLISE IA — RESUMO EXECUTIVO", pad + 20, y + 30);
+  ctx.fillStyle = palette.text;
+  setFont(18, "normal");
+  resumeLines.forEach((ln, i) => ctx.fillText(ln, pad + 20, y + 60 + i * 26));
+  y += resumeH + 20;
+
+  // Two-column lists: destaques + recomendações
+  function drawList(x: number, y0: number, w: number, title: string, items: string[], color: string) {
+    ctx.fillStyle = palette.card;
+    roundRect(x, y0, w, lh, 14); ctx.fill();
+    ctx.strokeStyle = palette.border; roundRect(x, y0, w, lh, 14); ctx.stroke();
+    ctx.fillStyle = palette.muted;
+    setFont(12, "bold");
+    ctx.fillText(title, x + 20, y0 + 30);
+    let yy = y0 + 55;
+    items.forEach((it) => {
+      ctx.fillStyle = color;
+      ctx.beginPath(); ctx.arc(x + 24, yy - 5, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = palette.text;
+      setFont(15, "normal");
+      const lines = wrap(it, w - 50, 15);
+      lines.forEach((ln, i) => ctx.fillText(ln, x + 38, yy + i * 22));
+      yy += lines.length * 22 + 6;
+    });
+  }
+  drawList(pad, y, colW, "DESTAQUES", dList, palette.brand);
+  drawList(pad + colW + 16, y, colW, "RECOMENDAÇÕES", rList, palette.info);
+  y += lh + 20;
+
+  // Alertas (full width)
+  if (aList.length) {
+    const ah = listH(aList);
+    ctx.fillStyle = palette.card;
+    roundRect(pad, y, W - pad * 2, ah, 14); ctx.fill();
+    ctx.strokeStyle = palette.border; roundRect(pad, y, W - pad * 2, ah, 14); ctx.stroke();
+    ctx.fillStyle = palette.muted;
+    setFont(12, "bold");
+    ctx.fillText("ALERTAS", pad + 20, y + 30);
+    let yy = y + 55;
+    aList.forEach((it) => {
+      ctx.fillStyle = palette.warn;
+      ctx.fillText("⚠", pad + 20, yy + 2);
+      ctx.fillStyle = palette.text;
+      setFont(15, "normal");
+      const lines = wrap(it, W - pad * 2 - 60, 15);
+      lines.forEach((ln, i) => ctx.fillText(ln, pad + 44, yy + i * 22));
+      yy += lines.length * 22 + 6;
+    });
+    y += ah + 20;
+  }
+
+  // Details table — Descrição + Classificação
+  const tableH = 60 + details.length * 32 + 20;
+  ctx.fillStyle = palette.card;
+  roundRect(pad, y, W - pad * 2, tableH, 14); ctx.fill();
+  ctx.strokeStyle = palette.border; roundRect(pad, y, W - pad * 2, tableH, 14); ctx.stroke();
+  ctx.fillStyle = palette.muted;
+  setFont(12, "bold");
+  ctx.fillText("DETALHAMENTO — DESCRIÇÃO E CLASSIFICAÇÃO", pad + 20, y + 30);
+
+  const tcols = detailCols;
+  const usableW = W - pad * 2 - 40;
+  const tcolW = usableW / tcols.length;
+  setFont(11, "bold");
+  ctx.fillStyle = palette.muted;
+  tcols.forEach((c, i) => ctx.fillText(c.label.toUpperCase(), pad + 20 + i * tcolW, y + 56));
+  ctx.strokeStyle = palette.border; ctx.beginPath();
+  ctx.moveTo(pad + 20, y + 64); ctx.lineTo(W - pad - 20, y + 64); ctx.stroke();
+
+  let ry = y + 86;
+  setFont(13, "normal");
+  details.forEach((r, idx) => {
+    if (idx % 2 === 1) {
+      ctx.fillStyle = "#10141c";
+      ctx.fillRect(pad + 12, ry - 18, W - pad * 2 - 24, 26);
+    }
+    tcols.forEach((c, i) => {
+      const txt = formatCell(c, r[c.key]);
+      ctx.fillStyle = c.key === "valor" ? palette.brand : palette.text;
+      const maxW = tcolW - 12;
+      let t = txt;
+      while (ctx.measureText(t).width > maxW && t.length > 3) t = t.slice(0, -2) + "…";
+      ctx.fillText(t, pad + 20 + i * tcolW, ry);
+    });
+    ry += 32;
+  });
+  y += tableH + 20;
+
+  // footer
+  ctx.fillStyle = palette.muted;
+  setFont(11, "normal");
+  ctx.fillText("Gerado automaticamente pelo PXOne", pad, y + 20);
+  const stampStr = new Date().toLocaleString("pt-BR");
+  const sw = ctx.measureText(stampStr).width;
+  ctx.fillText(stampStr, W - pad - sw, y + 20);
+
+  // Save PNG
+  const url = canvas.toDataURL("image/png");
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `pxone-${mod.key}-${kind}-${stamp()}.png`;
+  a.click();
 }
 
-function escape(s: any) {
-  return String(s ?? "")
-    .replaceAll("&", "&amp;").replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;").replaceAll('"', "&quot;");
-}
 
 function stamp() {
   const d = new Date();
