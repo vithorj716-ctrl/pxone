@@ -5,6 +5,7 @@ import {
   Users, Sparkles, Goal, Rocket, FileText, Clock, Wallet, Building2,
   PanelLeftClose, PanelLeftOpen, Search, Tag,
 } from "lucide-react";
+import { ExportButton } from "@/components/executive-share";
 
 const navGroups = [
   {
@@ -212,11 +213,11 @@ export function AppShell({ children, title, subtitle, rightPanel, headerActions 
               <Search className="size-3.5" /> Buscar
               <kbd className="ml-2 px-1.5 py-0.5 rounded bg-surface-2 text-[10px] font-mono">⌘K</kbd>
             </button>
-            {headerActions ?? (
-              <span className="text-[11px] text-muted-foreground tabular-nums">
-                <span className="size-1.5 rounded-full bg-brand inline-block mr-1.5 animate-pulse-glow" /> {now}
-              </span>
-            )}
+            {headerActions}
+            <ExportButton />
+            <span className="text-[11px] text-muted-foreground tabular-nums hidden md:inline">
+              <span className="size-1.5 rounded-full bg-brand inline-block mr-1.5 animate-pulse-glow" /> {now}
+            </span>
           </div>
         </header>
         <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-6 animate-fade-in">{children}</div>
