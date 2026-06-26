@@ -417,13 +417,13 @@ const MODULES: Record<string, ModuleConfig> = {
     fetch: async () => {
       const { data } = await supabase.from("timeline_events").select("*").order("data_evento", { ascending: false }).limit(300);
       const rows = (data ?? []).map((e: any) => ({
-        titulo: e.titulo, tipo: e.tipo, data: e.data_evento, status: e.status,
+        titulo: e.titulo ?? "—", tipo: e.tipo ?? "—", data: e.data_evento,
       }));
       return {
         rows,
         columns: [
           { key: "data", label: "Data", format: fmtDate }, { key: "titulo", label: "Evento" },
-          { key: "tipo", label: "Tipo" }, { key: "status", label: "Status" },
+          { key: "tipo", label: "Tipo" },
         ],
         kpis: [{ label: "Eventos", value: fmtNum(rows.length) }],
         aggregates: { total: rows.length, eventos: rows.slice(0, 20) },
@@ -435,20 +435,34 @@ const MODULES: Record<string, ModuleConfig> = {
     fetch: async () => {
       const { data } = await supabase.from("business_plans").select("*").limit(50);
       const rows = (data ?? []).map((b: any) => ({
-        nome: b.nome, ano: b.ano, status: b.status, meta_receita: Number(b.meta_receita || 0),
+        titulo: b.titulo ?? "—",
+        horizonte: b.horizonte ?? "—",
+        ano_inicio: b.ano_inicio ?? "—",
+        meta_receita: Number(b.meta_receita || 0),
+        meta_ebitda: Number(b.meta_ebitda || 0),
+        meta_valuation: Number(b.meta_valuation || 0),
+        progresso: Number(b.progresso || 0),
+        status: b.status ?? "—",
       }));
-      const meta = rows.reduce((s, r) => s + r.meta_receita, 0);
+      const metaR = rows.reduce((s, r) => s + r.meta_receita, 0);
+      const metaE = rows.reduce((s, r) => s + r.meta_ebitda, 0);
       return {
         rows,
         columns: [
-          { key: "nome", label: "Plano" }, { key: "ano", label: "Ano" },
-          { key: "meta_receita", label: "Meta Receita", format: fmtBRL }, { key: "status", label: "Status" },
+          { key: "titulo", label: "Plano" },
+          { key: "horizonte", label: "Horizonte" },
+          { key: "ano_inicio", label: "Início" },
+          { key: "meta_receita", label: "Meta Receita", format: fmtBRL },
+          { key: "meta_ebitda", label: "Meta EBITDA", format: fmtBRL },
+          { key: "progresso", label: "Progresso", format: fmtPct },
+          { key: "status", label: "Status" },
         ],
         kpis: [
           { label: "Planos", value: fmtNum(rows.length) },
-          { label: "Meta total", value: fmtBRL(meta), tone: "brand" },
+          { label: "Meta Receita total", value: fmtBRL(metaR), tone: "brand" },
+          { label: "Meta EBITDA total", value: fmtBRL(metaE) },
         ],
-        aggregates: { qtd: rows.length, meta_total: meta, planos: rows },
+        aggregates: { qtd: rows.length, meta_receita_total: metaR, meta_ebitda_total: metaE, planos: rows },
       };
     },
   },
