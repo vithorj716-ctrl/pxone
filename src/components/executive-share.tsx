@@ -727,8 +727,8 @@ function whatsappText(mod: ModuleConfig, data: ModuleData, ai: any) {
     lines.push("*Principais lançamentos*");
     const cols = pickDetailColumns(data);
     rows.forEach((r) => {
-      const nome = r.nome ?? r.titulo ?? r.produto ?? r.servico ?? r.objetivo ?? r.descricao ?? "—";
-      const cat = r.categoria ?? r.tipo ?? r.centro_custo ?? "";
+      const nome = r.nome ?? r.titulo ?? r.produto ?? r.servico ?? r.objetivo ?? r.descricao ?? r.metodologia ?? r.codigo ?? "—";
+      const cat = r.categoria ?? r.tipo ?? r.centro_custo ?? r.empresa ?? r.trimestre ?? "";
       const val =
         r.valor != null ? fmtBRL(Number(r.valor))
         : r.preco != null ? fmtBRL(Number(r.preco))
