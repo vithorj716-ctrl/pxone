@@ -8,7 +8,6 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
 import * as XLSX from "xlsx";
 import { supabase } from "@/integrations/supabase/client";
 import { generateExecutiveSummary } from "@/lib/executive-share.functions";
