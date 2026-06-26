@@ -60,7 +60,6 @@ interface AppShellProps {
 
 export function AppShell({ children, title, subtitle, rightPanel, headerActions }: AppShellProps) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const [email, setEmail] = useState<string | null>(null);
   const [collapsed, setCollapsed] = useState(false);
   const [now, setNow] = useState("");
   const [showSearch, setShowSearch] = useState(false);
@@ -68,7 +67,6 @@ export function AppShell({ children, title, subtitle, rightPanel, headerActions 
   const navigate = useNavigate();
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? null));
     try {
       const saved = localStorage.getItem("pxone:sidebar-collapsed");
       if (saved === "1") setCollapsed(true);
