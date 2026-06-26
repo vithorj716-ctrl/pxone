@@ -511,6 +511,71 @@ export type Database = {
           },
         ]
       }
+      markup_calculations: {
+        Row: {
+          categoria: string | null
+          centro_custo: string | null
+          created_at: string
+          descricao: string | null
+          empresa_id: string | null
+          fornecedor: string | null
+          id: string
+          inputs: Json
+          lucro_desejado: number | null
+          margem_desejada: number | null
+          preco_sugerido: number | null
+          produto: string
+          resultados: Json
+          servico: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          categoria?: string | null
+          centro_custo?: string | null
+          created_at?: string
+          descricao?: string | null
+          empresa_id?: string | null
+          fornecedor?: string | null
+          id?: string
+          inputs?: Json
+          lucro_desejado?: number | null
+          margem_desejada?: number | null
+          preco_sugerido?: number | null
+          produto: string
+          resultados?: Json
+          servico?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          categoria?: string | null
+          centro_custo?: string | null
+          created_at?: string
+          descricao?: string | null
+          empresa_id?: string | null
+          fornecedor?: string | null
+          id?: string
+          inputs?: Json
+          lucro_desejado?: number | null
+          margem_desejada?: number | null
+          preco_sugerido?: number | null
+          produto?: string
+          resultados?: Json
+          servico?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "markup_calculations_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       okrs: {
         Row: {
           created_at: string

@@ -3,7 +3,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import {
   LayoutDashboard, Target, Calculator, TrendingUp, Gavel, ShieldAlert,
   Users, Sparkles, Goal, Rocket, FileText, Clock, LogOut, Wallet, Building2,
-  PanelLeftClose, PanelLeftOpen, Search,
+  PanelLeftClose, PanelLeftOpen, Search, Tag,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -23,6 +23,7 @@ const navGroups = [
     items: [
       { to: "/empresas", label: "Empresas", icon: Building2 },
       { to: "/custos", label: "Central de Custos", icon: Wallet },
+      { to: "/markup", label: "Markup Engine", icon: Tag },
     ],
   },
   {
