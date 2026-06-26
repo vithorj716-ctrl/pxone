@@ -200,24 +200,33 @@ const MODULES: Record<string, ModuleConfig> = {
     fetch: async () => {
       const { data } = await supabase.from("valuation_models").select("*").limit(200);
       const rows = (data ?? []).map((v: any) => ({
-        nome: v.nome, metodo: v.metodo, valor: Number(v.valor_calculado || 0),
-        ebitda: Number(v.ebitda || 0), multiplo: Number(v.multiplo || 0),
+        metodologia: v.metodologia ?? "—",
+        valor: Number(v.valor_calculado || 0),
+        ebitda: Number(v.ebitda || 0),
+        multiplo: Number(v.multiplo || 0),
+        wacc: Number(v.wacc || 0),
+        ano_base: v.ano_base ?? "—",
         data: v.created_at,
       }));
       const total = rows.reduce((s, r) => s + r.valor, 0);
+      const avg = rows.length ? total / rows.length : 0;
       return {
         rows,
         columns: [
-          { key: "nome", label: "Modelo" }, { key: "metodo", label: "Método" },
-          { key: "valor", label: "Valor", format: fmtBRL }, { key: "ebitda", label: "EBITDA", format: fmtBRL },
+          { key: "metodologia", label: "Metodologia" },
+          { key: "valor", label: "Valor", format: fmtBRL },
+          { key: "ebitda", label: "EBITDA", format: fmtBRL },
           { key: "multiplo", label: "Múltiplo", format: (v) => `${Number(v).toFixed(1)}x` },
-          { key: "data", label: "Data", format: fmtDate },
+          { key: "wacc", label: "WACC", format: fmtPct },
+          { key: "ano_base", label: "Ano base" },
+          { key: "data", label: "Criado", format: fmtDate },
         ],
         kpis: [
           { label: "Modelos", value: fmtNum(rows.length) },
           { label: "Valor Total", value: fmtBRL(total), tone: "brand" },
+          { label: "Valor Médio", value: fmtBRL(avg) },
         ],
-        aggregates: { qtd: rows.length, valor_total: total, modelos: rows.slice(0, 10) },
+        aggregates: { qtd: rows.length, valor_total: total, valor_medio: avg, modelos: rows.slice(0, 10) },
       };
     },
   },
@@ -227,9 +236,12 @@ const MODULES: Record<string, ModuleConfig> = {
     fetch: async () => {
       const { data } = await supabase.from("payback_projects").select("*").limit(300);
       const rows = (data ?? []).map((p: any) => ({
-        nome: p.nome, investimento: Number(p.investimento_inicial || 0),
+        nome: p.nome ?? "—",
+        investimento: Number(p.investimento_inicial || 0),
         retorno_mensal: Number(p.retorno_mensal || 0),
-        payback_meses: Number(p.payback_meses || 0), status: p.status,
+        prazo_meses: Number(p.prazo_meses || 0),
+        taxa: Number(p.taxa_desconto || 0),
+        status: p.status ?? "—",
       }));
       const invest = rows.reduce((s, r) => s + r.investimento, 0);
       const retorno = rows.reduce((s, r) => s + r.retorno_mensal, 0);
@@ -239,7 +251,8 @@ const MODULES: Record<string, ModuleConfig> = {
           { key: "nome", label: "Projeto" },
           { key: "investimento", label: "Investimento", format: fmtBRL },
           { key: "retorno_mensal", label: "Retorno/mês", format: fmtBRL },
-          { key: "payback_meses", label: "Payback (meses)", format: (v) => `${v} m` },
+          { key: "prazo_meses", label: "Prazo (meses)", format: (v) => `${v} m` },
+          { key: "taxa", label: "Taxa desconto", format: fmtPct },
           { key: "status", label: "Status" },
         ],
         kpis: [
@@ -257,22 +270,26 @@ const MODULES: Record<string, ModuleConfig> = {
     fetch: async () => {
       const { data } = await supabase.from("risks").select("*").limit(300);
       const rows = (data ?? []).map((r: any) => ({
-        nome: r.nome, categoria: r.categoria ?? "—", probabilidade: r.probabilidade,
-        impacto: r.impacto, severidade: r.severidade, status: r.status,
+        titulo: r.titulo ?? "—",
+        categoria: r.categoria ?? "—",
+        probabilidade: r.probabilidade ?? "—",
+        impacto: r.impacto ?? "—",
+        status: r.status ?? "—",
+        responsavel: r.responsavel ?? "—",
       }));
-      const altos = rows.filter((r) => r.severidade === "alto" || r.severidade === "critico").length;
+      const altos = rows.filter((r) => String(r.impacto).toLowerCase().includes("alt") || String(r.impacto).toLowerCase().includes("crit")).length;
       return {
         rows,
         columns: [
-          { key: "nome", label: "Risco" }, { key: "categoria", label: "Categoria" },
+          { key: "titulo", label: "Risco" }, { key: "categoria", label: "Categoria" },
           { key: "probabilidade", label: "Probabilidade" }, { key: "impacto", label: "Impacto" },
-          { key: "severidade", label: "Severidade" }, { key: "status", label: "Status" },
+          { key: "responsavel", label: "Responsável" }, { key: "status", label: "Status" },
         ],
         kpis: [
           { label: "Riscos mapeados", value: fmtNum(rows.length) },
-          { label: "Críticos/Altos", value: fmtNum(altos), tone: altos > 0 ? "danger" : "brand" },
+          { label: "Alto impacto", value: fmtNum(altos), tone: altos > 0 ? "danger" : "brand" },
         ],
-        aggregates: { total: rows.length, criticos: altos, riscos: rows.slice(0, 20) },
+        aggregates: { total: rows.length, alto_impacto: altos, riscos: rows.slice(0, 20) },
       };
     },
   },
@@ -285,21 +302,26 @@ const MODULES: Record<string, ModuleConfig> = {
         supabase.from("key_results").select("*").limit(500),
       ]);
       const rows = (okrs ?? []).map((o: any) => ({
-        objetivo: o.objetivo, ciclo: o.ciclo, status: o.status, progresso: Number(o.progresso || 0),
+        objetivo: o.objetivo ?? "—",
+        trimestre: o.trimestre ?? "—",
+        responsavel: o.responsavel ?? "—",
+        progresso: Number(o.progresso || 0),
       }));
       const avgProg = rows.length ? rows.reduce((s, r) => s + r.progresso, 0) / rows.length : 0;
       return {
         rows,
         columns: [
-          { key: "objetivo", label: "Objetivo" }, { key: "ciclo", label: "Ciclo" },
-          { key: "progresso", label: "Progresso", format: fmtPct }, { key: "status", label: "Status" },
+          { key: "objetivo", label: "Objetivo" },
+          { key: "trimestre", label: "Trimestre" },
+          { key: "responsavel", label: "Responsável" },
+          { key: "progresso", label: "Progresso", format: fmtPct },
         ],
         kpis: [
           { label: "OKRs", value: fmtNum(rows.length) },
           { label: "Key Results", value: fmtNum(krs?.length ?? 0) },
           { label: "Progresso médio", value: fmtPct(avgProg), tone: avgProg >= 70 ? "brand" : "warning" },
         ],
-        aggregates: { total_okrs: rows.length, total_krs: krs?.length ?? 0, progresso_medio: avgProg },
+        aggregates: { total_okrs: rows.length, total_krs: krs?.length ?? 0, progresso_medio: avgProg, okrs: rows.slice(0, 10) },
       };
     },
   },
@@ -308,22 +330,30 @@ const MODULES: Record<string, ModuleConfig> = {
     fetch: async () => {
       const { data } = await supabase.from("growth_initiatives").select("*").limit(300);
       const rows = (data ?? []).map((g: any) => ({
-        nome: g.nome, categoria: g.categoria ?? "—", impacto_estimado: Number(g.impacto_estimado || 0),
-        status: g.status, prazo: g.prazo,
+        titulo: g.titulo ?? "—",
+        tipo: g.tipo ?? "—",
+        investimento: Number(g.investimento || 0),
+        retorno: Number(g.retorno_projetado || 0),
+        prazo_meses: Number(g.prazo_meses || 0),
+        status: g.status ?? "—",
       }));
-      const impacto = rows.reduce((s, r) => s + r.impacto_estimado, 0);
+      const inv = rows.reduce((s, r) => s + r.investimento, 0);
+      const ret = rows.reduce((s, r) => s + r.retorno, 0);
       return {
         rows,
         columns: [
-          { key: "nome", label: "Iniciativa" }, { key: "categoria", label: "Categoria" },
-          { key: "impacto_estimado", label: "Impacto", format: fmtBRL }, { key: "status", label: "Status" },
-          { key: "prazo", label: "Prazo", format: fmtDate },
+          { key: "titulo", label: "Iniciativa" }, { key: "tipo", label: "Tipo" },
+          { key: "investimento", label: "Investimento", format: fmtBRL },
+          { key: "retorno", label: "Retorno projetado", format: fmtBRL },
+          { key: "prazo_meses", label: "Prazo", format: (v) => `${v} m` },
+          { key: "status", label: "Status" },
         ],
         kpis: [
           { label: "Iniciativas", value: fmtNum(rows.length) },
-          { label: "Impacto estimado", value: fmtBRL(impacto), tone: "brand" },
+          { label: "Investimento", value: fmtBRL(inv), tone: "warning" },
+          { label: "Retorno projetado", value: fmtBRL(ret), tone: "brand" },
         ],
-        aggregates: { qtd: rows.length, impacto_total: impacto, iniciativas: rows.slice(0, 10) },
+        aggregates: { qtd: rows.length, investimento_total: inv, retorno_total: ret, iniciativas: rows.slice(0, 10) },
       };
     },
   },
@@ -350,13 +380,16 @@ const MODULES: Record<string, ModuleConfig> = {
     fetch: async () => {
       const { data } = await supabase.from("investor_updates").select("*").order("created_at", { ascending: false }).limit(100);
       const rows = (data ?? []).map((i: any) => ({
-        titulo: i.titulo, periodo: i.periodo, status: i.status, data: i.created_at,
+        titulo: i.titulo ?? "—",
+        periodo: i.periodo ?? "—",
+        autor: i.autor ?? "—",
+        data: i.created_at,
       }));
       return {
         rows,
         columns: [
           { key: "titulo", label: "Update" }, { key: "periodo", label: "Período" },
-          { key: "status", label: "Status" }, { key: "data", label: "Data", format: fmtDate },
+          { key: "autor", label: "Autor" }, { key: "data", label: "Data", format: fmtDate },
         ],
         kpis: [{ label: "Updates", value: fmtNum(rows.length) }],
         aggregates: { total: rows.length, updates: rows.slice(0, 10) },
