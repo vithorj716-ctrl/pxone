@@ -2,10 +2,9 @@ import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import {
   LayoutDashboard, Target, Calculator, TrendingUp, Gavel, ShieldAlert,
-  Users, Sparkles, Goal, Rocket, FileText, Clock, LogOut, Wallet, Building2,
+  Users, Sparkles, Goal, Rocket, FileText, Clock, Wallet, Building2,
   PanelLeftClose, PanelLeftOpen, Search, Tag,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 
 const navGroups = [
   {
@@ -60,7 +59,6 @@ interface AppShellProps {
 
 export function AppShell({ children, title, subtitle, rightPanel, headerActions }: AppShellProps) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const [email, setEmail] = useState<string | null>(null);
   const [collapsed, setCollapsed] = useState(false);
   const [now, setNow] = useState("");
   const [showSearch, setShowSearch] = useState(false);
@@ -68,7 +66,6 @@ export function AppShell({ children, title, subtitle, rightPanel, headerActions 
   const navigate = useNavigate();
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? null));
     try {
       const saved = localStorage.getItem("pxone:sidebar-collapsed");
       if (saved === "1") setCollapsed(true);
@@ -104,10 +101,8 @@ export function AppShell({ children, title, subtitle, rightPanel, headerActions 
   const isActive = (to: string, exact?: boolean) =>
     exact ? pathname === to : pathname === to || pathname.startsWith(to + "/");
 
-  async function signOut() {
-    await supabase.auth.signOut();
-    navigate({ to: "/auth", replace: true });
-  }
+
+
 
   const filteredLinks = search.trim()
     ? ALL_LINKS.filter((l) => l.label.toLowerCase().includes(search.toLowerCase()))
@@ -184,24 +179,13 @@ export function AppShell({ children, title, subtitle, rightPanel, headerActions 
         <div className="p-3 border-t border-border">
           <div className={`flex items-center gap-2 p-2 rounded-lg bg-surface/60 ring-1 ring-border ${collapsed ? "justify-center" : ""}`}>
             <div className="size-8 rounded-full flex items-center justify-center shrink-0" style={{ background: "var(--gradient-brand)" }}>
-              <span className="text-[10px] font-bold text-brand-foreground">
-                {(email ?? "PX").slice(0, 2).toUpperCase()}
-              </span>
+              <span className="text-[10px] font-bold text-brand-foreground">PX</span>
             </div>
             {!collapsed && (
-              <>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs font-medium truncate">Diretoria</p>
-                  <p className="text-[10px] text-muted-foreground truncate">{email ?? "—"}</p>
-                </div>
-                <button
-                  onClick={signOut}
-                  className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-surface-2 transition-colors"
-                  title="Sair"
-                >
-                  <LogOut className="size-3.5" />
-                </button>
-              </>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-medium truncate">Sistema Corporativo PXOne</p>
+                <p className="text-[10px] text-muted-foreground truncate">Modo Interno</p>
+              </div>
             )}
           </div>
         </div>
