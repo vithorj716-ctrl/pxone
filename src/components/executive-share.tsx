@@ -100,16 +100,21 @@ const MODULES: Record<string, ModuleConfig> = {
     title: "Markup Engine",
     fetch: async () => {
       const { data } = await supabase.from("markup_calculations").select("*").order("created_at", { ascending: false }).limit(500);
-      const rows = (data ?? []).map((r: any) => ({
-        produto: r.produto ?? "—",
-        categoria: r.categoria ?? "—",
-        custo: Number(r.custo_total || 0),
-        preco: Number(r.preco_sugerido || 0),
-        markup: Number(r.markup_pct || 0),
-        margem: Number(r.margem_pct || 0),
-        lucro: Number(r.lucro_unitario || 0),
-        data: r.created_at,
-      }));
+      const rows = (data ?? []).map((r: any) => {
+        const inputs = r.inputs || {};
+        const res = r.resultados || {};
+        const custo = Number(inputs.custo_total ?? inputs.custo ?? res.custo ?? 0);
+        const preco = Number(r.preco_sugerido ?? res.preco_sugerido ?? res.preco ?? 0);
+        const markup = Number(res.markup_pct ?? res.markup ?? 0);
+        const margem = Number(r.margem_desejada ?? res.margem_pct ?? res.margem ?? 0);
+        const lucro = Number(r.lucro_desejado ?? res.lucro_unitario ?? (preco - custo));
+        return {
+          produto: r.produto ?? r.servico ?? "—",
+          categoria: r.categoria ?? "—",
+          custo, preco, markup, margem, lucro,
+          data: r.created_at,
+        };
+      });
       const avgMarkup = rows.length ? rows.reduce((s, r) => s + r.markup, 0) / rows.length : 0;
       const avgMargem = rows.length ? rows.reduce((s, r) => s + r.margem, 0) / rows.length : 0;
       const receitaPotencial = rows.reduce((s, r) => s + r.preco, 0);
