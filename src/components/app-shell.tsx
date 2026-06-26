@@ -5,6 +5,7 @@ import {
   Users, Sparkles, Goal, Rocket, FileText, Clock, Wallet, Building2,
   PanelLeftClose, PanelLeftOpen, Search, Tag,
 } from "lucide-react";
+import { ExportButton } from "@/components/executive-share";
 
 const navGroups = [
   {
