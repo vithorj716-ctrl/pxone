@@ -182,24 +182,13 @@ export function AppShell({ children, title, subtitle, rightPanel, headerActions 
         <div className="p-3 border-t border-border">
           <div className={`flex items-center gap-2 p-2 rounded-lg bg-surface/60 ring-1 ring-border ${collapsed ? "justify-center" : ""}`}>
             <div className="size-8 rounded-full flex items-center justify-center shrink-0" style={{ background: "var(--gradient-brand)" }}>
-              <span className="text-[10px] font-bold text-brand-foreground">
-                {(email ?? "PX").slice(0, 2).toUpperCase()}
-              </span>
+              <span className="text-[10px] font-bold text-brand-foreground">PX</span>
             </div>
             {!collapsed && (
-              <>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs font-medium truncate">Diretoria</p>
-                  <p className="text-[10px] text-muted-foreground truncate">{email ?? "—"}</p>
-                </div>
-                <button
-                  onClick={signOut}
-                  className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-surface-2 transition-colors"
-                  title="Sair"
-                >
-                  <LogOut className="size-3.5" />
-                </button>
-              </>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-medium truncate">Sistema Corporativo PXOne</p>
+                <p className="text-[10px] text-muted-foreground truncate">Modo Interno</p>
+              </div>
             )}
           </div>
         </div>
