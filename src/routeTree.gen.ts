@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
@@ -19,6 +20,7 @@ import { Route as AuthenticatedPlatformRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedPaybackRouteImport } from './routes/_authenticated/payback'
 import { Route as AuthenticatedOkrRouteImport } from './routes/_authenticated/okr'
 import { Route as AuthenticatedMarkupRouteImport } from './routes/_authenticated/markup'
+import { Route as AuthenticatedLauncherRouteImport } from './routes/_authenticated/launcher'
 import { Route as AuthenticatedKpisRouteImport } from './routes/_authenticated/kpis'
 import { Route as AuthenticatedInvestorRouteImport } from './routes/_authenticated/investor'
 import { Route as AuthenticatedGrowthRouteImport } from './routes/_authenticated/growth'
@@ -27,12 +29,14 @@ import { Route as AuthenticatedEmpresasRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedDocumentsRouteImport } from './routes/_authenticated/documents'
 import { Route as AuthenticatedDecisionsRouteImport } from './routes/_authenticated/decisions'
 import { Route as AuthenticatedCustosRouteImport } from './routes/_authenticated/custos'
+import { Route as AuthenticatedContaRouteImport } from './routes/_authenticated/conta'
 import { Route as AuthenticatedConsolidadoRouteImport } from './routes/_authenticated/consolidado'
 import { Route as AuthenticatedBusinessPlanRouteImport } from './routes/_authenticated/business-plan'
 import { Route as AuthenticatedAplicacoesRouteImport } from './routes/_authenticated/aplicacoes'
 import { Route as AuthenticatedAiAnalystRouteImport } from './routes/_authenticated/ai-analyst'
 import { Route as AuthenticatedTmsIndexRouteImport } from './routes/_authenticated/tms.index'
 import { Route as AuthenticatedFinancialIntelligenceIndexRouteImport } from './routes/_authenticated/financial-intelligence.index'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedTmsTrackingRouteImport } from './routes/_authenticated/tms.tracking'
 import { Route as AuthenticatedTmsTabelaFreteRouteImport } from './routes/_authenticated/tms.tabela-frete'
 import { Route as AuthenticatedTmsSolicitacoesRouteImport } from './routes/_authenticated/tms.solicitacoes'
@@ -46,10 +50,17 @@ import { Route as AuthenticatedTmsClientesRouteImport } from './routes/_authenti
 import { Route as AuthenticatedFinancialIntelligenceDreRouteImport } from './routes/_authenticated/financial-intelligence.dre'
 import { Route as AuthenticatedFinancialIntelligenceDfcRouteImport } from './routes/_authenticated/financial-intelligence.dfc'
 import { Route as AuthenticatedFinancialIntelligenceBreakEvenRouteImport } from './routes/_authenticated/financial-intelligence.break-even'
+import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin.usuarios'
+import { Route as AuthenticatedAdminPerfisRouteImport } from './routes/_authenticated/admin.perfis'
 import { Route as AuthenticatedTmsSolicitacoesNovaRouteImport } from './routes/_authenticated/tms.solicitacoes.nova'
 import { Route as AuthenticatedTmsMinutasNumeroRouteImport } from './routes/_authenticated/tms.minutas.$numero'
 import { Route as AuthenticatedTmsEtiquetasMinutaRouteImport } from './routes/_authenticated/tms.etiquetas.$minuta'
 
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -99,6 +110,11 @@ const AuthenticatedMarkupRoute = AuthenticatedMarkupRouteImport.update({
   path: '/markup',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedLauncherRoute = AuthenticatedLauncherRouteImport.update({
+  id: '/launcher',
+  path: '/launcher',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedKpisRoute = AuthenticatedKpisRouteImport.update({
   id: '/kpis',
   path: '/kpis',
@@ -140,6 +156,11 @@ const AuthenticatedCustosRoute = AuthenticatedCustosRouteImport.update({
   path: '/custos',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedContaRoute = AuthenticatedContaRouteImport.update({
+  id: '/conta',
+  path: '/conta',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedConsolidadoRoute =
   AuthenticatedConsolidadoRouteImport.update({
     id: '/consolidado',
@@ -173,6 +194,11 @@ const AuthenticatedFinancialIntelligenceIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedFinancialIntelligenceRoute,
   } as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedTmsTrackingRoute =
   AuthenticatedTmsTrackingRouteImport.update({
     id: '/tms/tracking',
@@ -251,6 +277,18 @@ const AuthenticatedFinancialIntelligenceBreakEvenRoute =
     path: '/break-even',
     getParentRoute: () => AuthenticatedFinancialIntelligenceRoute,
   } as any)
+const AuthenticatedAdminUsuariosRoute =
+  AuthenticatedAdminUsuariosRouteImport.update({
+    id: '/admin/usuarios',
+    path: '/admin/usuarios',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminPerfisRoute =
+  AuthenticatedAdminPerfisRouteImport.update({
+    id: '/admin/perfis',
+    path: '/admin/perfis',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedTmsSolicitacoesNovaRoute =
   AuthenticatedTmsSolicitacoesNovaRouteImport.update({
     id: '/nova',
@@ -273,10 +311,12 @@ const AuthenticatedTmsEtiquetasMinutaRoute =
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/auth': typeof AuthRoute
+  '/login': typeof LoginRoute
   '/ai-analyst': typeof AuthenticatedAiAnalystRoute
   '/aplicacoes': typeof AuthenticatedAplicacoesRoute
   '/business-plan': typeof AuthenticatedBusinessPlanRoute
   '/consolidado': typeof AuthenticatedConsolidadoRoute
+  '/conta': typeof AuthenticatedContaRoute
   '/custos': typeof AuthenticatedCustosRoute
   '/decisions': typeof AuthenticatedDecisionsRoute
   '/documents': typeof AuthenticatedDocumentsRoute
@@ -285,6 +325,7 @@ export interface FileRoutesByFullPath {
   '/growth': typeof AuthenticatedGrowthRoute
   '/investor': typeof AuthenticatedInvestorRoute
   '/kpis': typeof AuthenticatedKpisRoute
+  '/launcher': typeof AuthenticatedLauncherRoute
   '/markup': typeof AuthenticatedMarkupRoute
   '/okr': typeof AuthenticatedOkrRoute
   '/payback': typeof AuthenticatedPaybackRoute
@@ -292,6 +333,8 @@ export interface FileRoutesByFullPath {
   '/risk': typeof AuthenticatedRiskRoute
   '/timeline': typeof AuthenticatedTimelineRoute
   '/valuation': typeof AuthenticatedValuationRoute
+  '/admin/perfis': typeof AuthenticatedAdminPerfisRoute
+  '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/financial-intelligence/break-even': typeof AuthenticatedFinancialIntelligenceBreakEvenRoute
   '/financial-intelligence/dfc': typeof AuthenticatedFinancialIntelligenceDfcRoute
   '/financial-intelligence/dre': typeof AuthenticatedFinancialIntelligenceDreRoute
@@ -305,6 +348,7 @@ export interface FileRoutesByFullPath {
   '/tms/solicitacoes': typeof AuthenticatedTmsSolicitacoesRouteWithChildren
   '/tms/tabela-frete': typeof AuthenticatedTmsTabelaFreteRoute
   '/tms/tracking': typeof AuthenticatedTmsTrackingRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
   '/financial-intelligence/': typeof AuthenticatedFinancialIntelligenceIndexRoute
   '/tms/': typeof AuthenticatedTmsIndexRoute
   '/tms/etiquetas/$minuta': typeof AuthenticatedTmsEtiquetasMinutaRoute
@@ -313,10 +357,12 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
+  '/login': typeof LoginRoute
   '/ai-analyst': typeof AuthenticatedAiAnalystRoute
   '/aplicacoes': typeof AuthenticatedAplicacoesRoute
   '/business-plan': typeof AuthenticatedBusinessPlanRoute
   '/consolidado': typeof AuthenticatedConsolidadoRoute
+  '/conta': typeof AuthenticatedContaRoute
   '/custos': typeof AuthenticatedCustosRoute
   '/decisions': typeof AuthenticatedDecisionsRoute
   '/documents': typeof AuthenticatedDocumentsRoute
@@ -324,6 +370,7 @@ export interface FileRoutesByTo {
   '/growth': typeof AuthenticatedGrowthRoute
   '/investor': typeof AuthenticatedInvestorRoute
   '/kpis': typeof AuthenticatedKpisRoute
+  '/launcher': typeof AuthenticatedLauncherRoute
   '/markup': typeof AuthenticatedMarkupRoute
   '/okr': typeof AuthenticatedOkrRoute
   '/payback': typeof AuthenticatedPaybackRoute
@@ -332,6 +379,8 @@ export interface FileRoutesByTo {
   '/timeline': typeof AuthenticatedTimelineRoute
   '/valuation': typeof AuthenticatedValuationRoute
   '/': typeof AuthenticatedIndexRoute
+  '/admin/perfis': typeof AuthenticatedAdminPerfisRoute
+  '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/financial-intelligence/break-even': typeof AuthenticatedFinancialIntelligenceBreakEvenRoute
   '/financial-intelligence/dfc': typeof AuthenticatedFinancialIntelligenceDfcRoute
   '/financial-intelligence/dre': typeof AuthenticatedFinancialIntelligenceDreRoute
@@ -345,6 +394,7 @@ export interface FileRoutesByTo {
   '/tms/solicitacoes': typeof AuthenticatedTmsSolicitacoesRouteWithChildren
   '/tms/tabela-frete': typeof AuthenticatedTmsTabelaFreteRoute
   '/tms/tracking': typeof AuthenticatedTmsTrackingRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
   '/financial-intelligence': typeof AuthenticatedFinancialIntelligenceIndexRoute
   '/tms': typeof AuthenticatedTmsIndexRoute
   '/tms/etiquetas/$minuta': typeof AuthenticatedTmsEtiquetasMinutaRoute
@@ -355,10 +405,12 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/login': typeof LoginRoute
   '/_authenticated/ai-analyst': typeof AuthenticatedAiAnalystRoute
   '/_authenticated/aplicacoes': typeof AuthenticatedAplicacoesRoute
   '/_authenticated/business-plan': typeof AuthenticatedBusinessPlanRoute
   '/_authenticated/consolidado': typeof AuthenticatedConsolidadoRoute
+  '/_authenticated/conta': typeof AuthenticatedContaRoute
   '/_authenticated/custos': typeof AuthenticatedCustosRoute
   '/_authenticated/decisions': typeof AuthenticatedDecisionsRoute
   '/_authenticated/documents': typeof AuthenticatedDocumentsRoute
@@ -367,6 +419,7 @@ export interface FileRoutesById {
   '/_authenticated/growth': typeof AuthenticatedGrowthRoute
   '/_authenticated/investor': typeof AuthenticatedInvestorRoute
   '/_authenticated/kpis': typeof AuthenticatedKpisRoute
+  '/_authenticated/launcher': typeof AuthenticatedLauncherRoute
   '/_authenticated/markup': typeof AuthenticatedMarkupRoute
   '/_authenticated/okr': typeof AuthenticatedOkrRoute
   '/_authenticated/payback': typeof AuthenticatedPaybackRoute
@@ -375,6 +428,8 @@ export interface FileRoutesById {
   '/_authenticated/timeline': typeof AuthenticatedTimelineRoute
   '/_authenticated/valuation': typeof AuthenticatedValuationRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/admin/perfis': typeof AuthenticatedAdminPerfisRoute
+  '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/_authenticated/financial-intelligence/break-even': typeof AuthenticatedFinancialIntelligenceBreakEvenRoute
   '/_authenticated/financial-intelligence/dfc': typeof AuthenticatedFinancialIntelligenceDfcRoute
   '/_authenticated/financial-intelligence/dre': typeof AuthenticatedFinancialIntelligenceDreRoute
@@ -388,6 +443,7 @@ export interface FileRoutesById {
   '/_authenticated/tms/solicitacoes': typeof AuthenticatedTmsSolicitacoesRouteWithChildren
   '/_authenticated/tms/tabela-frete': typeof AuthenticatedTmsTabelaFreteRoute
   '/_authenticated/tms/tracking': typeof AuthenticatedTmsTrackingRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/financial-intelligence/': typeof AuthenticatedFinancialIntelligenceIndexRoute
   '/_authenticated/tms/': typeof AuthenticatedTmsIndexRoute
   '/_authenticated/tms/etiquetas/$minuta': typeof AuthenticatedTmsEtiquetasMinutaRoute
@@ -399,10 +455,12 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/login'
     | '/ai-analyst'
     | '/aplicacoes'
     | '/business-plan'
     | '/consolidado'
+    | '/conta'
     | '/custos'
     | '/decisions'
     | '/documents'
@@ -411,6 +469,7 @@ export interface FileRouteTypes {
     | '/growth'
     | '/investor'
     | '/kpis'
+    | '/launcher'
     | '/markup'
     | '/okr'
     | '/payback'
@@ -418,6 +477,8 @@ export interface FileRouteTypes {
     | '/risk'
     | '/timeline'
     | '/valuation'
+    | '/admin/perfis'
+    | '/admin/usuarios'
     | '/financial-intelligence/break-even'
     | '/financial-intelligence/dfc'
     | '/financial-intelligence/dre'
@@ -431,6 +492,7 @@ export interface FileRouteTypes {
     | '/tms/solicitacoes'
     | '/tms/tabela-frete'
     | '/tms/tracking'
+    | '/admin/'
     | '/financial-intelligence/'
     | '/tms/'
     | '/tms/etiquetas/$minuta'
@@ -439,10 +501,12 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/auth'
+    | '/login'
     | '/ai-analyst'
     | '/aplicacoes'
     | '/business-plan'
     | '/consolidado'
+    | '/conta'
     | '/custos'
     | '/decisions'
     | '/documents'
@@ -450,6 +514,7 @@ export interface FileRouteTypes {
     | '/growth'
     | '/investor'
     | '/kpis'
+    | '/launcher'
     | '/markup'
     | '/okr'
     | '/payback'
@@ -458,6 +523,8 @@ export interface FileRouteTypes {
     | '/timeline'
     | '/valuation'
     | '/'
+    | '/admin/perfis'
+    | '/admin/usuarios'
     | '/financial-intelligence/break-even'
     | '/financial-intelligence/dfc'
     | '/financial-intelligence/dre'
@@ -471,6 +538,7 @@ export interface FileRouteTypes {
     | '/tms/solicitacoes'
     | '/tms/tabela-frete'
     | '/tms/tracking'
+    | '/admin'
     | '/financial-intelligence'
     | '/tms'
     | '/tms/etiquetas/$minuta'
@@ -480,10 +548,12 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_authenticated'
     | '/auth'
+    | '/login'
     | '/_authenticated/ai-analyst'
     | '/_authenticated/aplicacoes'
     | '/_authenticated/business-plan'
     | '/_authenticated/consolidado'
+    | '/_authenticated/conta'
     | '/_authenticated/custos'
     | '/_authenticated/decisions'
     | '/_authenticated/documents'
@@ -492,6 +562,7 @@ export interface FileRouteTypes {
     | '/_authenticated/growth'
     | '/_authenticated/investor'
     | '/_authenticated/kpis'
+    | '/_authenticated/launcher'
     | '/_authenticated/markup'
     | '/_authenticated/okr'
     | '/_authenticated/payback'
@@ -500,6 +571,8 @@ export interface FileRouteTypes {
     | '/_authenticated/timeline'
     | '/_authenticated/valuation'
     | '/_authenticated/'
+    | '/_authenticated/admin/perfis'
+    | '/_authenticated/admin/usuarios'
     | '/_authenticated/financial-intelligence/break-even'
     | '/_authenticated/financial-intelligence/dfc'
     | '/_authenticated/financial-intelligence/dre'
@@ -513,6 +586,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tms/solicitacoes'
     | '/_authenticated/tms/tabela-frete'
     | '/_authenticated/tms/tracking'
+    | '/_authenticated/admin/'
     | '/_authenticated/financial-intelligence/'
     | '/_authenticated/tms/'
     | '/_authenticated/tms/etiquetas/$minuta'
@@ -523,10 +597,18 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  LoginRoute: typeof LoginRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -597,6 +679,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMarkupRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/launcher': {
+      id: '/_authenticated/launcher'
+      path: '/launcher'
+      fullPath: '/launcher'
+      preLoaderRoute: typeof AuthenticatedLauncherRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/kpis': {
       id: '/_authenticated/kpis'
       path: '/kpis'
@@ -653,6 +742,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCustosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/conta': {
+      id: '/_authenticated/conta'
+      path: '/conta'
+      fullPath: '/conta'
+      preLoaderRoute: typeof AuthenticatedContaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/consolidado': {
       id: '/_authenticated/consolidado'
       path: '/consolidado'
@@ -694,6 +790,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/financial-intelligence/'
       preLoaderRoute: typeof AuthenticatedFinancialIntelligenceIndexRouteImport
       parentRoute: typeof AuthenticatedFinancialIntelligenceRoute
+    }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/tms/tracking': {
       id: '/_authenticated/tms/tracking'
@@ -786,6 +889,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFinancialIntelligenceBreakEvenRouteImport
       parentRoute: typeof AuthenticatedFinancialIntelligenceRoute
     }
+    '/_authenticated/admin/usuarios': {
+      id: '/_authenticated/admin/usuarios'
+      path: '/admin/usuarios'
+      fullPath: '/admin/usuarios'
+      preLoaderRoute: typeof AuthenticatedAdminUsuariosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/perfis': {
+      id: '/_authenticated/admin/perfis'
+      path: '/admin/perfis'
+      fullPath: '/admin/perfis'
+      preLoaderRoute: typeof AuthenticatedAdminPerfisRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/tms/solicitacoes/nova': {
       id: '/_authenticated/tms/solicitacoes/nova'
       path: '/nova'
@@ -854,6 +971,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAplicacoesRoute: typeof AuthenticatedAplicacoesRoute
   AuthenticatedBusinessPlanRoute: typeof AuthenticatedBusinessPlanRoute
   AuthenticatedConsolidadoRoute: typeof AuthenticatedConsolidadoRoute
+  AuthenticatedContaRoute: typeof AuthenticatedContaRoute
   AuthenticatedCustosRoute: typeof AuthenticatedCustosRoute
   AuthenticatedDecisionsRoute: typeof AuthenticatedDecisionsRoute
   AuthenticatedDocumentsRoute: typeof AuthenticatedDocumentsRoute
@@ -862,6 +980,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedGrowthRoute: typeof AuthenticatedGrowthRoute
   AuthenticatedInvestorRoute: typeof AuthenticatedInvestorRoute
   AuthenticatedKpisRoute: typeof AuthenticatedKpisRoute
+  AuthenticatedLauncherRoute: typeof AuthenticatedLauncherRoute
   AuthenticatedMarkupRoute: typeof AuthenticatedMarkupRoute
   AuthenticatedOkrRoute: typeof AuthenticatedOkrRoute
   AuthenticatedPaybackRoute: typeof AuthenticatedPaybackRoute
@@ -870,6 +989,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedTimelineRoute: typeof AuthenticatedTimelineRoute
   AuthenticatedValuationRoute: typeof AuthenticatedValuationRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedAdminPerfisRoute: typeof AuthenticatedAdminPerfisRoute
+  AuthenticatedAdminUsuariosRoute: typeof AuthenticatedAdminUsuariosRoute
   AuthenticatedTmsClientesRoute: typeof AuthenticatedTmsClientesRoute
   AuthenticatedTmsConferenciaRoute: typeof AuthenticatedTmsConferenciaRoute
   AuthenticatedTmsEmbarqueRoute: typeof AuthenticatedTmsEmbarqueRoute
@@ -880,6 +1001,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedTmsSolicitacoesRoute: typeof AuthenticatedTmsSolicitacoesRouteWithChildren
   AuthenticatedTmsTabelaFreteRoute: typeof AuthenticatedTmsTabelaFreteRoute
   AuthenticatedTmsTrackingRoute: typeof AuthenticatedTmsTrackingRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedTmsIndexRoute: typeof AuthenticatedTmsIndexRoute
   AuthenticatedTmsEtiquetasMinutaRoute: typeof AuthenticatedTmsEtiquetasMinutaRoute
   AuthenticatedTmsMinutasNumeroRoute: typeof AuthenticatedTmsMinutasNumeroRoute
@@ -890,6 +1012,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAplicacoesRoute: AuthenticatedAplicacoesRoute,
   AuthenticatedBusinessPlanRoute: AuthenticatedBusinessPlanRoute,
   AuthenticatedConsolidadoRoute: AuthenticatedConsolidadoRoute,
+  AuthenticatedContaRoute: AuthenticatedContaRoute,
   AuthenticatedCustosRoute: AuthenticatedCustosRoute,
   AuthenticatedDecisionsRoute: AuthenticatedDecisionsRoute,
   AuthenticatedDocumentsRoute: AuthenticatedDocumentsRoute,
@@ -899,6 +1022,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedGrowthRoute: AuthenticatedGrowthRoute,
   AuthenticatedInvestorRoute: AuthenticatedInvestorRoute,
   AuthenticatedKpisRoute: AuthenticatedKpisRoute,
+  AuthenticatedLauncherRoute: AuthenticatedLauncherRoute,
   AuthenticatedMarkupRoute: AuthenticatedMarkupRoute,
   AuthenticatedOkrRoute: AuthenticatedOkrRoute,
   AuthenticatedPaybackRoute: AuthenticatedPaybackRoute,
@@ -907,6 +1031,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedTimelineRoute: AuthenticatedTimelineRoute,
   AuthenticatedValuationRoute: AuthenticatedValuationRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedAdminPerfisRoute: AuthenticatedAdminPerfisRoute,
+  AuthenticatedAdminUsuariosRoute: AuthenticatedAdminUsuariosRoute,
   AuthenticatedTmsClientesRoute: AuthenticatedTmsClientesRoute,
   AuthenticatedTmsConferenciaRoute: AuthenticatedTmsConferenciaRoute,
   AuthenticatedTmsEmbarqueRoute: AuthenticatedTmsEmbarqueRoute,
@@ -918,6 +1044,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedTmsSolicitacoesRouteWithChildren,
   AuthenticatedTmsTabelaFreteRoute: AuthenticatedTmsTabelaFreteRoute,
   AuthenticatedTmsTrackingRoute: AuthenticatedTmsTrackingRoute,
+  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   AuthenticatedTmsIndexRoute: AuthenticatedTmsIndexRoute,
   AuthenticatedTmsEtiquetasMinutaRoute: AuthenticatedTmsEtiquetasMinutaRoute,
   AuthenticatedTmsMinutasNumeroRoute: AuthenticatedTmsMinutasNumeroRoute,
@@ -929,6 +1056,7 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

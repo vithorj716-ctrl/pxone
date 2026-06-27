@@ -49,22 +49,6 @@ const navGroups = [
     ],
   },
   {
-    label: "TMS PXLog",
-    items: [
-      { to: "/tms", label: "Dashboard PXLog", icon: Truck, exact: true },
-      { to: "/tms/solicitacoes", label: "Solicitações", icon: FileText },
-      { to: "/tms/conferencia", label: "Conferência", icon: ScanLine },
-      { to: "/tms/embarque", label: "Embarque", icon: Truck },
-      { to: "/tms/recebimento", label: "Recebimento", icon: Package },
-      { to: "/tms/entregas", label: "Entregas", icon: Package },
-      { to: "/tms/tracking", label: "Tracking", icon: Search },
-      { to: "/tms/ocorrencias", label: "Ocorrências", icon: AlertTriangle },
-      { to: "/tms/tabela-frete", label: "Tabela de Fretes", icon: Tag },
-      { to: "/tms/clientes", label: "Clientes TMS", icon: Users },
-      { to: "/tms/financeiro", label: "Financeiro TMS", icon: CircleDollarSign },
-    ],
-  },
-  {
     label: "Plataforma",
     items: [
       { to: "/platform", label: "PX Platform", icon: Boxes },

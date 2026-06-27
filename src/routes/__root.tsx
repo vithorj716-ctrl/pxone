@@ -13,6 +13,7 @@ import { Toaster } from "sonner";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { EmpresaProvider } from "@/px-core/empresa-context";
+import { SystemProvider } from "@/px-platform/system-context";
 
 function NotFoundComponent() {
   return (
@@ -155,10 +156,12 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <EmpresaProvider>
-        <Outlet />
-        <Toaster theme="dark" position="top-right" />
-      </EmpresaProvider>
+      <SystemProvider>
+        <EmpresaProvider>
+          <Outlet />
+          <Toaster theme="dark" position="top-right" />
+        </EmpresaProvider>
+      </SystemProvider>
     </QueryClientProvider>
   );
 }
