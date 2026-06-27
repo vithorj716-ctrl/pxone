@@ -34,10 +34,10 @@ function LmCarregamento() {
   }
 
   async function bipar(codigo: string) {
-    if (!rotaId) return toast.error("Abra uma rota primeiro");
+    if (!rotaId) { toast.error("Abra uma rota primeiro"); return; }
     const { data: vol } = await supabase.from("tms_lm_volumes").select("*, tms_lm_entregas!inner(rota_id)").eq("codigo", codigo).maybeSingle();
-    if (!vol) return toast.error("Volume não encontrado");
-    if ((vol as any).tms_lm_entregas?.rota_id !== rotaId) return toast.error("Volume não pertence à rota");
+    if (!vol) { toast.error("Volume não encontrado"); return; }
+    if ((vol as any).tms_lm_entregas?.rota_id !== rotaId) { toast.error("Volume não pertence à rota"); return; }
     await supabase.from("tms_lm_volumes").update({ status: "carregado", carregado_em: new Date().toISOString() }).eq("id", vol.id);
     await supabase.from("tms_lm_entregas").update({ status: "carregado" }).eq("id", vol.entrega_id);
     await supabase.from("tms_lm_eventos").insert({ entrega_id: vol.entrega_id, rota_id: rotaId, tipo: "carregado", payload: { codigo } });
