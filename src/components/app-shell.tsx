@@ -80,6 +80,12 @@ export function AppShell({ children, title, subtitle, rightPanel, headerActions 
   const [showSearch, setShowSearch] = useState(false);
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
+  const { setActiveSystem } = useSystem();
+
+  function trocarSistema() {
+    setActiveSystem(null);
+    navigate({ to: "/launcher" });
+  }
 
   useEffect(() => {
     try {
@@ -284,6 +290,13 @@ export function AppShell({ children, title, subtitle, rightPanel, headerActions 
               <Search className="size-5" />
             </button>
             {headerActions}
+            <button
+              onClick={trocarSistema}
+              className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md ring-1 ring-border text-xs text-muted-foreground hover:text-foreground"
+              title="Trocar Sistema"
+            >
+              <Grid3x3 className="size-3.5" /> Trocar Sistema
+            </button>
             <EmpresaSelector />
             <InstallAppButton />
             <ExportButton />
