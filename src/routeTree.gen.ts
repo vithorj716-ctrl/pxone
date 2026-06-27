@@ -52,6 +52,7 @@ import { Route as AuthenticatedFinancialIntelligenceDfcRouteImport } from './rou
 import { Route as AuthenticatedFinancialIntelligenceBreakEvenRouteImport } from './routes/_authenticated/financial-intelligence.break-even'
 import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin.usuarios'
 import { Route as AuthenticatedAdminPerfisRouteImport } from './routes/_authenticated/admin.perfis'
+import { Route as AuthenticatedTmsSolicitacoesIndexRouteImport } from './routes/_authenticated/tms.solicitacoes.index'
 import { Route as AuthenticatedTmsLmIndexRouteImport } from './routes/_authenticated/tms.lm.index'
 import { Route as AuthenticatedTmsSolicitacoesNovaRouteImport } from './routes/_authenticated/tms.solicitacoes.nova'
 import { Route as AuthenticatedTmsMinutasNumeroRouteImport } from './routes/_authenticated/tms.minutas.$numero'
@@ -301,6 +302,12 @@ const AuthenticatedAdminPerfisRoute =
     path: '/admin/perfis',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedTmsSolicitacoesIndexRoute =
+  AuthenticatedTmsSolicitacoesIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedTmsSolicitacoesRoute,
+  } as any)
 const AuthenticatedTmsLmIndexRoute = AuthenticatedTmsLmIndexRouteImport.update({
   id: '/tms/lm/',
   path: '/tms/lm/',
@@ -446,6 +453,7 @@ export interface FileRoutesByFullPath {
   '/tms/minutas/$numero': typeof AuthenticatedTmsMinutasNumeroRoute
   '/tms/solicitacoes/nova': typeof AuthenticatedTmsSolicitacoesNovaRoute
   '/tms/lm/': typeof AuthenticatedTmsLmIndexRoute
+  '/tms/solicitacoes/': typeof AuthenticatedTmsSolicitacoesIndexRoute
   '/tms/lm/motorista/$rotaId': typeof AuthenticatedTmsLmMotoristaRotaIdRoute
   '/tms/lm/rotas/$numero': typeof AuthenticatedTmsLmRotasNumeroRoute
 }
@@ -485,7 +493,6 @@ export interface FileRoutesByTo {
   '/tms/financeiro': typeof AuthenticatedTmsFinanceiroRoute
   '/tms/ocorrencias': typeof AuthenticatedTmsOcorrenciasRoute
   '/tms/recebimento': typeof AuthenticatedTmsRecebimentoRoute
-  '/tms/solicitacoes': typeof AuthenticatedTmsSolicitacoesRouteWithChildren
   '/tms/tabela-frete': typeof AuthenticatedTmsTabelaFreteRoute
   '/tms/tracking': typeof AuthenticatedTmsTrackingRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -504,6 +511,7 @@ export interface FileRoutesByTo {
   '/tms/minutas/$numero': typeof AuthenticatedTmsMinutasNumeroRoute
   '/tms/solicitacoes/nova': typeof AuthenticatedTmsSolicitacoesNovaRoute
   '/tms/lm': typeof AuthenticatedTmsLmIndexRoute
+  '/tms/solicitacoes': typeof AuthenticatedTmsSolicitacoesIndexRoute
   '/tms/lm/motorista/$rotaId': typeof AuthenticatedTmsLmMotoristaRotaIdRoute
   '/tms/lm/rotas/$numero': typeof AuthenticatedTmsLmRotasNumeroRoute
 }
@@ -565,6 +573,7 @@ export interface FileRoutesById {
   '/_authenticated/tms/minutas/$numero': typeof AuthenticatedTmsMinutasNumeroRoute
   '/_authenticated/tms/solicitacoes/nova': typeof AuthenticatedTmsSolicitacoesNovaRoute
   '/_authenticated/tms/lm/': typeof AuthenticatedTmsLmIndexRoute
+  '/_authenticated/tms/solicitacoes/': typeof AuthenticatedTmsSolicitacoesIndexRoute
   '/_authenticated/tms/lm/motorista/$rotaId': typeof AuthenticatedTmsLmMotoristaRotaIdRoute
   '/_authenticated/tms/lm/rotas/$numero': typeof AuthenticatedTmsLmRotasNumeroRoute
 }
@@ -626,6 +635,7 @@ export interface FileRouteTypes {
     | '/tms/minutas/$numero'
     | '/tms/solicitacoes/nova'
     | '/tms/lm/'
+    | '/tms/solicitacoes/'
     | '/tms/lm/motorista/$rotaId'
     | '/tms/lm/rotas/$numero'
   fileRoutesByTo: FileRoutesByTo
@@ -665,7 +675,6 @@ export interface FileRouteTypes {
     | '/tms/financeiro'
     | '/tms/ocorrencias'
     | '/tms/recebimento'
-    | '/tms/solicitacoes'
     | '/tms/tabela-frete'
     | '/tms/tracking'
     | '/admin'
@@ -684,6 +693,7 @@ export interface FileRouteTypes {
     | '/tms/minutas/$numero'
     | '/tms/solicitacoes/nova'
     | '/tms/lm'
+    | '/tms/solicitacoes'
     | '/tms/lm/motorista/$rotaId'
     | '/tms/lm/rotas/$numero'
   id:
@@ -744,6 +754,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tms/minutas/$numero'
     | '/_authenticated/tms/solicitacoes/nova'
     | '/_authenticated/tms/lm/'
+    | '/_authenticated/tms/solicitacoes/'
     | '/_authenticated/tms/lm/motorista/$rotaId'
     | '/_authenticated/tms/lm/rotas/$numero'
   fileRoutesById: FileRoutesById
@@ -1057,6 +1068,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminPerfisRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/tms/solicitacoes/': {
+      id: '/_authenticated/tms/solicitacoes/'
+      path: '/'
+      fullPath: '/tms/solicitacoes/'
+      preLoaderRoute: typeof AuthenticatedTmsSolicitacoesIndexRouteImport
+      parentRoute: typeof AuthenticatedTmsSolicitacoesRoute
+    }
     '/_authenticated/tms/lm/': {
       id: '/_authenticated/tms/lm/'
       path: '/tms/lm'
@@ -1191,12 +1209,15 @@ const AuthenticatedFinancialIntelligenceRouteWithChildren =
 
 interface AuthenticatedTmsSolicitacoesRouteChildren {
   AuthenticatedTmsSolicitacoesNovaRoute: typeof AuthenticatedTmsSolicitacoesNovaRoute
+  AuthenticatedTmsSolicitacoesIndexRoute: typeof AuthenticatedTmsSolicitacoesIndexRoute
 }
 
 const AuthenticatedTmsSolicitacoesRouteChildren: AuthenticatedTmsSolicitacoesRouteChildren =
   {
     AuthenticatedTmsSolicitacoesNovaRoute:
       AuthenticatedTmsSolicitacoesNovaRoute,
+    AuthenticatedTmsSolicitacoesIndexRoute:
+      AuthenticatedTmsSolicitacoesIndexRoute,
   }
 
 const AuthenticatedTmsSolicitacoesRouteWithChildren =
@@ -1336,13 +1357,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
