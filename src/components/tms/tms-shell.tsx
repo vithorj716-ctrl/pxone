@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { useSystem } from "@/px-platform/system-context";
 import { supabase } from "@/integrations/supabase/client";
+import { PxLogLogo } from "@/components/pxlog-logo";
 
 type NavItem = { to: string; label: string; icon: typeof Truck; exact?: boolean; group: string };
 
@@ -33,8 +34,8 @@ const TMS_NAV: NavItem[] = [
   { to: "/tms/lm/configuracoes", label: "Configurações", icon: Settings, group: "Last Mile" },
 ];
 
-const ACCENT = "#f97316"; // laranja logística
-const ACCENT_BG = "#1a0f08";
+const ACCENT = "#19c4d8"; // PXLog cyan
+const ACCENT_BG = "#06222e";
 
 interface TmsShellProps {
   children: ReactNode;
@@ -72,14 +73,9 @@ export function TmsShell({ children, title, subtitle, headerActions }: TmsShellP
   return (
     <div className="flex h-[100dvh] overflow-hidden text-foreground" style={{ background: "#0a0a0c" }}>
       <aside className="hidden lg:flex w-64 flex-col border-r border-border shrink-0" style={{ background: "#0f0f12" }}>
-        <div className="p-4 flex items-center gap-2">
-          <div className="size-9 rounded-lg flex items-center justify-center" style={{ background: ACCENT }}>
-            <Truck className="size-5 text-black" />
-          </div>
-          <div>
-            <div className="text-base font-bold leading-none">PXLog</div>
-            <div className="text-[9px] uppercase tracking-widest text-muted-foreground mt-0.5">Transfer Hub</div>
-          </div>
+        <div className="p-4 flex items-center gap-2 border-b border-border" style={{ background: "#ffffff" }}>
+          <PxLogLogo height={28} />
+          <div className="ml-auto text-[9px] uppercase tracking-widest text-slate-500">Transfer Hub</div>
         </div>
 
         <nav className="flex-1 px-2 space-y-2 overflow-y-auto thin-scroll pb-4">
