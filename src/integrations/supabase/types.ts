@@ -275,6 +275,47 @@ export type Database = {
         }
         Relationships: []
       }
+      financial_scenarios: {
+        Row: {
+          created_at: string
+          descricao: string | null
+          empresa_id: string | null
+          id: string
+          nome: string
+          payload: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          nome: string
+          payload?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          nome?: string
+          payload?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_scenarios_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       growth_initiatives: {
         Row: {
           created_at: string
