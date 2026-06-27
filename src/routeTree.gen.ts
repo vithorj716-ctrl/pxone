@@ -31,10 +31,24 @@ import { Route as AuthenticatedConsolidadoRouteImport } from './routes/_authenti
 import { Route as AuthenticatedBusinessPlanRouteImport } from './routes/_authenticated/business-plan'
 import { Route as AuthenticatedAplicacoesRouteImport } from './routes/_authenticated/aplicacoes'
 import { Route as AuthenticatedAiAnalystRouteImport } from './routes/_authenticated/ai-analyst'
+import { Route as AuthenticatedTmsIndexRouteImport } from './routes/_authenticated/tms.index'
 import { Route as AuthenticatedFinancialIntelligenceIndexRouteImport } from './routes/_authenticated/financial-intelligence.index'
+import { Route as AuthenticatedTmsTrackingRouteImport } from './routes/_authenticated/tms.tracking'
+import { Route as AuthenticatedTmsTabelaFreteRouteImport } from './routes/_authenticated/tms.tabela-frete'
+import { Route as AuthenticatedTmsSolicitacoesRouteImport } from './routes/_authenticated/tms.solicitacoes'
+import { Route as AuthenticatedTmsRecebimentoRouteImport } from './routes/_authenticated/tms.recebimento'
+import { Route as AuthenticatedTmsOcorrenciasRouteImport } from './routes/_authenticated/tms.ocorrencias'
+import { Route as AuthenticatedTmsFinanceiroRouteImport } from './routes/_authenticated/tms.financeiro'
+import { Route as AuthenticatedTmsEntregasRouteImport } from './routes/_authenticated/tms.entregas'
+import { Route as AuthenticatedTmsEmbarqueRouteImport } from './routes/_authenticated/tms.embarque'
+import { Route as AuthenticatedTmsConferenciaRouteImport } from './routes/_authenticated/tms.conferencia'
+import { Route as AuthenticatedTmsClientesRouteImport } from './routes/_authenticated/tms.clientes'
 import { Route as AuthenticatedFinancialIntelligenceDreRouteImport } from './routes/_authenticated/financial-intelligence.dre'
 import { Route as AuthenticatedFinancialIntelligenceDfcRouteImport } from './routes/_authenticated/financial-intelligence.dfc'
 import { Route as AuthenticatedFinancialIntelligenceBreakEvenRouteImport } from './routes/_authenticated/financial-intelligence.break-even'
+import { Route as AuthenticatedTmsSolicitacoesNovaRouteImport } from './routes/_authenticated/tms.solicitacoes.nova'
+import { Route as AuthenticatedTmsMinutasNumeroRouteImport } from './routes/_authenticated/tms.minutas.$numero'
+import { Route as AuthenticatedTmsEtiquetasMinutaRouteImport } from './routes/_authenticated/tms.etiquetas.$minuta'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -148,11 +162,76 @@ const AuthenticatedAiAnalystRoute = AuthenticatedAiAnalystRouteImport.update({
   path: '/ai-analyst',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedTmsIndexRoute = AuthenticatedTmsIndexRouteImport.update({
+  id: '/tms/',
+  path: '/tms/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedFinancialIntelligenceIndexRoute =
   AuthenticatedFinancialIntelligenceIndexRouteImport.update({
     id: '/',
     path: '/',
     getParentRoute: () => AuthenticatedFinancialIntelligenceRoute,
+  } as any)
+const AuthenticatedTmsTrackingRoute =
+  AuthenticatedTmsTrackingRouteImport.update({
+    id: '/tms/tracking',
+    path: '/tms/tracking',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTmsTabelaFreteRoute =
+  AuthenticatedTmsTabelaFreteRouteImport.update({
+    id: '/tms/tabela-frete',
+    path: '/tms/tabela-frete',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTmsSolicitacoesRoute =
+  AuthenticatedTmsSolicitacoesRouteImport.update({
+    id: '/tms/solicitacoes',
+    path: '/tms/solicitacoes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTmsRecebimentoRoute =
+  AuthenticatedTmsRecebimentoRouteImport.update({
+    id: '/tms/recebimento',
+    path: '/tms/recebimento',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTmsOcorrenciasRoute =
+  AuthenticatedTmsOcorrenciasRouteImport.update({
+    id: '/tms/ocorrencias',
+    path: '/tms/ocorrencias',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTmsFinanceiroRoute =
+  AuthenticatedTmsFinanceiroRouteImport.update({
+    id: '/tms/financeiro',
+    path: '/tms/financeiro',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTmsEntregasRoute =
+  AuthenticatedTmsEntregasRouteImport.update({
+    id: '/tms/entregas',
+    path: '/tms/entregas',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTmsEmbarqueRoute =
+  AuthenticatedTmsEmbarqueRouteImport.update({
+    id: '/tms/embarque',
+    path: '/tms/embarque',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTmsConferenciaRoute =
+  AuthenticatedTmsConferenciaRouteImport.update({
+    id: '/tms/conferencia',
+    path: '/tms/conferencia',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTmsClientesRoute =
+  AuthenticatedTmsClientesRouteImport.update({
+    id: '/tms/clientes',
+    path: '/tms/clientes',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedFinancialIntelligenceDreRoute =
   AuthenticatedFinancialIntelligenceDreRouteImport.update({
@@ -171,6 +250,24 @@ const AuthenticatedFinancialIntelligenceBreakEvenRoute =
     id: '/break-even',
     path: '/break-even',
     getParentRoute: () => AuthenticatedFinancialIntelligenceRoute,
+  } as any)
+const AuthenticatedTmsSolicitacoesNovaRoute =
+  AuthenticatedTmsSolicitacoesNovaRouteImport.update({
+    id: '/nova',
+    path: '/nova',
+    getParentRoute: () => AuthenticatedTmsSolicitacoesRoute,
+  } as any)
+const AuthenticatedTmsMinutasNumeroRoute =
+  AuthenticatedTmsMinutasNumeroRouteImport.update({
+    id: '/tms/minutas/$numero',
+    path: '/tms/minutas/$numero',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTmsEtiquetasMinutaRoute =
+  AuthenticatedTmsEtiquetasMinutaRouteImport.update({
+    id: '/tms/etiquetas/$minuta',
+    path: '/tms/etiquetas/$minuta',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -198,7 +295,21 @@ export interface FileRoutesByFullPath {
   '/financial-intelligence/break-even': typeof AuthenticatedFinancialIntelligenceBreakEvenRoute
   '/financial-intelligence/dfc': typeof AuthenticatedFinancialIntelligenceDfcRoute
   '/financial-intelligence/dre': typeof AuthenticatedFinancialIntelligenceDreRoute
+  '/tms/clientes': typeof AuthenticatedTmsClientesRoute
+  '/tms/conferencia': typeof AuthenticatedTmsConferenciaRoute
+  '/tms/embarque': typeof AuthenticatedTmsEmbarqueRoute
+  '/tms/entregas': typeof AuthenticatedTmsEntregasRoute
+  '/tms/financeiro': typeof AuthenticatedTmsFinanceiroRoute
+  '/tms/ocorrencias': typeof AuthenticatedTmsOcorrenciasRoute
+  '/tms/recebimento': typeof AuthenticatedTmsRecebimentoRoute
+  '/tms/solicitacoes': typeof AuthenticatedTmsSolicitacoesRouteWithChildren
+  '/tms/tabela-frete': typeof AuthenticatedTmsTabelaFreteRoute
+  '/tms/tracking': typeof AuthenticatedTmsTrackingRoute
   '/financial-intelligence/': typeof AuthenticatedFinancialIntelligenceIndexRoute
+  '/tms/': typeof AuthenticatedTmsIndexRoute
+  '/tms/etiquetas/$minuta': typeof AuthenticatedTmsEtiquetasMinutaRoute
+  '/tms/minutas/$numero': typeof AuthenticatedTmsMinutasNumeroRoute
+  '/tms/solicitacoes/nova': typeof AuthenticatedTmsSolicitacoesNovaRoute
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
@@ -224,7 +335,21 @@ export interface FileRoutesByTo {
   '/financial-intelligence/break-even': typeof AuthenticatedFinancialIntelligenceBreakEvenRoute
   '/financial-intelligence/dfc': typeof AuthenticatedFinancialIntelligenceDfcRoute
   '/financial-intelligence/dre': typeof AuthenticatedFinancialIntelligenceDreRoute
+  '/tms/clientes': typeof AuthenticatedTmsClientesRoute
+  '/tms/conferencia': typeof AuthenticatedTmsConferenciaRoute
+  '/tms/embarque': typeof AuthenticatedTmsEmbarqueRoute
+  '/tms/entregas': typeof AuthenticatedTmsEntregasRoute
+  '/tms/financeiro': typeof AuthenticatedTmsFinanceiroRoute
+  '/tms/ocorrencias': typeof AuthenticatedTmsOcorrenciasRoute
+  '/tms/recebimento': typeof AuthenticatedTmsRecebimentoRoute
+  '/tms/solicitacoes': typeof AuthenticatedTmsSolicitacoesRouteWithChildren
+  '/tms/tabela-frete': typeof AuthenticatedTmsTabelaFreteRoute
+  '/tms/tracking': typeof AuthenticatedTmsTrackingRoute
   '/financial-intelligence': typeof AuthenticatedFinancialIntelligenceIndexRoute
+  '/tms': typeof AuthenticatedTmsIndexRoute
+  '/tms/etiquetas/$minuta': typeof AuthenticatedTmsEtiquetasMinutaRoute
+  '/tms/minutas/$numero': typeof AuthenticatedTmsMinutasNumeroRoute
+  '/tms/solicitacoes/nova': typeof AuthenticatedTmsSolicitacoesNovaRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -253,7 +378,21 @@ export interface FileRoutesById {
   '/_authenticated/financial-intelligence/break-even': typeof AuthenticatedFinancialIntelligenceBreakEvenRoute
   '/_authenticated/financial-intelligence/dfc': typeof AuthenticatedFinancialIntelligenceDfcRoute
   '/_authenticated/financial-intelligence/dre': typeof AuthenticatedFinancialIntelligenceDreRoute
+  '/_authenticated/tms/clientes': typeof AuthenticatedTmsClientesRoute
+  '/_authenticated/tms/conferencia': typeof AuthenticatedTmsConferenciaRoute
+  '/_authenticated/tms/embarque': typeof AuthenticatedTmsEmbarqueRoute
+  '/_authenticated/tms/entregas': typeof AuthenticatedTmsEntregasRoute
+  '/_authenticated/tms/financeiro': typeof AuthenticatedTmsFinanceiroRoute
+  '/_authenticated/tms/ocorrencias': typeof AuthenticatedTmsOcorrenciasRoute
+  '/_authenticated/tms/recebimento': typeof AuthenticatedTmsRecebimentoRoute
+  '/_authenticated/tms/solicitacoes': typeof AuthenticatedTmsSolicitacoesRouteWithChildren
+  '/_authenticated/tms/tabela-frete': typeof AuthenticatedTmsTabelaFreteRoute
+  '/_authenticated/tms/tracking': typeof AuthenticatedTmsTrackingRoute
   '/_authenticated/financial-intelligence/': typeof AuthenticatedFinancialIntelligenceIndexRoute
+  '/_authenticated/tms/': typeof AuthenticatedTmsIndexRoute
+  '/_authenticated/tms/etiquetas/$minuta': typeof AuthenticatedTmsEtiquetasMinutaRoute
+  '/_authenticated/tms/minutas/$numero': typeof AuthenticatedTmsMinutasNumeroRoute
+  '/_authenticated/tms/solicitacoes/nova': typeof AuthenticatedTmsSolicitacoesNovaRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -282,7 +421,21 @@ export interface FileRouteTypes {
     | '/financial-intelligence/break-even'
     | '/financial-intelligence/dfc'
     | '/financial-intelligence/dre'
+    | '/tms/clientes'
+    | '/tms/conferencia'
+    | '/tms/embarque'
+    | '/tms/entregas'
+    | '/tms/financeiro'
+    | '/tms/ocorrencias'
+    | '/tms/recebimento'
+    | '/tms/solicitacoes'
+    | '/tms/tabela-frete'
+    | '/tms/tracking'
     | '/financial-intelligence/'
+    | '/tms/'
+    | '/tms/etiquetas/$minuta'
+    | '/tms/minutas/$numero'
+    | '/tms/solicitacoes/nova'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/auth'
@@ -308,7 +461,21 @@ export interface FileRouteTypes {
     | '/financial-intelligence/break-even'
     | '/financial-intelligence/dfc'
     | '/financial-intelligence/dre'
+    | '/tms/clientes'
+    | '/tms/conferencia'
+    | '/tms/embarque'
+    | '/tms/entregas'
+    | '/tms/financeiro'
+    | '/tms/ocorrencias'
+    | '/tms/recebimento'
+    | '/tms/solicitacoes'
+    | '/tms/tabela-frete'
+    | '/tms/tracking'
     | '/financial-intelligence'
+    | '/tms'
+    | '/tms/etiquetas/$minuta'
+    | '/tms/minutas/$numero'
+    | '/tms/solicitacoes/nova'
   id:
     | '__root__'
     | '/_authenticated'
@@ -336,7 +503,21 @@ export interface FileRouteTypes {
     | '/_authenticated/financial-intelligence/break-even'
     | '/_authenticated/financial-intelligence/dfc'
     | '/_authenticated/financial-intelligence/dre'
+    | '/_authenticated/tms/clientes'
+    | '/_authenticated/tms/conferencia'
+    | '/_authenticated/tms/embarque'
+    | '/_authenticated/tms/entregas'
+    | '/_authenticated/tms/financeiro'
+    | '/_authenticated/tms/ocorrencias'
+    | '/_authenticated/tms/recebimento'
+    | '/_authenticated/tms/solicitacoes'
+    | '/_authenticated/tms/tabela-frete'
+    | '/_authenticated/tms/tracking'
     | '/_authenticated/financial-intelligence/'
+    | '/_authenticated/tms/'
+    | '/_authenticated/tms/etiquetas/$minuta'
+    | '/_authenticated/tms/minutas/$numero'
+    | '/_authenticated/tms/solicitacoes/nova'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -500,12 +681,89 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAiAnalystRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/tms/': {
+      id: '/_authenticated/tms/'
+      path: '/tms'
+      fullPath: '/tms/'
+      preLoaderRoute: typeof AuthenticatedTmsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/financial-intelligence/': {
       id: '/_authenticated/financial-intelligence/'
       path: '/'
       fullPath: '/financial-intelligence/'
       preLoaderRoute: typeof AuthenticatedFinancialIntelligenceIndexRouteImport
       parentRoute: typeof AuthenticatedFinancialIntelligenceRoute
+    }
+    '/_authenticated/tms/tracking': {
+      id: '/_authenticated/tms/tracking'
+      path: '/tms/tracking'
+      fullPath: '/tms/tracking'
+      preLoaderRoute: typeof AuthenticatedTmsTrackingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tms/tabela-frete': {
+      id: '/_authenticated/tms/tabela-frete'
+      path: '/tms/tabela-frete'
+      fullPath: '/tms/tabela-frete'
+      preLoaderRoute: typeof AuthenticatedTmsTabelaFreteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tms/solicitacoes': {
+      id: '/_authenticated/tms/solicitacoes'
+      path: '/tms/solicitacoes'
+      fullPath: '/tms/solicitacoes'
+      preLoaderRoute: typeof AuthenticatedTmsSolicitacoesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tms/recebimento': {
+      id: '/_authenticated/tms/recebimento'
+      path: '/tms/recebimento'
+      fullPath: '/tms/recebimento'
+      preLoaderRoute: typeof AuthenticatedTmsRecebimentoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tms/ocorrencias': {
+      id: '/_authenticated/tms/ocorrencias'
+      path: '/tms/ocorrencias'
+      fullPath: '/tms/ocorrencias'
+      preLoaderRoute: typeof AuthenticatedTmsOcorrenciasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tms/financeiro': {
+      id: '/_authenticated/tms/financeiro'
+      path: '/tms/financeiro'
+      fullPath: '/tms/financeiro'
+      preLoaderRoute: typeof AuthenticatedTmsFinanceiroRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tms/entregas': {
+      id: '/_authenticated/tms/entregas'
+      path: '/tms/entregas'
+      fullPath: '/tms/entregas'
+      preLoaderRoute: typeof AuthenticatedTmsEntregasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tms/embarque': {
+      id: '/_authenticated/tms/embarque'
+      path: '/tms/embarque'
+      fullPath: '/tms/embarque'
+      preLoaderRoute: typeof AuthenticatedTmsEmbarqueRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tms/conferencia': {
+      id: '/_authenticated/tms/conferencia'
+      path: '/tms/conferencia'
+      fullPath: '/tms/conferencia'
+      preLoaderRoute: typeof AuthenticatedTmsConferenciaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tms/clientes': {
+      id: '/_authenticated/tms/clientes'
+      path: '/tms/clientes'
+      fullPath: '/tms/clientes'
+      preLoaderRoute: typeof AuthenticatedTmsClientesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/financial-intelligence/dre': {
       id: '/_authenticated/financial-intelligence/dre'
@@ -527,6 +785,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/financial-intelligence/break-even'
       preLoaderRoute: typeof AuthenticatedFinancialIntelligenceBreakEvenRouteImport
       parentRoute: typeof AuthenticatedFinancialIntelligenceRoute
+    }
+    '/_authenticated/tms/solicitacoes/nova': {
+      id: '/_authenticated/tms/solicitacoes/nova'
+      path: '/nova'
+      fullPath: '/tms/solicitacoes/nova'
+      preLoaderRoute: typeof AuthenticatedTmsSolicitacoesNovaRouteImport
+      parentRoute: typeof AuthenticatedTmsSolicitacoesRoute
+    }
+    '/_authenticated/tms/minutas/$numero': {
+      id: '/_authenticated/tms/minutas/$numero'
+      path: '/tms/minutas/$numero'
+      fullPath: '/tms/minutas/$numero'
+      preLoaderRoute: typeof AuthenticatedTmsMinutasNumeroRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tms/etiquetas/$minuta': {
+      id: '/_authenticated/tms/etiquetas/$minuta'
+      path: '/tms/etiquetas/$minuta'
+      fullPath: '/tms/etiquetas/$minuta'
+      preLoaderRoute: typeof AuthenticatedTmsEtiquetasMinutaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
   }
 }
@@ -555,6 +834,21 @@ const AuthenticatedFinancialIntelligenceRouteWithChildren =
     AuthenticatedFinancialIntelligenceRouteChildren,
   )
 
+interface AuthenticatedTmsSolicitacoesRouteChildren {
+  AuthenticatedTmsSolicitacoesNovaRoute: typeof AuthenticatedTmsSolicitacoesNovaRoute
+}
+
+const AuthenticatedTmsSolicitacoesRouteChildren: AuthenticatedTmsSolicitacoesRouteChildren =
+  {
+    AuthenticatedTmsSolicitacoesNovaRoute:
+      AuthenticatedTmsSolicitacoesNovaRoute,
+  }
+
+const AuthenticatedTmsSolicitacoesRouteWithChildren =
+  AuthenticatedTmsSolicitacoesRoute._addFileChildren(
+    AuthenticatedTmsSolicitacoesRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAiAnalystRoute: typeof AuthenticatedAiAnalystRoute
   AuthenticatedAplicacoesRoute: typeof AuthenticatedAplicacoesRoute
@@ -576,6 +870,19 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedTimelineRoute: typeof AuthenticatedTimelineRoute
   AuthenticatedValuationRoute: typeof AuthenticatedValuationRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedTmsClientesRoute: typeof AuthenticatedTmsClientesRoute
+  AuthenticatedTmsConferenciaRoute: typeof AuthenticatedTmsConferenciaRoute
+  AuthenticatedTmsEmbarqueRoute: typeof AuthenticatedTmsEmbarqueRoute
+  AuthenticatedTmsEntregasRoute: typeof AuthenticatedTmsEntregasRoute
+  AuthenticatedTmsFinanceiroRoute: typeof AuthenticatedTmsFinanceiroRoute
+  AuthenticatedTmsOcorrenciasRoute: typeof AuthenticatedTmsOcorrenciasRoute
+  AuthenticatedTmsRecebimentoRoute: typeof AuthenticatedTmsRecebimentoRoute
+  AuthenticatedTmsSolicitacoesRoute: typeof AuthenticatedTmsSolicitacoesRouteWithChildren
+  AuthenticatedTmsTabelaFreteRoute: typeof AuthenticatedTmsTabelaFreteRoute
+  AuthenticatedTmsTrackingRoute: typeof AuthenticatedTmsTrackingRoute
+  AuthenticatedTmsIndexRoute: typeof AuthenticatedTmsIndexRoute
+  AuthenticatedTmsEtiquetasMinutaRoute: typeof AuthenticatedTmsEtiquetasMinutaRoute
+  AuthenticatedTmsMinutasNumeroRoute: typeof AuthenticatedTmsMinutasNumeroRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -600,6 +907,20 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedTimelineRoute: AuthenticatedTimelineRoute,
   AuthenticatedValuationRoute: AuthenticatedValuationRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedTmsClientesRoute: AuthenticatedTmsClientesRoute,
+  AuthenticatedTmsConferenciaRoute: AuthenticatedTmsConferenciaRoute,
+  AuthenticatedTmsEmbarqueRoute: AuthenticatedTmsEmbarqueRoute,
+  AuthenticatedTmsEntregasRoute: AuthenticatedTmsEntregasRoute,
+  AuthenticatedTmsFinanceiroRoute: AuthenticatedTmsFinanceiroRoute,
+  AuthenticatedTmsOcorrenciasRoute: AuthenticatedTmsOcorrenciasRoute,
+  AuthenticatedTmsRecebimentoRoute: AuthenticatedTmsRecebimentoRoute,
+  AuthenticatedTmsSolicitacoesRoute:
+    AuthenticatedTmsSolicitacoesRouteWithChildren,
+  AuthenticatedTmsTabelaFreteRoute: AuthenticatedTmsTabelaFreteRoute,
+  AuthenticatedTmsTrackingRoute: AuthenticatedTmsTrackingRoute,
+  AuthenticatedTmsIndexRoute: AuthenticatedTmsIndexRoute,
+  AuthenticatedTmsEtiquetasMinutaRoute: AuthenticatedTmsEtiquetasMinutaRoute,
+  AuthenticatedTmsMinutasNumeroRoute: AuthenticatedTmsMinutasNumeroRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

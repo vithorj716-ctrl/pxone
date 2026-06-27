@@ -1042,6 +1042,345 @@ export type Database = {
           },
         ]
       }
+      tms_clientes: {
+        Row: {
+          ativo: boolean
+          cidade: string | null
+          cnpj: string | null
+          contato: string | null
+          created_at: string
+          email: string | null
+          empresa_id: string | null
+          endereco: string | null
+          id: string
+          nome: string
+          observacoes: string | null
+          telefone: string | null
+          uf: string | null
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          cidade?: string | null
+          cnpj?: string | null
+          contato?: string | null
+          created_at?: string
+          email?: string | null
+          empresa_id?: string | null
+          endereco?: string | null
+          id?: string
+          nome: string
+          observacoes?: string | null
+          telefone?: string | null
+          uf?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          cidade?: string | null
+          cnpj?: string | null
+          contato?: string | null
+          created_at?: string
+          email?: string | null
+          empresa_id?: string | null
+          endereco?: string | null
+          id?: string
+          nome?: string
+          observacoes?: string | null
+          telefone?: string | null
+          uf?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tms_clientes_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tms_eventos: {
+        Row: {
+          created_at: string
+          id: string
+          minuta_id: string | null
+          operador_id: string | null
+          origem_evento: string | null
+          payload: Json
+          tipo: Database["public"]["Enums"]["tms_evento_tipo"]
+          volume_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          minuta_id?: string | null
+          operador_id?: string | null
+          origem_evento?: string | null
+          payload?: Json
+          tipo: Database["public"]["Enums"]["tms_evento_tipo"]
+          volume_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          minuta_id?: string | null
+          operador_id?: string | null
+          origem_evento?: string | null
+          payload?: Json
+          tipo?: Database["public"]["Enums"]["tms_evento_tipo"]
+          volume_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tms_eventos_minuta_id_fkey"
+            columns: ["minuta_id"]
+            isOneToOne: false
+            referencedRelation: "tms_minutas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tms_eventos_volume_id_fkey"
+            columns: ["volume_id"]
+            isOneToOne: false
+            referencedRelation: "tms_volumes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tms_minutas: {
+        Row: {
+          cliente_id: string | null
+          created_at: string
+          cubagem: number
+          data_coleta: string | null
+          destinatario: Json
+          destino: string
+          empresa_id: string | null
+          id: string
+          janela_atendimento: string | null
+          necessita_coleta: boolean
+          numero: number
+          observacoes: string | null
+          origem: string
+          peso: number
+          peso_cubado: number
+          peso_taxado: number
+          prazo_dias: number
+          qtd_volumes: number
+          remetente: Json
+          responsavel_id: string | null
+          status: string
+          status_financeiro: string
+          tipo_mercadoria: string | null
+          updated_at: string
+          valor_frete: number
+          valor_mercadoria: number
+        }
+        Insert: {
+          cliente_id?: string | null
+          created_at?: string
+          cubagem?: number
+          data_coleta?: string | null
+          destinatario?: Json
+          destino: string
+          empresa_id?: string | null
+          id?: string
+          janela_atendimento?: string | null
+          necessita_coleta?: boolean
+          numero?: number
+          observacoes?: string | null
+          origem: string
+          peso?: number
+          peso_cubado?: number
+          peso_taxado?: number
+          prazo_dias?: number
+          qtd_volumes?: number
+          remetente?: Json
+          responsavel_id?: string | null
+          status?: string
+          status_financeiro?: string
+          tipo_mercadoria?: string | null
+          updated_at?: string
+          valor_frete?: number
+          valor_mercadoria?: number
+        }
+        Update: {
+          cliente_id?: string | null
+          created_at?: string
+          cubagem?: number
+          data_coleta?: string | null
+          destinatario?: Json
+          destino?: string
+          empresa_id?: string | null
+          id?: string
+          janela_atendimento?: string | null
+          necessita_coleta?: boolean
+          numero?: number
+          observacoes?: string | null
+          origem?: string
+          peso?: number
+          peso_cubado?: number
+          peso_taxado?: number
+          prazo_dias?: number
+          qtd_volumes?: number
+          remetente?: Json
+          responsavel_id?: string | null
+          status?: string
+          status_financeiro?: string
+          tipo_mercadoria?: string | null
+          updated_at?: string
+          valor_frete?: number
+          valor_mercadoria?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tms_minutas_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "tms_clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tms_minutas_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tms_tabela_frete: {
+        Row: {
+          ativo: boolean
+          cliente_id: string | null
+          created_at: string
+          destino: string | null
+          faixa_cubagem_max: number | null
+          faixa_cubagem_min: number | null
+          faixa_peso_max: number | null
+          faixa_peso_min: number | null
+          id: string
+          nome: string
+          origem: string | null
+          prazo_dias: number
+          regra: Json
+          tipo_cobranca: string
+          updated_at: string
+          valor_coleta: number
+          valor_entrega: number
+          valor_kg: number
+          valor_m3: number
+          valor_minimo: number
+        }
+        Insert: {
+          ativo?: boolean
+          cliente_id?: string | null
+          created_at?: string
+          destino?: string | null
+          faixa_cubagem_max?: number | null
+          faixa_cubagem_min?: number | null
+          faixa_peso_max?: number | null
+          faixa_peso_min?: number | null
+          id?: string
+          nome: string
+          origem?: string | null
+          prazo_dias?: number
+          regra?: Json
+          tipo_cobranca?: string
+          updated_at?: string
+          valor_coleta?: number
+          valor_entrega?: number
+          valor_kg?: number
+          valor_m3?: number
+          valor_minimo?: number
+        }
+        Update: {
+          ativo?: boolean
+          cliente_id?: string | null
+          created_at?: string
+          destino?: string | null
+          faixa_cubagem_max?: number | null
+          faixa_cubagem_min?: number | null
+          faixa_peso_max?: number | null
+          faixa_peso_min?: number | null
+          id?: string
+          nome?: string
+          origem?: string | null
+          prazo_dias?: number
+          regra?: Json
+          tipo_cobranca?: string
+          updated_at?: string
+          valor_coleta?: number
+          valor_entrega?: number
+          valor_kg?: number
+          valor_m3?: number
+          valor_minimo?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tms_tabela_frete_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "tms_clientes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tms_volumes: {
+        Row: {
+          altura: number | null
+          codigo: string
+          comprimento: number | null
+          created_at: string
+          hub_atual: string | null
+          id: string
+          largura: number | null
+          minuta_id: string
+          numero: number
+          peso: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          altura?: number | null
+          codigo: string
+          comprimento?: number | null
+          created_at?: string
+          hub_atual?: string | null
+          id?: string
+          largura?: number | null
+          minuta_id: string
+          numero: number
+          peso?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          altura?: number | null
+          codigo?: string
+          comprimento?: number | null
+          created_at?: string
+          hub_atual?: string | null
+          id?: string
+          largura?: number | null
+          minuta_id?: string
+          numero?: number
+          peso?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tms_volumes_minuta_id_fkey"
+            columns: ["minuta_id"]
+            isOneToOne: false
+            referencedRelation: "tms_minutas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -1146,6 +1485,22 @@ export type Database = {
         | "auditor"
       plan_horizon: "1_ano" | "3_anos" | "5_anos" | "10_anos"
       tipo_custo: "fixo" | "variavel" | "unico" | "recorrente"
+      tms_evento_tipo:
+        | "solicitado"
+        | "coleta_programada"
+        | "coletado"
+        | "recebido_hub_origem"
+        | "conferido"
+        | "etiquetado"
+        | "embarcado"
+        | "em_transferencia"
+        | "recebido_hub_destino"
+        | "separado"
+        | "em_rota"
+        | "saiu_entrega"
+        | "entregue"
+        | "ocorrencia"
+        | "devolucao"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1283,6 +1638,23 @@ export const Constants = {
       ],
       plan_horizon: ["1_ano", "3_anos", "5_anos", "10_anos"],
       tipo_custo: ["fixo", "variavel", "unico", "recorrente"],
+      tms_evento_tipo: [
+        "solicitado",
+        "coleta_programada",
+        "coletado",
+        "recebido_hub_origem",
+        "conferido",
+        "etiquetado",
+        "embarcado",
+        "em_transferencia",
+        "recebido_hub_destino",
+        "separado",
+        "em_rota",
+        "saiu_entrega",
+        "entregue",
+        "ocorrencia",
+        "devolucao",
+      ],
     },
   },
 } as const

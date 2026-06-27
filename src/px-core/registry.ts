@@ -88,6 +88,18 @@ export const PX_MODULES: ModuleDefinition[] = [
     eventos: [],
     apis: ["coreEmpresas"],
   },
+  {
+    key: "tms-pxlog",
+    nome: "TMS PXLog",
+    icone: "Truck",
+    versao: "1.0.0",
+    status: "ativo",
+    descricao: "Transfer Hub: minutas, conferência, embarque, tracking e financeiro de fretes.",
+    rotas: ["/tms"],
+    permissoes: ["tms.read", "tms.write", "tms.operacional"],
+    eventos: ["frete.entregue", "custo.lancado"],
+    apis: ["coreCustos", "coreEmpresas"],
+  },
   // Reservados — não implementados, apenas declarados:
   { key: "pxsales", nome: "PXSales", icone: "Rocket", versao: "0.0.0", status: "planejado", descricao: "CRM e gestão comercial.", rotas: [], permissoes: [], eventos: ["venda.criada", "cliente.criado"], apis: [] },
   { key: "pxtms", nome: "PXTMS", icone: "Truck", versao: "0.0.0", status: "planejado", descricao: "Gestão de transporte e fretes.", rotas: [], permissoes: [], eventos: ["frete.entregue"], apis: [] },
