@@ -13,6 +13,7 @@ export const Route = createFileRoute("/_authenticated/tms/etiquetas/$minuta")({
 
 function EtiquetasPage() {
   const { minuta: numero } = useParams({ from: "/_authenticated/tms/etiquetas/$minuta" });
+  const { print: printFlag } = useSearch({ from: "/_authenticated/tms/etiquetas/$minuta" });
   const [minuta, setMinuta] = useState<any | null>(null);
   const [volumes, setVolumes] = useState<any[]>([]);
 
@@ -30,6 +31,13 @@ function EtiquetasPage() {
       await supabase.from("tms_eventos").insert({ minuta_id: (m as any).id, tipo: "etiquetado", origem_evento: "Impressão de etiquetas" });
     })();
   }, [numero]);
+
+  useEffect(() => {
+    if (printFlag && minuta && volumes.length > 0) {
+      const t = setTimeout(() => window.print(), 600);
+      return () => clearTimeout(t);
+    }
+  }, [printFlag, minuta, volumes.length]);
 
   if (!minuta) return <div className="p-6">Carregando…</div>;
 
