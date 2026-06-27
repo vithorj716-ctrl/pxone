@@ -6,6 +6,7 @@ import {
   PanelLeftClose, PanelLeftOpen, Search, Tag, Brain,
 } from "lucide-react";
 import { ExportButton } from "@/components/executive-share";
+import { InstallAppButton } from "@/components/install-app-button";
 
 const navGroups = [
   {
