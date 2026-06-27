@@ -36,7 +36,7 @@ export async function callPxAI(opts: {
   const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ model: modelo, messages: opts.messages }),
+    body: JSON.stringify({ model: modelo, messages }),
   });
   if (r.status === 429) throw new Error("Limite de IA atingido");
   if (r.status === 402) throw new Error("Créditos de IA esgotados");
