@@ -52,7 +52,7 @@ async function callGateway(messages: any[]) {
   const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ model: "google/gemini-2.5-flash", messages }),
+    body: JSON.stringify({ model: "google/gemini-2.5-flash-lite", messages }),
   });
   if (resp.status === 402) throw new Error("Créditos de IA esgotados. Adicione créditos para reativar o conselheiro de preços.");
   if (resp.status === 429) throw new Error("Limite de requisições atingido. Tente novamente em instantes.");
