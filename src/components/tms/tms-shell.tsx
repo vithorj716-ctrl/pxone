@@ -28,9 +28,10 @@ interface TmsShellProps {
   children: ReactNode;
   title: string;
   subtitle?: string;
+  headerActions?: ReactNode;
 }
 
-export function TmsShell({ children, title, subtitle }: TmsShellProps) {
+export function TmsShell({ children, title, subtitle, headerActions }: TmsShellProps) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
   const { activeSystem, setActiveSystem } = useSystem();
