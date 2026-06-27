@@ -13,6 +13,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedValuationRouteImport } from './routes/_authenticated/valuation'
+import { Route as AuthenticatedTmsRouteImport } from './routes/_authenticated/tms'
 import { Route as AuthenticatedTimelineRouteImport } from './routes/_authenticated/timeline'
 import { Route as AuthenticatedRiskRouteImport } from './routes/_authenticated/risk'
 import { Route as AuthenticatedPlatformRouteImport } from './routes/_authenticated/platform'
@@ -32,6 +33,8 @@ import { Route as AuthenticatedBusinessPlanRouteImport } from './routes/_authent
 import { Route as AuthenticatedAplicacoesRouteImport } from './routes/_authenticated/aplicacoes'
 import { Route as AuthenticatedAiAnalystRouteImport } from './routes/_authenticated/ai-analyst'
 import { Route as AuthenticatedFinancialIntelligenceIndexRouteImport } from './routes/_authenticated/financial-intelligence.index'
+import { Route as AuthenticatedTmsTabelaFreteRouteImport } from './routes/_authenticated/tms.tabela-frete'
+import { Route as AuthenticatedTmsClientesRouteImport } from './routes/_authenticated/tms.clientes'
 import { Route as AuthenticatedFinancialIntelligenceDreRouteImport } from './routes/_authenticated/financial-intelligence.dre'
 import { Route as AuthenticatedFinancialIntelligenceDfcRouteImport } from './routes/_authenticated/financial-intelligence.dfc'
 import { Route as AuthenticatedFinancialIntelligenceBreakEvenRouteImport } from './routes/_authenticated/financial-intelligence.break-even'
@@ -53,6 +56,11 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
 const AuthenticatedValuationRoute = AuthenticatedValuationRouteImport.update({
   id: '/valuation',
   path: '/valuation',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTmsRoute = AuthenticatedTmsRouteImport.update({
+  id: '/tms',
+  path: '/tms',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedTimelineRoute = AuthenticatedTimelineRouteImport.update({
@@ -154,6 +162,18 @@ const AuthenticatedFinancialIntelligenceIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedFinancialIntelligenceRoute,
   } as any)
+const AuthenticatedTmsTabelaFreteRoute =
+  AuthenticatedTmsTabelaFreteRouteImport.update({
+    id: '/tabela-frete',
+    path: '/tabela-frete',
+    getParentRoute: () => AuthenticatedTmsRoute,
+  } as any)
+const AuthenticatedTmsClientesRoute =
+  AuthenticatedTmsClientesRouteImport.update({
+    id: '/clientes',
+    path: '/clientes',
+    getParentRoute: () => AuthenticatedTmsRoute,
+  } as any)
 const AuthenticatedFinancialIntelligenceDreRoute =
   AuthenticatedFinancialIntelligenceDreRouteImport.update({
     id: '/dre',
@@ -194,10 +214,13 @@ export interface FileRoutesByFullPath {
   '/platform': typeof AuthenticatedPlatformRoute
   '/risk': typeof AuthenticatedRiskRoute
   '/timeline': typeof AuthenticatedTimelineRoute
+  '/tms': typeof AuthenticatedTmsRouteWithChildren
   '/valuation': typeof AuthenticatedValuationRoute
   '/financial-intelligence/break-even': typeof AuthenticatedFinancialIntelligenceBreakEvenRoute
   '/financial-intelligence/dfc': typeof AuthenticatedFinancialIntelligenceDfcRoute
   '/financial-intelligence/dre': typeof AuthenticatedFinancialIntelligenceDreRoute
+  '/tms/clientes': typeof AuthenticatedTmsClientesRoute
+  '/tms/tabela-frete': typeof AuthenticatedTmsTabelaFreteRoute
   '/financial-intelligence/': typeof AuthenticatedFinancialIntelligenceIndexRoute
 }
 export interface FileRoutesByTo {
@@ -219,11 +242,14 @@ export interface FileRoutesByTo {
   '/platform': typeof AuthenticatedPlatformRoute
   '/risk': typeof AuthenticatedRiskRoute
   '/timeline': typeof AuthenticatedTimelineRoute
+  '/tms': typeof AuthenticatedTmsRouteWithChildren
   '/valuation': typeof AuthenticatedValuationRoute
   '/': typeof AuthenticatedIndexRoute
   '/financial-intelligence/break-even': typeof AuthenticatedFinancialIntelligenceBreakEvenRoute
   '/financial-intelligence/dfc': typeof AuthenticatedFinancialIntelligenceDfcRoute
   '/financial-intelligence/dre': typeof AuthenticatedFinancialIntelligenceDreRoute
+  '/tms/clientes': typeof AuthenticatedTmsClientesRoute
+  '/tms/tabela-frete': typeof AuthenticatedTmsTabelaFreteRoute
   '/financial-intelligence': typeof AuthenticatedFinancialIntelligenceIndexRoute
 }
 export interface FileRoutesById {
@@ -248,11 +274,14 @@ export interface FileRoutesById {
   '/_authenticated/platform': typeof AuthenticatedPlatformRoute
   '/_authenticated/risk': typeof AuthenticatedRiskRoute
   '/_authenticated/timeline': typeof AuthenticatedTimelineRoute
+  '/_authenticated/tms': typeof AuthenticatedTmsRouteWithChildren
   '/_authenticated/valuation': typeof AuthenticatedValuationRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/financial-intelligence/break-even': typeof AuthenticatedFinancialIntelligenceBreakEvenRoute
   '/_authenticated/financial-intelligence/dfc': typeof AuthenticatedFinancialIntelligenceDfcRoute
   '/_authenticated/financial-intelligence/dre': typeof AuthenticatedFinancialIntelligenceDreRoute
+  '/_authenticated/tms/clientes': typeof AuthenticatedTmsClientesRoute
+  '/_authenticated/tms/tabela-frete': typeof AuthenticatedTmsTabelaFreteRoute
   '/_authenticated/financial-intelligence/': typeof AuthenticatedFinancialIntelligenceIndexRoute
 }
 export interface FileRouteTypes {
@@ -278,10 +307,13 @@ export interface FileRouteTypes {
     | '/platform'
     | '/risk'
     | '/timeline'
+    | '/tms'
     | '/valuation'
     | '/financial-intelligence/break-even'
     | '/financial-intelligence/dfc'
     | '/financial-intelligence/dre'
+    | '/tms/clientes'
+    | '/tms/tabela-frete'
     | '/financial-intelligence/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -303,11 +335,14 @@ export interface FileRouteTypes {
     | '/platform'
     | '/risk'
     | '/timeline'
+    | '/tms'
     | '/valuation'
     | '/'
     | '/financial-intelligence/break-even'
     | '/financial-intelligence/dfc'
     | '/financial-intelligence/dre'
+    | '/tms/clientes'
+    | '/tms/tabela-frete'
     | '/financial-intelligence'
   id:
     | '__root__'
@@ -331,11 +366,14 @@ export interface FileRouteTypes {
     | '/_authenticated/platform'
     | '/_authenticated/risk'
     | '/_authenticated/timeline'
+    | '/_authenticated/tms'
     | '/_authenticated/valuation'
     | '/_authenticated/'
     | '/_authenticated/financial-intelligence/break-even'
     | '/_authenticated/financial-intelligence/dfc'
     | '/_authenticated/financial-intelligence/dre'
+    | '/_authenticated/tms/clientes'
+    | '/_authenticated/tms/tabela-frete'
     | '/_authenticated/financial-intelligence/'
   fileRoutesById: FileRoutesById
 }
@@ -372,6 +410,13 @@ declare module '@tanstack/react-router' {
       path: '/valuation'
       fullPath: '/valuation'
       preLoaderRoute: typeof AuthenticatedValuationRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tms': {
+      id: '/_authenticated/tms'
+      path: '/tms'
+      fullPath: '/tms'
+      preLoaderRoute: typeof AuthenticatedTmsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/timeline': {
@@ -507,6 +552,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFinancialIntelligenceIndexRouteImport
       parentRoute: typeof AuthenticatedFinancialIntelligenceRoute
     }
+    '/_authenticated/tms/tabela-frete': {
+      id: '/_authenticated/tms/tabela-frete'
+      path: '/tabela-frete'
+      fullPath: '/tms/tabela-frete'
+      preLoaderRoute: typeof AuthenticatedTmsTabelaFreteRouteImport
+      parentRoute: typeof AuthenticatedTmsRoute
+    }
+    '/_authenticated/tms/clientes': {
+      id: '/_authenticated/tms/clientes'
+      path: '/clientes'
+      fullPath: '/tms/clientes'
+      preLoaderRoute: typeof AuthenticatedTmsClientesRouteImport
+      parentRoute: typeof AuthenticatedTmsRoute
+    }
     '/_authenticated/financial-intelligence/dre': {
       id: '/_authenticated/financial-intelligence/dre'
       path: '/dre'
@@ -555,6 +614,19 @@ const AuthenticatedFinancialIntelligenceRouteWithChildren =
     AuthenticatedFinancialIntelligenceRouteChildren,
   )
 
+interface AuthenticatedTmsRouteChildren {
+  AuthenticatedTmsClientesRoute: typeof AuthenticatedTmsClientesRoute
+  AuthenticatedTmsTabelaFreteRoute: typeof AuthenticatedTmsTabelaFreteRoute
+}
+
+const AuthenticatedTmsRouteChildren: AuthenticatedTmsRouteChildren = {
+  AuthenticatedTmsClientesRoute: AuthenticatedTmsClientesRoute,
+  AuthenticatedTmsTabelaFreteRoute: AuthenticatedTmsTabelaFreteRoute,
+}
+
+const AuthenticatedTmsRouteWithChildren =
+  AuthenticatedTmsRoute._addFileChildren(AuthenticatedTmsRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAiAnalystRoute: typeof AuthenticatedAiAnalystRoute
   AuthenticatedAplicacoesRoute: typeof AuthenticatedAplicacoesRoute
@@ -574,6 +646,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPlatformRoute: typeof AuthenticatedPlatformRoute
   AuthenticatedRiskRoute: typeof AuthenticatedRiskRoute
   AuthenticatedTimelineRoute: typeof AuthenticatedTimelineRoute
+  AuthenticatedTmsRoute: typeof AuthenticatedTmsRouteWithChildren
   AuthenticatedValuationRoute: typeof AuthenticatedValuationRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
@@ -598,6 +671,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPlatformRoute: AuthenticatedPlatformRoute,
   AuthenticatedRiskRoute: AuthenticatedRiskRoute,
   AuthenticatedTimelineRoute: AuthenticatedTimelineRoute,
+  AuthenticatedTmsRoute: AuthenticatedTmsRouteWithChildren,
   AuthenticatedValuationRoute: AuthenticatedValuationRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
 }
