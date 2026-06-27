@@ -599,24 +599,24 @@ function ExportModal({ module: mod, onClose }: { module: ModuleConfig; onClose: 
   if (!portalTarget) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in" onClick={onClose}>
+    <div className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center sm:p-4 animate-fade-in" onClick={onClose}>
       <div
-        className="bg-surface ring-1 ring-border rounded-xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col"
+        className="bg-surface ring-1 ring-border rounded-t-xl sm:rounded-xl w-full max-w-3xl max-h-[92vh] sm:max-h-[90vh] overflow-hidden flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        <header className="px-6 py-4 border-b border-border flex items-center justify-between">
-          <div>
-            <h2 className="text-sm font-medium">Centro de Exportação Executiva</h2>
-            <p className="text-xs text-muted-foreground mt-0.5">
+        <header className="px-4 sm:px-6 py-4 border-b border-border flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <h2 className="text-sm font-medium truncate">Centro de Exportação</h2>
+            <p className="text-xs text-muted-foreground mt-0.5 truncate">
               Módulo: <span className="text-foreground font-medium">{mod.title}</span>
             </p>
           </div>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
-            <X className="size-4" />
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground p-1 shrink-0">
+            <X className="size-5" />
           </button>
         </header>
 
-        <div className="px-6 py-4 border-b border-border bg-surface-2/30">
+        <div className="px-4 sm:px-6 py-4 border-b border-border bg-surface-2/30">
           <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground mb-2">
             <Sparkles className="size-3.5 text-brand" /> Análise IA
           </div>
@@ -636,7 +636,7 @@ function ExportModal({ module: mod, onClose }: { module: ModuleConfig; onClose: 
           )}
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6 thin-scroll">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 thin-scroll">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {FORMATS.map((f) => {
               const Icon = f.icon;
