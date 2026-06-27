@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-async function callGateway(messages: any[], model = "google/gemini-2.5-flash") {
+async function callGateway(messages: any[], model = "google/gemini-2.5-flash-lite") {
   const apiKey = process.env.LOVABLE_API_KEY;
   if (!apiKey) throw new Error("LOVABLE_API_KEY ausente no servidor");
   const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
