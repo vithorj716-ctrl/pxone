@@ -3,7 +3,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import {
   LayoutDashboard, Target, Calculator, TrendingUp, Gavel, ShieldAlert,
   Users, Sparkles, Goal, Rocket, FileText, Clock, Wallet, Building2,
-  PanelLeftClose, PanelLeftOpen, Search, Tag, Brain, Menu, X, PanelRight,
+  PanelLeftClose, PanelLeftOpen, Search, Tag, Brain, Menu, X, PanelRight, Boxes,
 } from "lucide-react";
 import { ExportButton } from "@/components/executive-share";
 import { InstallAppButton } from "@/components/install-app-button";
@@ -44,6 +44,12 @@ const navGroups = [
       { to: "/ai-analyst", label: "Conselheiro IA", icon: Sparkles },
       { to: "/documents", label: "Documentos", icon: FileText },
       { to: "/timeline", label: "Timeline", icon: Clock },
+    ],
+  },
+  {
+    label: "Plataforma",
+    items: [
+      { to: "/platform", label: "PX Platform", icon: Boxes },
     ],
   },
 ] as const;
