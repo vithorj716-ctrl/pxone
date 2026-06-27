@@ -178,7 +178,10 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
     </div>
   );
 }
-function Inp({ label, value, onChange, type = "text", step, required, placeholder }: any) {
+function Inp({ label, value, onChange, type = "text", step, required, placeholder }: {
+  label: string; value: any; onChange: (v: string) => void;
+  type?: string; step?: string; required?: boolean; placeholder?: string;
+}) {
   return (
     <div>
       <label className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</label>
@@ -188,13 +191,16 @@ function Inp({ label, value, onChange, type = "text", step, required, placeholde
     </div>
   );
 }
-function Sel({ label, value, onChange, options }: any) {
+function Sel({ label, value, onChange, options }: {
+  label: string; value: string; onChange: (v: string) => void;
+  options: { value: string; label: string }[];
+}) {
   return (
     <div className="col-span-2">
       <label className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</label>
       <select value={value} onChange={(e) => onChange(e.target.value)}
         className="w-full mt-1 bg-surface ring-1 ring-border rounded-md px-2 py-1.5 text-sm">
-        {options.map((o: any) => <option key={o.value} value={o.value}>{o.label}</option>)}
+        {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
       </select>
     </div>
   );

@@ -34,10 +34,14 @@ import { Route as AuthenticatedAplicacoesRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAiAnalystRouteImport } from './routes/_authenticated/ai-analyst'
 import { Route as AuthenticatedFinancialIntelligenceIndexRouteImport } from './routes/_authenticated/financial-intelligence.index'
 import { Route as AuthenticatedTmsTabelaFreteRouteImport } from './routes/_authenticated/tms.tabela-frete'
+import { Route as AuthenticatedTmsSolicitacoesRouteImport } from './routes/_authenticated/tms.solicitacoes'
 import { Route as AuthenticatedTmsClientesRouteImport } from './routes/_authenticated/tms.clientes'
 import { Route as AuthenticatedFinancialIntelligenceDreRouteImport } from './routes/_authenticated/financial-intelligence.dre'
 import { Route as AuthenticatedFinancialIntelligenceDfcRouteImport } from './routes/_authenticated/financial-intelligence.dfc'
 import { Route as AuthenticatedFinancialIntelligenceBreakEvenRouteImport } from './routes/_authenticated/financial-intelligence.break-even'
+import { Route as AuthenticatedTmsSolicitacoesNovaRouteImport } from './routes/_authenticated/tms.solicitacoes.nova'
+import { Route as AuthenticatedTmsMinutasNumeroRouteImport } from './routes/_authenticated/tms.minutas.$numero'
+import { Route as AuthenticatedTmsEtiquetasMinutaRouteImport } from './routes/_authenticated/tms.etiquetas.$minuta'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -168,6 +172,12 @@ const AuthenticatedTmsTabelaFreteRoute =
     path: '/tabela-frete',
     getParentRoute: () => AuthenticatedTmsRoute,
   } as any)
+const AuthenticatedTmsSolicitacoesRoute =
+  AuthenticatedTmsSolicitacoesRouteImport.update({
+    id: '/solicitacoes',
+    path: '/solicitacoes',
+    getParentRoute: () => AuthenticatedTmsRoute,
+  } as any)
 const AuthenticatedTmsClientesRoute =
   AuthenticatedTmsClientesRouteImport.update({
     id: '/clientes',
@@ -191,6 +201,24 @@ const AuthenticatedFinancialIntelligenceBreakEvenRoute =
     id: '/break-even',
     path: '/break-even',
     getParentRoute: () => AuthenticatedFinancialIntelligenceRoute,
+  } as any)
+const AuthenticatedTmsSolicitacoesNovaRoute =
+  AuthenticatedTmsSolicitacoesNovaRouteImport.update({
+    id: '/nova',
+    path: '/nova',
+    getParentRoute: () => AuthenticatedTmsSolicitacoesRoute,
+  } as any)
+const AuthenticatedTmsMinutasNumeroRoute =
+  AuthenticatedTmsMinutasNumeroRouteImport.update({
+    id: '/minutas/$numero',
+    path: '/minutas/$numero',
+    getParentRoute: () => AuthenticatedTmsRoute,
+  } as any)
+const AuthenticatedTmsEtiquetasMinutaRoute =
+  AuthenticatedTmsEtiquetasMinutaRouteImport.update({
+    id: '/etiquetas/$minuta',
+    path: '/etiquetas/$minuta',
+    getParentRoute: () => AuthenticatedTmsRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -220,8 +248,12 @@ export interface FileRoutesByFullPath {
   '/financial-intelligence/dfc': typeof AuthenticatedFinancialIntelligenceDfcRoute
   '/financial-intelligence/dre': typeof AuthenticatedFinancialIntelligenceDreRoute
   '/tms/clientes': typeof AuthenticatedTmsClientesRoute
+  '/tms/solicitacoes': typeof AuthenticatedTmsSolicitacoesRouteWithChildren
   '/tms/tabela-frete': typeof AuthenticatedTmsTabelaFreteRoute
   '/financial-intelligence/': typeof AuthenticatedFinancialIntelligenceIndexRoute
+  '/tms/etiquetas/$minuta': typeof AuthenticatedTmsEtiquetasMinutaRoute
+  '/tms/minutas/$numero': typeof AuthenticatedTmsMinutasNumeroRoute
+  '/tms/solicitacoes/nova': typeof AuthenticatedTmsSolicitacoesNovaRoute
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
@@ -249,8 +281,12 @@ export interface FileRoutesByTo {
   '/financial-intelligence/dfc': typeof AuthenticatedFinancialIntelligenceDfcRoute
   '/financial-intelligence/dre': typeof AuthenticatedFinancialIntelligenceDreRoute
   '/tms/clientes': typeof AuthenticatedTmsClientesRoute
+  '/tms/solicitacoes': typeof AuthenticatedTmsSolicitacoesRouteWithChildren
   '/tms/tabela-frete': typeof AuthenticatedTmsTabelaFreteRoute
   '/financial-intelligence': typeof AuthenticatedFinancialIntelligenceIndexRoute
+  '/tms/etiquetas/$minuta': typeof AuthenticatedTmsEtiquetasMinutaRoute
+  '/tms/minutas/$numero': typeof AuthenticatedTmsMinutasNumeroRoute
+  '/tms/solicitacoes/nova': typeof AuthenticatedTmsSolicitacoesNovaRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -281,8 +317,12 @@ export interface FileRoutesById {
   '/_authenticated/financial-intelligence/dfc': typeof AuthenticatedFinancialIntelligenceDfcRoute
   '/_authenticated/financial-intelligence/dre': typeof AuthenticatedFinancialIntelligenceDreRoute
   '/_authenticated/tms/clientes': typeof AuthenticatedTmsClientesRoute
+  '/_authenticated/tms/solicitacoes': typeof AuthenticatedTmsSolicitacoesRouteWithChildren
   '/_authenticated/tms/tabela-frete': typeof AuthenticatedTmsTabelaFreteRoute
   '/_authenticated/financial-intelligence/': typeof AuthenticatedFinancialIntelligenceIndexRoute
+  '/_authenticated/tms/etiquetas/$minuta': typeof AuthenticatedTmsEtiquetasMinutaRoute
+  '/_authenticated/tms/minutas/$numero': typeof AuthenticatedTmsMinutasNumeroRoute
+  '/_authenticated/tms/solicitacoes/nova': typeof AuthenticatedTmsSolicitacoesNovaRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -313,8 +353,12 @@ export interface FileRouteTypes {
     | '/financial-intelligence/dfc'
     | '/financial-intelligence/dre'
     | '/tms/clientes'
+    | '/tms/solicitacoes'
     | '/tms/tabela-frete'
     | '/financial-intelligence/'
+    | '/tms/etiquetas/$minuta'
+    | '/tms/minutas/$numero'
+    | '/tms/solicitacoes/nova'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/auth'
@@ -342,8 +386,12 @@ export interface FileRouteTypes {
     | '/financial-intelligence/dfc'
     | '/financial-intelligence/dre'
     | '/tms/clientes'
+    | '/tms/solicitacoes'
     | '/tms/tabela-frete'
     | '/financial-intelligence'
+    | '/tms/etiquetas/$minuta'
+    | '/tms/minutas/$numero'
+    | '/tms/solicitacoes/nova'
   id:
     | '__root__'
     | '/_authenticated'
@@ -373,8 +421,12 @@ export interface FileRouteTypes {
     | '/_authenticated/financial-intelligence/dfc'
     | '/_authenticated/financial-intelligence/dre'
     | '/_authenticated/tms/clientes'
+    | '/_authenticated/tms/solicitacoes'
     | '/_authenticated/tms/tabela-frete'
     | '/_authenticated/financial-intelligence/'
+    | '/_authenticated/tms/etiquetas/$minuta'
+    | '/_authenticated/tms/minutas/$numero'
+    | '/_authenticated/tms/solicitacoes/nova'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -559,6 +611,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTmsTabelaFreteRouteImport
       parentRoute: typeof AuthenticatedTmsRoute
     }
+    '/_authenticated/tms/solicitacoes': {
+      id: '/_authenticated/tms/solicitacoes'
+      path: '/solicitacoes'
+      fullPath: '/tms/solicitacoes'
+      preLoaderRoute: typeof AuthenticatedTmsSolicitacoesRouteImport
+      parentRoute: typeof AuthenticatedTmsRoute
+    }
     '/_authenticated/tms/clientes': {
       id: '/_authenticated/tms/clientes'
       path: '/clientes'
@@ -587,6 +646,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFinancialIntelligenceBreakEvenRouteImport
       parentRoute: typeof AuthenticatedFinancialIntelligenceRoute
     }
+    '/_authenticated/tms/solicitacoes/nova': {
+      id: '/_authenticated/tms/solicitacoes/nova'
+      path: '/nova'
+      fullPath: '/tms/solicitacoes/nova'
+      preLoaderRoute: typeof AuthenticatedTmsSolicitacoesNovaRouteImport
+      parentRoute: typeof AuthenticatedTmsSolicitacoesRoute
+    }
+    '/_authenticated/tms/minutas/$numero': {
+      id: '/_authenticated/tms/minutas/$numero'
+      path: '/minutas/$numero'
+      fullPath: '/tms/minutas/$numero'
+      preLoaderRoute: typeof AuthenticatedTmsMinutasNumeroRouteImport
+      parentRoute: typeof AuthenticatedTmsRoute
+    }
+    '/_authenticated/tms/etiquetas/$minuta': {
+      id: '/_authenticated/tms/etiquetas/$minuta'
+      path: '/etiquetas/$minuta'
+      fullPath: '/tms/etiquetas/$minuta'
+      preLoaderRoute: typeof AuthenticatedTmsEtiquetasMinutaRouteImport
+      parentRoute: typeof AuthenticatedTmsRoute
+    }
   }
 }
 
@@ -614,14 +694,36 @@ const AuthenticatedFinancialIntelligenceRouteWithChildren =
     AuthenticatedFinancialIntelligenceRouteChildren,
   )
 
+interface AuthenticatedTmsSolicitacoesRouteChildren {
+  AuthenticatedTmsSolicitacoesNovaRoute: typeof AuthenticatedTmsSolicitacoesNovaRoute
+}
+
+const AuthenticatedTmsSolicitacoesRouteChildren: AuthenticatedTmsSolicitacoesRouteChildren =
+  {
+    AuthenticatedTmsSolicitacoesNovaRoute:
+      AuthenticatedTmsSolicitacoesNovaRoute,
+  }
+
+const AuthenticatedTmsSolicitacoesRouteWithChildren =
+  AuthenticatedTmsSolicitacoesRoute._addFileChildren(
+    AuthenticatedTmsSolicitacoesRouteChildren,
+  )
+
 interface AuthenticatedTmsRouteChildren {
   AuthenticatedTmsClientesRoute: typeof AuthenticatedTmsClientesRoute
+  AuthenticatedTmsSolicitacoesRoute: typeof AuthenticatedTmsSolicitacoesRouteWithChildren
   AuthenticatedTmsTabelaFreteRoute: typeof AuthenticatedTmsTabelaFreteRoute
+  AuthenticatedTmsEtiquetasMinutaRoute: typeof AuthenticatedTmsEtiquetasMinutaRoute
+  AuthenticatedTmsMinutasNumeroRoute: typeof AuthenticatedTmsMinutasNumeroRoute
 }
 
 const AuthenticatedTmsRouteChildren: AuthenticatedTmsRouteChildren = {
   AuthenticatedTmsClientesRoute: AuthenticatedTmsClientesRoute,
+  AuthenticatedTmsSolicitacoesRoute:
+    AuthenticatedTmsSolicitacoesRouteWithChildren,
   AuthenticatedTmsTabelaFreteRoute: AuthenticatedTmsTabelaFreteRoute,
+  AuthenticatedTmsEtiquetasMinutaRoute: AuthenticatedTmsEtiquetasMinutaRoute,
+  AuthenticatedTmsMinutasNumeroRoute: AuthenticatedTmsMinutasNumeroRoute,
 }
 
 const AuthenticatedTmsRouteWithChildren =
