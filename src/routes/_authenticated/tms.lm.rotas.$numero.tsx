@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { TmsShell } from "@/components/tms/tms-shell";
 import { EntregaCard } from "@/components/tms/lm/entrega-card";
 import { PodCapture } from "@/components/tms/lm/pod-capture";
+import { NovaEntregaDialog } from "@/components/tms/lm/nova-entrega-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { LM_STATUS_ROTA } from "@/lib/tms-lm";
 import { useState } from "react";
