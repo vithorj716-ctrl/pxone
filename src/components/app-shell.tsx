@@ -3,7 +3,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import {
   LayoutDashboard, Target, Calculator, TrendingUp, Gavel, ShieldAlert,
   Users, Sparkles, Goal, Rocket, FileText, Clock, Wallet, Building2,
-  PanelLeftClose, PanelLeftOpen, Search, Tag, Brain,
+  PanelLeftClose, PanelLeftOpen, Search, Tag, Brain, Menu, X, PanelRight,
 } from "lucide-react";
 import { ExportButton } from "@/components/executive-share";
 import { InstallAppButton } from "@/components/install-app-button";
@@ -63,6 +63,8 @@ interface AppShellProps {
 export function AppShell({ children, title, subtitle, rightPanel, headerActions }: AppShellProps) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [mobileRightOpen, setMobileRightOpen] = useState(false);
   const [now, setNow] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const [search, setSearch] = useState("");
@@ -89,11 +91,29 @@ export function AppShell({ children, title, subtitle, rightPanel, headerActions 
         setShowSearch((s) => !s);
       } else if (e.key === "Escape") {
         setShowSearch(false);
+        setMobileNavOpen(false);
+        setMobileRightOpen(false);
       }
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
+
+  // Close mobile drawers on route change
+  useEffect(() => {
+    setMobileNavOpen(false);
+    setMobileRightOpen(false);
+  }, [pathname]);
+
+  // Lock body scroll when any drawer is open
+  useEffect(() => {
+    const anyOpen = mobileNavOpen || mobileRightOpen || showSearch;
+    if (anyOpen) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => { document.body.style.overflow = prev; };
+    }
+  }, [mobileNavOpen, mobileRightOpen, showSearch]);
 
   function toggleCollapse() {
     const next = !collapsed;
@@ -104,138 +124,200 @@ export function AppShell({ children, title, subtitle, rightPanel, headerActions 
   const isActive = (to: string, exact?: boolean) =>
     exact ? pathname === to : pathname === to || pathname.startsWith(to + "/");
 
-
-
-
   const filteredLinks = search.trim()
     ? ALL_LINKS.filter((l) => l.label.toLowerCase().includes(search.toLowerCase()))
     : ALL_LINKS;
 
+  const SidebarInner = ({ onNavigate }: { onNavigate?: () => void }) => (
+    <>
+      <div className="p-4 flex items-center justify-between">
+        <Link to="/" onClick={onNavigate} className="flex items-center gap-2 overflow-hidden">
+          <div className="size-7 rounded-md flex items-center justify-center shrink-0" style={{ background: "var(--gradient-brand)" }}>
+            <span className="text-[11px] font-bold text-brand-foreground">PX</span>
+          </div>
+          {!collapsed && (
+            <div className="overflow-hidden">
+              <span className="text-base font-semibold tracking-tight block leading-none">PXOne</span>
+              <span className="text-[9px] uppercase tracking-widest text-muted-foreground">Corporate OS</span>
+            </div>
+          )}
+        </Link>
+        {/* Desktop collapse toggle */}
+        <button
+          onClick={toggleCollapse}
+          className="hidden lg:inline-flex p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-surface/60 transition-colors"
+          title={collapsed ? "Expandir (Ctrl+B)" : "Recolher (Ctrl+B)"}
+        >
+          {collapsed ? <PanelLeftOpen className="size-4" /> : <PanelLeftClose className="size-4" />}
+        </button>
+        {/* Mobile close */}
+        {onNavigate && (
+          <button onClick={onNavigate} className="lg:hidden p-1.5 rounded-md text-muted-foreground hover:text-foreground">
+            <X className="size-5" />
+          </button>
+        )}
+      </div>
+
+      <nav className="flex-1 px-2 space-y-1 overflow-y-auto thin-scroll pb-4">
+        {navGroups.map((group) => (
+          <div key={group.label}>
+            {!collapsed && (
+              <p className="px-2 pt-4 pb-2 text-[10px] font-medium uppercase tracking-widest text-muted-foreground/70">
+                {group.label}
+              </p>
+            )}
+            {collapsed && <div className="my-3 mx-3 h-px bg-border/60" />}
+            <div className="space-y-0.5">
+              {group.items.map((item) => {
+                const Icon = item.icon;
+                const active = isActive(item.to, "exact" in item ? item.exact : false);
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    onClick={onNavigate}
+                    title={collapsed ? item.label : undefined}
+                    className={`group relative w-full flex items-center py-2.5 rounded-md text-sm transition-all duration-200 ${
+                      collapsed ? "justify-center px-2" : "px-3"
+                    } ${
+                      active
+                        ? "bg-surface-2 text-foreground"
+                        : "text-muted-foreground hover:text-foreground hover:bg-surface/60"
+                    }`}
+                  >
+                    {active && (
+                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 rounded-r-full bg-brand animate-fade-in" />
+                    )}
+                    <Icon className={`size-4 shrink-0 ${active ? "text-brand" : ""} ${collapsed ? "" : "mr-2.5"}`} />
+                    {!collapsed && <span className="font-medium truncate">{item.label}</span>}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </nav>
+
+      <div className="p-3 border-t border-border">
+        <div className={`flex items-center gap-2 p-2 rounded-lg bg-surface/60 ring-1 ring-border ${collapsed ? "justify-center" : ""}`}>
+          <div className="size-8 rounded-full flex items-center justify-center shrink-0" style={{ background: "var(--gradient-brand)" }}>
+            <span className="text-[10px] font-bold text-brand-foreground">PX</span>
+          </div>
+          {!collapsed && (
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-medium truncate">Sistema Corporativo PXOne</p>
+              <p className="text-[10px] text-muted-foreground truncate">Modo Interno</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </>
+  );
+
   return (
-    <div className="flex h-screen overflow-hidden bg-background text-foreground">
-      {/* Sidebar */}
+    <div className="flex h-[100dvh] overflow-hidden bg-background text-foreground">
+      {/* Desktop Sidebar */}
       <aside
-        className={`border-r border-border flex flex-col shrink-0 bg-sidebar transition-[width] duration-300 ease-out ${
+        className={`hidden lg:flex border-r border-border flex-col shrink-0 bg-sidebar transition-[width] duration-300 ease-out ${
           collapsed ? "w-16" : "w-64"
         }`}
       >
-        <div className="p-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 overflow-hidden">
-            <div className="size-7 rounded-md flex items-center justify-center shrink-0" style={{ background: "var(--gradient-brand)" }}>
-              <span className="text-[11px] font-bold text-brand-foreground">PX</span>
-            </div>
-            {!collapsed && (
-              <div className="overflow-hidden">
-                <span className="text-base font-semibold tracking-tight block leading-none">PXOne</span>
-                <span className="text-[9px] uppercase tracking-widest text-muted-foreground">Corporate OS</span>
-              </div>
-            )}
-          </Link>
-          <button
-            onClick={toggleCollapse}
-            className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-surface/60 transition-colors"
-            title={collapsed ? "Expandir (Ctrl+B)" : "Recolher (Ctrl+B)"}
-          >
-            {collapsed ? <PanelLeftOpen className="size-4" /> : <PanelLeftClose className="size-4" />}
-          </button>
-        </div>
-
-        <nav className="flex-1 px-2 space-y-1 overflow-y-auto thin-scroll pb-4">
-          {navGroups.map((group) => (
-            <div key={group.label}>
-              {!collapsed && (
-                <p className="px-2 pt-4 pb-2 text-[10px] font-medium uppercase tracking-widest text-muted-foreground/70">
-                  {group.label}
-                </p>
-              )}
-              {collapsed && <div className="my-3 mx-3 h-px bg-border/60" />}
-              <div className="space-y-0.5">
-                {group.items.map((item) => {
-                  const Icon = item.icon;
-                  const active = isActive(item.to, "exact" in item ? item.exact : false);
-                  return (
-                    <Link
-                      key={item.to}
-                      to={item.to}
-                      title={collapsed ? item.label : undefined}
-                      className={`group relative w-full flex items-center py-2 rounded-md text-sm transition-all duration-200 ${
-                        collapsed ? "justify-center px-2" : "px-3"
-                      } ${
-                        active
-                          ? "bg-surface-2 text-foreground"
-                          : "text-muted-foreground hover:text-foreground hover:bg-surface/60 hover:translate-x-0.5"
-                      }`}
-                    >
-                      {active && (
-                        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 rounded-r-full bg-brand animate-fade-in" />
-                      )}
-                      <Icon className={`size-4 shrink-0 ${active ? "text-brand" : ""} ${collapsed ? "" : "mr-2.5"}`} />
-                      {!collapsed && <span className="font-medium truncate">{item.label}</span>}
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
-        </nav>
-
-        <div className="p-3 border-t border-border">
-          <div className={`flex items-center gap-2 p-2 rounded-lg bg-surface/60 ring-1 ring-border ${collapsed ? "justify-center" : ""}`}>
-            <div className="size-8 rounded-full flex items-center justify-center shrink-0" style={{ background: "var(--gradient-brand)" }}>
-              <span className="text-[10px] font-bold text-brand-foreground">PX</span>
-            </div>
-            {!collapsed && (
-              <div className="min-w-0 flex-1">
-                <p className="text-xs font-medium truncate">Sistema Corporativo PXOne</p>
-                <p className="text-[10px] text-muted-foreground truncate">Modo Interno</p>
-              </div>
-            )}
-          </div>
-        </div>
+        <SidebarInner />
       </aside>
 
+      {/* Mobile Sidebar Drawer */}
+      {mobileNavOpen && (
+        <div className="lg:hidden fixed inset-0 z-50 flex">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm animate-fade-in" onClick={() => setMobileNavOpen(false)} />
+          <aside className="relative w-72 max-w-[85vw] bg-sidebar border-r border-border flex flex-col h-full animate-slide-down">
+            <SidebarInner onNavigate={() => setMobileNavOpen(false)} />
+          </aside>
+        </div>
+      )}
+
       {/* Main */}
-      <main className="flex-1 overflow-y-auto thin-scroll bg-background">
-        <header className="sticky top-0 z-20 h-14 border-b border-border bg-background/80 backdrop-blur-xl px-6 flex items-center justify-between">
-          <div className="flex items-center gap-3 min-w-0">
-            <h1 className="text-sm font-semibold truncate">{title}</h1>
-            {subtitle && (
-              <>
-                <div className="h-3.5 w-px bg-border" />
-                <span className="text-sm text-muted-foreground truncate">{subtitle}</span>
-              </>
-            )}
+      <main className="flex-1 overflow-y-auto thin-scroll bg-background min-w-0">
+        <header className="sticky top-0 z-20 h-14 border-b border-border bg-background/85 backdrop-blur-xl px-3 sm:px-4 lg:px-6 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            <button
+              onClick={() => setMobileNavOpen(true)}
+              className="lg:hidden p-2 -ml-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-surface/60"
+              aria-label="Abrir menu"
+            >
+              <Menu className="size-5" />
+            </button>
+            <div className="min-w-0 flex items-center gap-2">
+              <h1 className="text-sm font-semibold truncate">{title}</h1>
+              {subtitle && (
+                <>
+                  <div className="h-3.5 w-px bg-border hidden sm:block" />
+                  <span className="text-sm text-muted-foreground truncate hidden sm:inline">{subtitle}</span>
+                </>
+              )}
+            </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
             <button
               onClick={() => setShowSearch(true)}
-              className="hidden sm:inline-flex items-center gap-2 px-2.5 py-1.5 rounded-md ring-1 ring-border bg-surface/60 text-xs text-muted-foreground hover:text-foreground transition-colors"
+              className="hidden md:inline-flex items-center gap-2 px-2.5 py-1.5 rounded-md ring-1 ring-border bg-surface/60 text-xs text-muted-foreground hover:text-foreground transition-colors"
               title="Buscar módulo (Ctrl+K)"
             >
               <Search className="size-3.5" /> Buscar
               <kbd className="ml-2 px-1.5 py-0.5 rounded bg-surface-2 text-[10px] font-mono">⌘K</kbd>
             </button>
+            <button
+              onClick={() => setShowSearch(true)}
+              className="md:hidden p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-surface/60"
+              aria-label="Buscar"
+            >
+              <Search className="size-5" />
+            </button>
             {headerActions}
             <InstallAppButton />
             <ExportButton />
-            <span className="text-[11px] text-muted-foreground tabular-nums hidden md:inline">
+            {rightPanel && (
+              <button
+                onClick={() => setMobileRightOpen(true)}
+                className="xl:hidden p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-surface/60"
+                aria-label="Abrir painel"
+              >
+                <PanelRight className="size-5" />
+              </button>
+            )}
+            <span className="text-[11px] text-muted-foreground tabular-nums hidden lg:inline">
               <span className="size-1.5 rounded-full bg-brand inline-block mr-1.5 animate-pulse-glow" /> {now}
             </span>
           </div>
         </header>
-        <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-6 animate-fade-in">{children}</div>
+        <div className="p-3 sm:p-5 lg:p-8 max-w-7xl mx-auto space-y-4 sm:space-y-6 animate-fade-in">{children}</div>
       </main>
 
-      {/* Right panel */}
+      {/* Right panel — desktop */}
       {rightPanel && (
-        <aside className="w-80 border-l border-border bg-sidebar/40 shrink-0 p-6 overflow-y-auto thin-scroll animate-fade-in">
+        <aside className="hidden xl:block w-80 border-l border-border bg-sidebar/40 shrink-0 p-6 overflow-y-auto thin-scroll animate-fade-in">
           {rightPanel}
         </aside>
       )}
 
+      {/* Right panel — mobile drawer */}
+      {rightPanel && mobileRightOpen && (
+        <div className="xl:hidden fixed inset-0 z-50 flex justify-end">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm animate-fade-in" onClick={() => setMobileRightOpen(false)} />
+          <aside className="relative w-80 max-w-[90vw] bg-sidebar border-l border-border h-full overflow-y-auto thin-scroll animate-slide-down">
+            <div className="flex items-center justify-between p-3 border-b border-border sticky top-0 bg-sidebar z-10">
+              <span className="text-xs font-medium uppercase tracking-widest text-muted-foreground">Painel</span>
+              <button onClick={() => setMobileRightOpen(false)} className="p-1.5 rounded-md text-muted-foreground hover:text-foreground">
+                <X className="size-5" />
+              </button>
+            </div>
+            <div className="p-5">{rightPanel}</div>
+          </aside>
+        </div>
+      )}
+
       {/* Command palette */}
       {showSearch && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-start justify-center pt-32 px-4 animate-fade-in" onClick={() => setShowSearch(false)}>
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-start justify-center pt-16 sm:pt-32 px-3 animate-fade-in" onClick={() => setShowSearch(false)}>
           <div
             className="w-full max-w-lg bg-surface ring-1 ring-border rounded-xl overflow-hidden shadow-2xl animate-scale-in"
             onClick={(e) => e.stopPropagation()}
@@ -249,9 +331,9 @@ export function AppShell({ children, title, subtitle, rightPanel, headerActions 
                 placeholder="Ir para módulo…"
                 className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
               />
-              <kbd className="px-1.5 py-0.5 rounded bg-surface-2 text-[10px] font-mono text-muted-foreground">ESC</kbd>
+              <kbd className="px-1.5 py-0.5 rounded bg-surface-2 text-[10px] font-mono text-muted-foreground hidden sm:inline">ESC</kbd>
             </div>
-            <div className="max-h-80 overflow-y-auto thin-scroll p-1">
+            <div className="max-h-[60vh] sm:max-h-80 overflow-y-auto thin-scroll p-1">
               {filteredLinks.length === 0 ? (
                 <div className="p-6 text-center text-sm text-muted-foreground">Nada encontrado</div>
               ) : (
@@ -261,13 +343,12 @@ export function AppShell({ children, title, subtitle, rightPanel, headerActions 
                     <button
                       key={l.to}
                       onClick={() => { setShowSearch(false); setSearch(""); navigate({ to: l.to as any }); }}
-                      className="w-full text-left flex items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-surface-2 text-muted-foreground hover:text-foreground transition-colors"
+                      className="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-md text-sm hover:bg-surface-2 text-muted-foreground hover:text-foreground transition-colors"
                     >
                       <Icon className="size-4" /> {l.label}
                     </button>
                   );
                 })
-
               )}
             </div>
           </div>
