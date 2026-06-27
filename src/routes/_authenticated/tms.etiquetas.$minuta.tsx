@@ -25,18 +25,28 @@ function EtiquetasPage() {
       setMinuta(m);
       const { data: v } = await supabase.from("tms_volumes").select("*").eq("minuta_id", (m as any).id).order("numero");
       setVolumes((v ?? []) as any[]);
-      // Marca como etiquetado
       await supabase.from("tms_eventos").insert({ minuta_id: (m as any).id, tipo: "etiquetado", origem_evento: "Impressão de etiquetas" });
     })();
   }, [numero]);
 
   if (!minuta) return <div className="p-6">Carregando…</div>;
 
+  const dest = (minuta.destinatario || {}) as any;
+  const rem = (minuta.remetente || {}) as any;
+  const flags: string[] = (() => {
+    const obs = String(minuta.observacoes || "").toLowerCase();
+    const out: string[] = [];
+    ["fragil", "empilhar", "nao_empilhar", "urgente", "medicamento", "controlado", "refrigerado", "inflamavel"].forEach((f) => {
+      if (obs.includes(f.replace("_", " ")) || obs.includes(f)) out.push(f);
+    });
+    return out;
+  })();
+
   return (
-    <div className="min-h-screen bg-slate-100 print:bg-white p-4 print:p-0">
+    <div className="min-h-screen bg-slate-200 print:bg-white p-4 print:p-0">
       <div className="max-w-5xl mx-auto print:max-w-none">
         <div className="flex items-center justify-between mb-4 print:hidden">
-          <div className="text-sm text-slate-700">
+          <div className="text-sm text-slate-800">
             <div className="font-semibold">Etiquetas — Minuta #{minuta.numero}</div>
             <div className="text-xs">{volumes.length} volume(s) · {minuta.origem} → {minuta.destino}</div>
           </div>
@@ -45,7 +55,7 @@ function EtiquetasPage() {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 print:grid-cols-1 print:gap-0">
+        <div className="flex flex-wrap gap-4 justify-center print:gap-0 print:block">
           {volumes.map((v) => (
             <QrLabel
               key={v.id}
@@ -53,13 +63,27 @@ function EtiquetasPage() {
               numeroMinuta={minuta.numero}
               numeroVol={v.numero}
               totalVol={minuta.qtd_volumes}
+              status={minuta.status}
+              flags={flags}
               cliente={minuta.tms_clientes?.nome}
-              remetente={minuta.remetente?.nome}
-              destinatario={minuta.destinatario?.nome}
+              remetente={rem.nome}
+              destinatario={dest.nome}
+              telefone={dest.telefone}
+              rua={dest.rua || dest.endereco}
+              numero={dest.numero}
+              bairro={dest.bairro}
+              cidadeDestino={dest.cidade}
+              cep={dest.cep}
               origem={minuta.origem}
               destino={minuta.destino}
-              cidadeDestino={minuta.destino}
-              peso={Number(v.peso).toFixed(2) as any}
+              pesoReal={Number(v.peso ?? minuta.peso ?? 0)}
+              pesoCubado={Number(minuta.peso_cubado ?? 0)}
+              pesoTaxado={Number(minuta.peso_taxado ?? 0)}
+              cubagem={Number(minuta.cubagem ?? 0)}
+              tipoMercadoria={minuta.tipo_mercadoria}
+              hubOrigem={minuta.origem}
+              hubDestino={minuta.destino}
+              prazoDias={minuta.prazo_dias}
               data={new Date(minuta.created_at).toLocaleDateString("pt-BR")}
             />
           ))}
