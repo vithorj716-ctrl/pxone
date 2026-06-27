@@ -2,23 +2,35 @@ import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import {
   Truck, Package, ScanLine, FileText, Search, AlertTriangle, Users, Tag, CircleDollarSign,
-  Grid3x3, LogOut,
+  Grid3x3, LogOut, MapPin, Route as RouteIcon, Camera, BarChart3, Settings,
 } from "lucide-react";
 import { useSystem } from "@/px-platform/system-context";
 import { supabase } from "@/integrations/supabase/client";
 
-const TMS_NAV = [
-  { to: "/tms", label: "Dashboard", icon: Truck, exact: true },
-  { to: "/tms/solicitacoes", label: "Solicitações", icon: FileText },
-  { to: "/tms/conferencia", label: "Conferência", icon: ScanLine },
-  { to: "/tms/embarque", label: "Embarque", icon: Truck },
-  { to: "/tms/recebimento", label: "Recebimento", icon: Package },
-  { to: "/tms/entregas", label: "Entregas", icon: Package },
-  { to: "/tms/tracking", label: "Tracking", icon: Search },
-  { to: "/tms/ocorrencias", label: "Ocorrências", icon: AlertTriangle },
-  { to: "/tms/tabela-frete", label: "Tabela de Fretes", icon: Tag },
-  { to: "/tms/clientes", label: "Clientes", icon: Users },
-  { to: "/tms/financeiro", label: "Financeiro", icon: CircleDollarSign },
+type NavItem = { to: string; label: string; icon: typeof Truck; exact?: boolean; group: string };
+
+const TMS_NAV: NavItem[] = [
+  { to: "/tms", label: "Dashboard", icon: Truck, exact: true, group: "Transferências" },
+  { to: "/tms/solicitacoes", label: "Solicitações", icon: FileText, group: "Transferências" },
+  { to: "/tms/conferencia", label: "Conferência", icon: ScanLine, group: "Transferências" },
+  { to: "/tms/embarque", label: "Embarque", icon: Truck, group: "Transferências" },
+  { to: "/tms/recebimento", label: "Recebimento", icon: Package, group: "Transferências" },
+  { to: "/tms/entregas", label: "Entregas", icon: Package, group: "Transferências" },
+  { to: "/tms/tracking", label: "Tracking", icon: Search, group: "Transferências" },
+  { to: "/tms/ocorrencias", label: "Ocorrências", icon: AlertTriangle, group: "Transferências" },
+  { to: "/tms/tabela-frete", label: "Tabela de Fretes", icon: Tag, group: "Transferências" },
+  { to: "/tms/clientes", label: "Clientes", icon: Users, group: "Transferências" },
+  { to: "/tms/financeiro", label: "Financeiro", icon: CircleDollarSign, group: "Transferências" },
+  { to: "/tms/lm", label: "Dashboard", icon: MapPin, exact: true, group: "Last Mile" },
+  { to: "/tms/lm/rotas", label: "Rotas", icon: RouteIcon, group: "Last Mile" },
+  { to: "/tms/lm/entregas", label: "Entregas", icon: Package, group: "Last Mile" },
+  { to: "/tms/lm/separacao", label: "Separação", icon: ScanLine, group: "Last Mile" },
+  { to: "/tms/lm/carregamento", label: "Carregamento", icon: Truck, group: "Last Mile" },
+  { to: "/tms/lm/tracking", label: "Tracking", icon: Search, group: "Last Mile" },
+  { to: "/tms/lm/ocorrencias", label: "Ocorrências", icon: AlertTriangle, group: "Last Mile" },
+  { to: "/tms/lm/comprovantes", label: "Comprovantes", icon: Camera, group: "Last Mile" },
+  { to: "/tms/lm/relatorios", label: "Relatórios", icon: BarChart3, group: "Last Mile" },
+  { to: "/tms/lm/configuracoes", label: "Configurações", icon: Settings, group: "Last Mile" },
 ];
 
 const ACCENT = "#f97316"; // laranja logística
