@@ -164,24 +164,24 @@ export function CrudTable({
 
   return (
     <div className="space-y-4 animate-fade-in">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          {title && <h3 className="text-sm font-semibold">{title}</h3>}
-          <span className="text-[11px] text-muted-foreground tabular-nums">{filteredRows.length} registro(s)</span>
+      <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          {title && <h3 className="text-sm font-semibold truncate">{title}</h3>}
+          <span className="text-[11px] text-muted-foreground tabular-nums shrink-0">{filteredRows.length} reg.</span>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="relative">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <div className="relative flex-1 sm:flex-none">
             <Search className="size-3.5 text-muted-foreground absolute left-2.5 top-1/2 -translate-y-1/2" />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Filtrar…"
-              className="input !py-1.5 !pl-8 text-xs w-44"
+              className="input !py-1.5 !pl-8 text-xs w-full sm:w-44"
             />
           </div>
           <button
             onClick={openCreate}
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-brand text-brand-foreground text-xs font-medium hover:opacity-90 transition-opacity hover-glow"
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-brand text-brand-foreground text-xs font-medium hover:opacity-90 transition-opacity hover-glow shrink-0"
           >
             <Plus className="size-3.5" /> Novo
           </button>
@@ -271,18 +271,18 @@ export function CrudTable({
       {renderExtra?.(rows)}
 
       {open && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in" onClick={() => setOpen(false)}>
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center sm:p-4 animate-fade-in" onClick={() => setOpen(false)}>
           <div
-            className="bg-surface ring-1 ring-border rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto thin-scroll animate-scale-in"
+            className="bg-surface ring-1 ring-border rounded-t-xl sm:rounded-xl w-full max-w-2xl max-h-[92vh] overflow-y-auto thin-scroll animate-scale-in"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+            <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-border sticky top-0 bg-surface z-10">
               <h3 className="text-sm font-medium">{editing ? "Editar registro" : "Novo registro"}</h3>
-              <button onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground">
-                <X className="size-4" />
+              <button onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground p-1">
+                <X className="size-5" />
               </button>
             </div>
-            <form onSubmit={save} className="p-6 grid grid-cols-2 gap-4">
+            <form onSubmit={save} className="p-4 sm:p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
               {fields.map((f) => (
                 <div key={f.name} className={f.colSpan === 2 ? "col-span-2" : ""}>
                   <label className="block text-xs font-medium text-muted-foreground mb-1">
