@@ -102,8 +102,10 @@ function EtiquetasPage() {
 
       <style>{`
         @media print {
-          body { background: white !important; }
-          .tms-label { box-shadow: none !important; }
+          html, body { background: white !important; margin: 0 !important; padding: 0 !important; }
+          body * { visibility: hidden !important; }
+          .tms-label, .tms-label * { visibility: visible !important; }
+          .tms-label { box-shadow: none !important; margin: 0 !important; page-break-after: always; }
           @page { size: 100mm 150mm; margin: 0; }
         }
       `}</style>
