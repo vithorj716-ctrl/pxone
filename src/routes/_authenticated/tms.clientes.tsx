@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { AppShell } from "@/components/app-shell";
+import { TmsShell } from "@/components/tms/tms-shell";
 import { CrudTable } from "@/lib/crud";
 
 export const Route = createFileRoute("/_authenticated/tms/clientes")({
   head: () => ({ meta: [{ title: "PXLog — Clientes" }] }),
   component: () => (
-    <AppShell title="Clientes TMS" subtitle="Cadastro de clientes do PXLog">
+    <TmsShell title="Clientes TMS" subtitle="Cadastro de clientes do PXLog">
       <CrudTable
         table="tms_clientes"
         orderBy="nome"
@@ -31,6 +31,6 @@ export const Route = createFileRoute("/_authenticated/tms/clientes")({
           { key: "telefone", label: "Telefone", format: (v) => v ?? "—" },
         ]}
       />
-    </AppShell>
+    </TmsShell>
   ),
 });

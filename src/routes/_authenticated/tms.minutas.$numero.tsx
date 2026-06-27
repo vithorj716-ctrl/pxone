@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { AppShell } from "@/components/app-shell";
+import { TmsShell } from "@/components/tms/tms-shell";
 import { supabase } from "@/integrations/supabase/client";
 import { QrSvg } from "@/components/tms/qr-label";
 import { Timeline } from "@/components/tms/timeline";
@@ -36,7 +36,7 @@ function MinutaPage() {
     })();
   }, [numero]);
 
-  if (!minuta) return <AppShell title="Carregando…"><div className="text-sm text-muted-foreground">Buscando minuta #{numero}…</div></AppShell>;
+  if (!minuta) return <TmsShell title="Carregando…"><div className="text-sm text-muted-foreground">Buscando minuta #{numero}…</div></TmsShell>;
 
   const st = STATUS_VOL_LABEL[minuta.status];
 
@@ -119,6 +119,6 @@ function MinutaPage() {
           <Timeline eventos={eventos} />
         </aside>
       </div>
-    </AppShell>
+    </TmsShell>
   );
 }

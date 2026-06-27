@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { AppShell } from "@/components/app-shell";
+import { TmsShell } from "@/components/tms/tms-shell";
 import { supabase } from "@/integrations/supabase/client";
 import { useEmpresaAtiva } from "@/px-core/empresa-context";
 import { toast } from "sonner";
@@ -57,7 +57,7 @@ function FinanceiroPage() {
   };
 
   return (
-    <AppShell title="Financeiro TMS" subtitle="Liberação para faturamento integra com a Central de Custos">
+    <TmsShell title="Financeiro TMS" subtitle="Liberação para faturamento integra com a Central de Custos">
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
         <KpiCard label="Previsto" value={brl(totais.previsto)} />
         <KpiCard label="Faturado" value={brl(totais.faturado)} accent="emerald" />
@@ -106,7 +106,7 @@ function FinanceiroPage() {
           </tbody>
         </table>
       </div>
-    </AppShell>
+    </TmsShell>
   );
 }
 

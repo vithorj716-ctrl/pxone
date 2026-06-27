@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { AppShell } from "@/components/app-shell";
+import { TmsShell } from "@/components/tms/tms-shell";
 import { supabase } from "@/integrations/supabase/client";
 import { Plus } from "lucide-react";
 import { STATUS_VOL_LABEL } from "@/lib/tms";
@@ -80,6 +80,6 @@ function SolicitacoesPage() {
           </tbody>
         </table>
       </div>
-    </AppShell>
+    </TmsShell>
   );
 }

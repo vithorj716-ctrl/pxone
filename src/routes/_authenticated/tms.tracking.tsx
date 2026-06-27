@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { AppShell } from "@/components/app-shell";
+import { TmsShell } from "@/components/tms/tms-shell";
 import { supabase } from "@/integrations/supabase/client";
 import { Timeline } from "@/components/tms/timeline";
 import { STATUS_VOL_LABEL } from "@/lib/tms";
@@ -58,7 +58,7 @@ function TrackingPage() {
   const st = minuta ? STATUS_VOL_LABEL[minuta.status] : null;
 
   return (
-    <AppShell title="Tracking" subtitle="Busque por número da minuta ou código do volume">
+    <TmsShell title="Tracking" subtitle="Busque por número da minuta ou código do volume">
       <form onSubmit={buscar} className="relative max-w-xl">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Ex.: 1042 ou PXLOG-0001042-001"
@@ -86,6 +86,6 @@ function TrackingPage() {
           </aside>
         </div>
       )}
-    </AppShell>
+    </TmsShell>
   );
 }

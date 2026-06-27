@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { AppShell } from "@/components/app-shell";
+import { TmsShell } from "@/components/tms/tms-shell";
 import { supabase } from "@/integrations/supabase/client";
 import { Timeline } from "@/components/tms/timeline";
 import { Truck, Package, CheckCircle2, AlertTriangle, CircleDollarSign, Users, ScanLine, Tag, Plus } from "lucide-react";
@@ -138,7 +138,7 @@ function TmsDashboard() {
           <Timeline eventos={eventos.slice(0, 12)} />
         </div>
       </div>
-    </AppShell>
+    </TmsShell>
   );
 }
 

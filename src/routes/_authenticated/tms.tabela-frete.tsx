@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { AppShell } from "@/components/app-shell";
+import { TmsShell } from "@/components/tms/tms-shell";
 import { CrudTable } from "@/lib/crud";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -19,7 +19,7 @@ function TabelaFretePage() {
   }, []);
 
   return (
-    <AppShell title="Tabela de Fretes" subtitle="Regras de precificação por cliente, rota e faixas">
+    <TmsShell title="Tabela de Fretes" subtitle="Regras de precificação por cliente, rota e faixas">
       <CrudTable
         table="tms_tabela_frete"
         orderBy="nome"
@@ -59,6 +59,6 @@ function TabelaFretePage() {
           { key: "prazo_dias", label: "Prazo" },
         ]}
       />
-    </AppShell>
+    </TmsShell>
   );
 }
