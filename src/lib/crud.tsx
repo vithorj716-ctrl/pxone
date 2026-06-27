@@ -271,18 +271,18 @@ export function CrudTable({
       {renderExtra?.(rows)}
 
       {open && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in" onClick={() => setOpen(false)}>
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center sm:p-4 animate-fade-in" onClick={() => setOpen(false)}>
           <div
-            className="bg-surface ring-1 ring-border rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto thin-scroll animate-scale-in"
+            className="bg-surface ring-1 ring-border rounded-t-xl sm:rounded-xl w-full max-w-2xl max-h-[92vh] overflow-y-auto thin-scroll animate-scale-in"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+            <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-border sticky top-0 bg-surface z-10">
               <h3 className="text-sm font-medium">{editing ? "Editar registro" : "Novo registro"}</h3>
-              <button onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground">
-                <X className="size-4" />
+              <button onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground p-1">
+                <X className="size-5" />
               </button>
             </div>
-            <form onSubmit={save} className="p-6 grid grid-cols-2 gap-4">
+            <form onSubmit={save} className="p-4 sm:p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
               {fields.map((f) => (
                 <div key={f.name} className={f.colSpan === 2 ? "col-span-2" : ""}>
                   <label className="block text-xs font-medium text-muted-foreground mb-1">
