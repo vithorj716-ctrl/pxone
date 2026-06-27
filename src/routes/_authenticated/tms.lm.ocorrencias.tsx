@@ -27,8 +27,18 @@ function LmOcor() {
     },
   });
 
+  const { data: entregasAtivas } = useQuery({
+    queryKey: ["lm-entregas-ativas"],
+    queryFn: async () => {
+      const { data } = await supabase.from("tms_lm_entregas")
+        .select("id, destinatario, cidade, status, tms_lm_rotas(numero)")
+        .neq("status", "entregue").order("created_at", { ascending: false }).limit(200);
+      return data ?? [];
+    },
+  });
+
   async function salvar() {
-    if (!entregaId) return toast.error("Informe a entrega");
+    if (!entregaId) return toast.error("Selecione a entrega");
     const { error } = await supabase.from("tms_lm_ocorrencias").insert({ entrega_id: entregaId, tipo, descricao: desc || null });
     if (error) return toast.error(error.message);
     await supabase.from("tms_lm_eventos").insert({ entrega_id: entregaId, tipo: `ocorrencia:${tipo}`, payload: { descricao: desc } });
@@ -62,7 +72,14 @@ function LmOcor() {
         <DialogContent>
           <DialogHeader><DialogTitle>Registrar Ocorrência</DialogTitle></DialogHeader>
           <div className="space-y-3">
-            <input value={entregaId} onChange={(e) => setEntregaId(e.target.value)} placeholder="ID da entrega" className="w-full px-3 py-2 bg-surface ring-1 ring-border rounded" />
+            <select value={entregaId} onChange={(e) => setEntregaId(e.target.value)} className="w-full px-3 py-2 bg-surface ring-1 ring-border rounded">
+              <option value="">— Selecione a entrega —</option>
+              {(entregasAtivas ?? []).map((e: any) => (
+                <option key={e.id} value={e.id}>
+                  Rota #{e.tms_lm_rotas?.numero ?? "—"} · {e.destinatario} ({e.cidade ?? ""})
+                </option>
+              ))}
+            </select>
             <select value={tipo} onChange={(e) => setTipo(e.target.value)} className="w-full px-3 py-2 bg-surface ring-1 ring-border rounded">
               {LM_TIPOS_OCORRENCIA.map(t => <option key={t.key} value={t.key}>{t.label}</option>)}
             </select>
