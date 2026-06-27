@@ -52,9 +52,21 @@ import { Route as AuthenticatedFinancialIntelligenceDfcRouteImport } from './rou
 import { Route as AuthenticatedFinancialIntelligenceBreakEvenRouteImport } from './routes/_authenticated/financial-intelligence.break-even'
 import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin.usuarios'
 import { Route as AuthenticatedAdminPerfisRouteImport } from './routes/_authenticated/admin.perfis'
+import { Route as AuthenticatedTmsLmIndexRouteImport } from './routes/_authenticated/tms.lm.index'
 import { Route as AuthenticatedTmsSolicitacoesNovaRouteImport } from './routes/_authenticated/tms.solicitacoes.nova'
 import { Route as AuthenticatedTmsMinutasNumeroRouteImport } from './routes/_authenticated/tms.minutas.$numero'
+import { Route as AuthenticatedTmsLmTrackingRouteImport } from './routes/_authenticated/tms.lm.tracking'
+import { Route as AuthenticatedTmsLmSeparacaoRouteImport } from './routes/_authenticated/tms.lm.separacao'
+import { Route as AuthenticatedTmsLmRotasRouteImport } from './routes/_authenticated/tms.lm.rotas'
+import { Route as AuthenticatedTmsLmRelatoriosRouteImport } from './routes/_authenticated/tms.lm.relatorios'
+import { Route as AuthenticatedTmsLmOcorrenciasRouteImport } from './routes/_authenticated/tms.lm.ocorrencias'
+import { Route as AuthenticatedTmsLmEntregasRouteImport } from './routes/_authenticated/tms.lm.entregas'
+import { Route as AuthenticatedTmsLmConfiguracoesRouteImport } from './routes/_authenticated/tms.lm.configuracoes'
+import { Route as AuthenticatedTmsLmComprovantesRouteImport } from './routes/_authenticated/tms.lm.comprovantes'
+import { Route as AuthenticatedTmsLmCarregamentoRouteImport } from './routes/_authenticated/tms.lm.carregamento'
 import { Route as AuthenticatedTmsEtiquetasMinutaRouteImport } from './routes/_authenticated/tms.etiquetas.$minuta'
+import { Route as AuthenticatedTmsLmRotasNumeroRouteImport } from './routes/_authenticated/tms.lm.rotas.$numero'
+import { Route as AuthenticatedTmsLmMotoristaRotaIdRouteImport } from './routes/_authenticated/tms.lm.motorista.$rotaId'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -289,6 +301,11 @@ const AuthenticatedAdminPerfisRoute =
     path: '/admin/perfis',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedTmsLmIndexRoute = AuthenticatedTmsLmIndexRouteImport.update({
+  id: '/tms/lm/',
+  path: '/tms/lm/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedTmsSolicitacoesNovaRoute =
   AuthenticatedTmsSolicitacoesNovaRouteImport.update({
     id: '/nova',
@@ -301,10 +318,75 @@ const AuthenticatedTmsMinutasNumeroRoute =
     path: '/tms/minutas/$numero',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedTmsLmTrackingRoute =
+  AuthenticatedTmsLmTrackingRouteImport.update({
+    id: '/tms/lm/tracking',
+    path: '/tms/lm/tracking',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTmsLmSeparacaoRoute =
+  AuthenticatedTmsLmSeparacaoRouteImport.update({
+    id: '/tms/lm/separacao',
+    path: '/tms/lm/separacao',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTmsLmRotasRoute = AuthenticatedTmsLmRotasRouteImport.update({
+  id: '/tms/lm/rotas',
+  path: '/tms/lm/rotas',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTmsLmRelatoriosRoute =
+  AuthenticatedTmsLmRelatoriosRouteImport.update({
+    id: '/tms/lm/relatorios',
+    path: '/tms/lm/relatorios',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTmsLmOcorrenciasRoute =
+  AuthenticatedTmsLmOcorrenciasRouteImport.update({
+    id: '/tms/lm/ocorrencias',
+    path: '/tms/lm/ocorrencias',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTmsLmEntregasRoute =
+  AuthenticatedTmsLmEntregasRouteImport.update({
+    id: '/tms/lm/entregas',
+    path: '/tms/lm/entregas',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTmsLmConfiguracoesRoute =
+  AuthenticatedTmsLmConfiguracoesRouteImport.update({
+    id: '/tms/lm/configuracoes',
+    path: '/tms/lm/configuracoes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTmsLmComprovantesRoute =
+  AuthenticatedTmsLmComprovantesRouteImport.update({
+    id: '/tms/lm/comprovantes',
+    path: '/tms/lm/comprovantes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTmsLmCarregamentoRoute =
+  AuthenticatedTmsLmCarregamentoRouteImport.update({
+    id: '/tms/lm/carregamento',
+    path: '/tms/lm/carregamento',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedTmsEtiquetasMinutaRoute =
   AuthenticatedTmsEtiquetasMinutaRouteImport.update({
     id: '/tms/etiquetas/$minuta',
     path: '/tms/etiquetas/$minuta',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTmsLmRotasNumeroRoute =
+  AuthenticatedTmsLmRotasNumeroRouteImport.update({
+    id: '/$numero',
+    path: '/$numero',
+    getParentRoute: () => AuthenticatedTmsLmRotasRoute,
+  } as any)
+const AuthenticatedTmsLmMotoristaRotaIdRoute =
+  AuthenticatedTmsLmMotoristaRotaIdRouteImport.update({
+    id: '/tms/lm/motorista/$rotaId',
+    path: '/tms/lm/motorista/$rotaId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 
@@ -352,8 +434,20 @@ export interface FileRoutesByFullPath {
   '/financial-intelligence/': typeof AuthenticatedFinancialIntelligenceIndexRoute
   '/tms/': typeof AuthenticatedTmsIndexRoute
   '/tms/etiquetas/$minuta': typeof AuthenticatedTmsEtiquetasMinutaRoute
+  '/tms/lm/carregamento': typeof AuthenticatedTmsLmCarregamentoRoute
+  '/tms/lm/comprovantes': typeof AuthenticatedTmsLmComprovantesRoute
+  '/tms/lm/configuracoes': typeof AuthenticatedTmsLmConfiguracoesRoute
+  '/tms/lm/entregas': typeof AuthenticatedTmsLmEntregasRoute
+  '/tms/lm/ocorrencias': typeof AuthenticatedTmsLmOcorrenciasRoute
+  '/tms/lm/relatorios': typeof AuthenticatedTmsLmRelatoriosRoute
+  '/tms/lm/rotas': typeof AuthenticatedTmsLmRotasRouteWithChildren
+  '/tms/lm/separacao': typeof AuthenticatedTmsLmSeparacaoRoute
+  '/tms/lm/tracking': typeof AuthenticatedTmsLmTrackingRoute
   '/tms/minutas/$numero': typeof AuthenticatedTmsMinutasNumeroRoute
   '/tms/solicitacoes/nova': typeof AuthenticatedTmsSolicitacoesNovaRoute
+  '/tms/lm/': typeof AuthenticatedTmsLmIndexRoute
+  '/tms/lm/motorista/$rotaId': typeof AuthenticatedTmsLmMotoristaRotaIdRoute
+  '/tms/lm/rotas/$numero': typeof AuthenticatedTmsLmRotasNumeroRoute
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
@@ -398,8 +492,20 @@ export interface FileRoutesByTo {
   '/financial-intelligence': typeof AuthenticatedFinancialIntelligenceIndexRoute
   '/tms': typeof AuthenticatedTmsIndexRoute
   '/tms/etiquetas/$minuta': typeof AuthenticatedTmsEtiquetasMinutaRoute
+  '/tms/lm/carregamento': typeof AuthenticatedTmsLmCarregamentoRoute
+  '/tms/lm/comprovantes': typeof AuthenticatedTmsLmComprovantesRoute
+  '/tms/lm/configuracoes': typeof AuthenticatedTmsLmConfiguracoesRoute
+  '/tms/lm/entregas': typeof AuthenticatedTmsLmEntregasRoute
+  '/tms/lm/ocorrencias': typeof AuthenticatedTmsLmOcorrenciasRoute
+  '/tms/lm/relatorios': typeof AuthenticatedTmsLmRelatoriosRoute
+  '/tms/lm/rotas': typeof AuthenticatedTmsLmRotasRouteWithChildren
+  '/tms/lm/separacao': typeof AuthenticatedTmsLmSeparacaoRoute
+  '/tms/lm/tracking': typeof AuthenticatedTmsLmTrackingRoute
   '/tms/minutas/$numero': typeof AuthenticatedTmsMinutasNumeroRoute
   '/tms/solicitacoes/nova': typeof AuthenticatedTmsSolicitacoesNovaRoute
+  '/tms/lm': typeof AuthenticatedTmsLmIndexRoute
+  '/tms/lm/motorista/$rotaId': typeof AuthenticatedTmsLmMotoristaRotaIdRoute
+  '/tms/lm/rotas/$numero': typeof AuthenticatedTmsLmRotasNumeroRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -447,8 +553,20 @@ export interface FileRoutesById {
   '/_authenticated/financial-intelligence/': typeof AuthenticatedFinancialIntelligenceIndexRoute
   '/_authenticated/tms/': typeof AuthenticatedTmsIndexRoute
   '/_authenticated/tms/etiquetas/$minuta': typeof AuthenticatedTmsEtiquetasMinutaRoute
+  '/_authenticated/tms/lm/carregamento': typeof AuthenticatedTmsLmCarregamentoRoute
+  '/_authenticated/tms/lm/comprovantes': typeof AuthenticatedTmsLmComprovantesRoute
+  '/_authenticated/tms/lm/configuracoes': typeof AuthenticatedTmsLmConfiguracoesRoute
+  '/_authenticated/tms/lm/entregas': typeof AuthenticatedTmsLmEntregasRoute
+  '/_authenticated/tms/lm/ocorrencias': typeof AuthenticatedTmsLmOcorrenciasRoute
+  '/_authenticated/tms/lm/relatorios': typeof AuthenticatedTmsLmRelatoriosRoute
+  '/_authenticated/tms/lm/rotas': typeof AuthenticatedTmsLmRotasRouteWithChildren
+  '/_authenticated/tms/lm/separacao': typeof AuthenticatedTmsLmSeparacaoRoute
+  '/_authenticated/tms/lm/tracking': typeof AuthenticatedTmsLmTrackingRoute
   '/_authenticated/tms/minutas/$numero': typeof AuthenticatedTmsMinutasNumeroRoute
   '/_authenticated/tms/solicitacoes/nova': typeof AuthenticatedTmsSolicitacoesNovaRoute
+  '/_authenticated/tms/lm/': typeof AuthenticatedTmsLmIndexRoute
+  '/_authenticated/tms/lm/motorista/$rotaId': typeof AuthenticatedTmsLmMotoristaRotaIdRoute
+  '/_authenticated/tms/lm/rotas/$numero': typeof AuthenticatedTmsLmRotasNumeroRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -496,8 +614,20 @@ export interface FileRouteTypes {
     | '/financial-intelligence/'
     | '/tms/'
     | '/tms/etiquetas/$minuta'
+    | '/tms/lm/carregamento'
+    | '/tms/lm/comprovantes'
+    | '/tms/lm/configuracoes'
+    | '/tms/lm/entregas'
+    | '/tms/lm/ocorrencias'
+    | '/tms/lm/relatorios'
+    | '/tms/lm/rotas'
+    | '/tms/lm/separacao'
+    | '/tms/lm/tracking'
     | '/tms/minutas/$numero'
     | '/tms/solicitacoes/nova'
+    | '/tms/lm/'
+    | '/tms/lm/motorista/$rotaId'
+    | '/tms/lm/rotas/$numero'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/auth'
@@ -542,8 +672,20 @@ export interface FileRouteTypes {
     | '/financial-intelligence'
     | '/tms'
     | '/tms/etiquetas/$minuta'
+    | '/tms/lm/carregamento'
+    | '/tms/lm/comprovantes'
+    | '/tms/lm/configuracoes'
+    | '/tms/lm/entregas'
+    | '/tms/lm/ocorrencias'
+    | '/tms/lm/relatorios'
+    | '/tms/lm/rotas'
+    | '/tms/lm/separacao'
+    | '/tms/lm/tracking'
     | '/tms/minutas/$numero'
     | '/tms/solicitacoes/nova'
+    | '/tms/lm'
+    | '/tms/lm/motorista/$rotaId'
+    | '/tms/lm/rotas/$numero'
   id:
     | '__root__'
     | '/_authenticated'
@@ -590,8 +732,20 @@ export interface FileRouteTypes {
     | '/_authenticated/financial-intelligence/'
     | '/_authenticated/tms/'
     | '/_authenticated/tms/etiquetas/$minuta'
+    | '/_authenticated/tms/lm/carregamento'
+    | '/_authenticated/tms/lm/comprovantes'
+    | '/_authenticated/tms/lm/configuracoes'
+    | '/_authenticated/tms/lm/entregas'
+    | '/_authenticated/tms/lm/ocorrencias'
+    | '/_authenticated/tms/lm/relatorios'
+    | '/_authenticated/tms/lm/rotas'
+    | '/_authenticated/tms/lm/separacao'
+    | '/_authenticated/tms/lm/tracking'
     | '/_authenticated/tms/minutas/$numero'
     | '/_authenticated/tms/solicitacoes/nova'
+    | '/_authenticated/tms/lm/'
+    | '/_authenticated/tms/lm/motorista/$rotaId'
+    | '/_authenticated/tms/lm/rotas/$numero'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -903,6 +1057,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminPerfisRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/tms/lm/': {
+      id: '/_authenticated/tms/lm/'
+      path: '/tms/lm'
+      fullPath: '/tms/lm/'
+      preLoaderRoute: typeof AuthenticatedTmsLmIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/tms/solicitacoes/nova': {
       id: '/_authenticated/tms/solicitacoes/nova'
       path: '/nova'
@@ -917,11 +1078,88 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTmsMinutasNumeroRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/tms/lm/tracking': {
+      id: '/_authenticated/tms/lm/tracking'
+      path: '/tms/lm/tracking'
+      fullPath: '/tms/lm/tracking'
+      preLoaderRoute: typeof AuthenticatedTmsLmTrackingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tms/lm/separacao': {
+      id: '/_authenticated/tms/lm/separacao'
+      path: '/tms/lm/separacao'
+      fullPath: '/tms/lm/separacao'
+      preLoaderRoute: typeof AuthenticatedTmsLmSeparacaoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tms/lm/rotas': {
+      id: '/_authenticated/tms/lm/rotas'
+      path: '/tms/lm/rotas'
+      fullPath: '/tms/lm/rotas'
+      preLoaderRoute: typeof AuthenticatedTmsLmRotasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tms/lm/relatorios': {
+      id: '/_authenticated/tms/lm/relatorios'
+      path: '/tms/lm/relatorios'
+      fullPath: '/tms/lm/relatorios'
+      preLoaderRoute: typeof AuthenticatedTmsLmRelatoriosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tms/lm/ocorrencias': {
+      id: '/_authenticated/tms/lm/ocorrencias'
+      path: '/tms/lm/ocorrencias'
+      fullPath: '/tms/lm/ocorrencias'
+      preLoaderRoute: typeof AuthenticatedTmsLmOcorrenciasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tms/lm/entregas': {
+      id: '/_authenticated/tms/lm/entregas'
+      path: '/tms/lm/entregas'
+      fullPath: '/tms/lm/entregas'
+      preLoaderRoute: typeof AuthenticatedTmsLmEntregasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tms/lm/configuracoes': {
+      id: '/_authenticated/tms/lm/configuracoes'
+      path: '/tms/lm/configuracoes'
+      fullPath: '/tms/lm/configuracoes'
+      preLoaderRoute: typeof AuthenticatedTmsLmConfiguracoesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tms/lm/comprovantes': {
+      id: '/_authenticated/tms/lm/comprovantes'
+      path: '/tms/lm/comprovantes'
+      fullPath: '/tms/lm/comprovantes'
+      preLoaderRoute: typeof AuthenticatedTmsLmComprovantesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tms/lm/carregamento': {
+      id: '/_authenticated/tms/lm/carregamento'
+      path: '/tms/lm/carregamento'
+      fullPath: '/tms/lm/carregamento'
+      preLoaderRoute: typeof AuthenticatedTmsLmCarregamentoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/tms/etiquetas/$minuta': {
       id: '/_authenticated/tms/etiquetas/$minuta'
       path: '/tms/etiquetas/$minuta'
       fullPath: '/tms/etiquetas/$minuta'
       preLoaderRoute: typeof AuthenticatedTmsEtiquetasMinutaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tms/lm/rotas/$numero': {
+      id: '/_authenticated/tms/lm/rotas/$numero'
+      path: '/$numero'
+      fullPath: '/tms/lm/rotas/$numero'
+      preLoaderRoute: typeof AuthenticatedTmsLmRotasNumeroRouteImport
+      parentRoute: typeof AuthenticatedTmsLmRotasRoute
+    }
+    '/_authenticated/tms/lm/motorista/$rotaId': {
+      id: '/_authenticated/tms/lm/motorista/$rotaId'
+      path: '/tms/lm/motorista/$rotaId'
+      fullPath: '/tms/lm/motorista/$rotaId'
+      preLoaderRoute: typeof AuthenticatedTmsLmMotoristaRotaIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
   }
@@ -966,6 +1204,20 @@ const AuthenticatedTmsSolicitacoesRouteWithChildren =
     AuthenticatedTmsSolicitacoesRouteChildren,
   )
 
+interface AuthenticatedTmsLmRotasRouteChildren {
+  AuthenticatedTmsLmRotasNumeroRoute: typeof AuthenticatedTmsLmRotasNumeroRoute
+}
+
+const AuthenticatedTmsLmRotasRouteChildren: AuthenticatedTmsLmRotasRouteChildren =
+  {
+    AuthenticatedTmsLmRotasNumeroRoute: AuthenticatedTmsLmRotasNumeroRoute,
+  }
+
+const AuthenticatedTmsLmRotasRouteWithChildren =
+  AuthenticatedTmsLmRotasRoute._addFileChildren(
+    AuthenticatedTmsLmRotasRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAiAnalystRoute: typeof AuthenticatedAiAnalystRoute
   AuthenticatedAplicacoesRoute: typeof AuthenticatedAplicacoesRoute
@@ -1004,7 +1256,18 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedTmsIndexRoute: typeof AuthenticatedTmsIndexRoute
   AuthenticatedTmsEtiquetasMinutaRoute: typeof AuthenticatedTmsEtiquetasMinutaRoute
+  AuthenticatedTmsLmCarregamentoRoute: typeof AuthenticatedTmsLmCarregamentoRoute
+  AuthenticatedTmsLmComprovantesRoute: typeof AuthenticatedTmsLmComprovantesRoute
+  AuthenticatedTmsLmConfiguracoesRoute: typeof AuthenticatedTmsLmConfiguracoesRoute
+  AuthenticatedTmsLmEntregasRoute: typeof AuthenticatedTmsLmEntregasRoute
+  AuthenticatedTmsLmOcorrenciasRoute: typeof AuthenticatedTmsLmOcorrenciasRoute
+  AuthenticatedTmsLmRelatoriosRoute: typeof AuthenticatedTmsLmRelatoriosRoute
+  AuthenticatedTmsLmRotasRoute: typeof AuthenticatedTmsLmRotasRouteWithChildren
+  AuthenticatedTmsLmSeparacaoRoute: typeof AuthenticatedTmsLmSeparacaoRoute
+  AuthenticatedTmsLmTrackingRoute: typeof AuthenticatedTmsLmTrackingRoute
   AuthenticatedTmsMinutasNumeroRoute: typeof AuthenticatedTmsMinutasNumeroRoute
+  AuthenticatedTmsLmIndexRoute: typeof AuthenticatedTmsLmIndexRoute
+  AuthenticatedTmsLmMotoristaRotaIdRoute: typeof AuthenticatedTmsLmMotoristaRotaIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -1047,7 +1310,19 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   AuthenticatedTmsIndexRoute: AuthenticatedTmsIndexRoute,
   AuthenticatedTmsEtiquetasMinutaRoute: AuthenticatedTmsEtiquetasMinutaRoute,
+  AuthenticatedTmsLmCarregamentoRoute: AuthenticatedTmsLmCarregamentoRoute,
+  AuthenticatedTmsLmComprovantesRoute: AuthenticatedTmsLmComprovantesRoute,
+  AuthenticatedTmsLmConfiguracoesRoute: AuthenticatedTmsLmConfiguracoesRoute,
+  AuthenticatedTmsLmEntregasRoute: AuthenticatedTmsLmEntregasRoute,
+  AuthenticatedTmsLmOcorrenciasRoute: AuthenticatedTmsLmOcorrenciasRoute,
+  AuthenticatedTmsLmRelatoriosRoute: AuthenticatedTmsLmRelatoriosRoute,
+  AuthenticatedTmsLmRotasRoute: AuthenticatedTmsLmRotasRouteWithChildren,
+  AuthenticatedTmsLmSeparacaoRoute: AuthenticatedTmsLmSeparacaoRoute,
+  AuthenticatedTmsLmTrackingRoute: AuthenticatedTmsLmTrackingRoute,
   AuthenticatedTmsMinutasNumeroRoute: AuthenticatedTmsMinutasNumeroRoute,
+  AuthenticatedTmsLmIndexRoute: AuthenticatedTmsLmIndexRoute,
+  AuthenticatedTmsLmMotoristaRotaIdRoute:
+    AuthenticatedTmsLmMotoristaRotaIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
