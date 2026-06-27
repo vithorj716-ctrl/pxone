@@ -29,7 +29,7 @@ export function ScanOperationPage({ op, extraField }: { op: Operacao; extraField
   async function processar(codigo: string) {
     const { data: vol } = await supabase
       .from("tms_volumes")
-      .select("id, numero, status, tms_minutas(numero, qtd_volumes, destino)")
+      .select("id, numero, status, minuta_id, tms_minutas(id, numero, qtd_volumes, destino, status)")
       .eq("codigo", codigo)
       .maybeSingle() as any;
 
@@ -39,6 +39,9 @@ export function ScanOperationPage({ op, extraField }: { op: Operacao; extraField
       return;
     }
 
+    const m = (vol as any).tms_minutas;
+    const minutaId: string = vol.minuta_id ?? m?.id;
+
     const updates: any = { status: op.novoStatus };
     if (op.hubAtual) updates.hub_atual = op.hubAtual;
     await supabase.from("tms_volumes").update(updates).eq("id", vol.id);
@@ -46,14 +49,25 @@ export function ScanOperationPage({ op, extraField }: { op: Operacao; extraField
     const payload: any = {};
     if (extraField && extra) payload[extraField.key] = extra;
     await supabase.from("tms_eventos").insert({
-      minuta_id: (vol as any).tms_minutas ? undefined : undefined,
+      minuta_id: minutaId,
       volume_id: vol.id,
       tipo: op.evento,
       origem_evento: op.titulo,
       payload,
     });
 
-    const m = (vol as any).tms_minutas;
+    // Propaga status para a minuta quando todos os volumes estão no mesmo estado
+    if (minutaId) {
+      const { data: vols } = await supabase
+        .from("tms_volumes")
+        .select("status")
+        .eq("minuta_id", minutaId);
+      const todos = (vols ?? []) as { status: string }[];
+      if (todos.length > 0 && todos.every((v) => v.status === op.novoStatus)) {
+        await supabase.from("tms_minutas").update({ status: op.novoStatus }).eq("id", minutaId);
+      }
+    }
+
     setHistorico((h) => [
       { codigo, ok: true, msg: `Minuta #${m?.numero} · Vol ${vol.numero}/${m?.qtd_volumes} → ${m?.destino}` },
       ...h,
