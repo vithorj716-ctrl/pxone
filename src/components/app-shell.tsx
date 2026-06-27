@@ -80,7 +80,13 @@ export function AppShell({ children, title, subtitle, rightPanel, headerActions 
   const [showSearch, setShowSearch] = useState(false);
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
-  const { setActiveSystem } = useSystem();
+  const { setActiveSystem, activeSystem } = useSystem();
+
+  useEffect(() => {
+    if (!activeSystem || activeSystem.key !== "pxone-erp") {
+      setActiveSystem("pxone-erp");
+    }
+  }, [activeSystem, setActiveSystem]);
 
   function trocarSistema() {
     setActiveSystem(null);
