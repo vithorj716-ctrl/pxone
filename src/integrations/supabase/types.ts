@@ -250,28 +250,55 @@ export type Database = {
       }
       empresas: {
         Row: {
+          cnpj: string | null
           codigo: string
+          configuracoes: Json
+          cor_primaria: string | null
+          cor_secundaria: string | null
           cor_tema: string | null
           created_at: string
           id: string
+          logo_url: string | null
           nome: string
+          nome_fantasia: string | null
+          razao_social: string | null
+          segmento: string | null
           setor: string | null
+          situacao: string
         }
         Insert: {
+          cnpj?: string | null
           codigo: string
+          configuracoes?: Json
+          cor_primaria?: string | null
+          cor_secundaria?: string | null
           cor_tema?: string | null
           created_at?: string
           id?: string
+          logo_url?: string | null
           nome: string
+          nome_fantasia?: string | null
+          razao_social?: string | null
+          segmento?: string | null
           setor?: string | null
+          situacao?: string
         }
         Update: {
+          cnpj?: string | null
           codigo?: string
+          configuracoes?: Json
+          cor_primaria?: string | null
+          cor_secundaria?: string | null
           cor_tema?: string | null
           created_at?: string
           id?: string
+          logo_url?: string | null
           nome?: string
+          nome_fantasia?: string | null
+          razao_social?: string | null
+          segmento?: string | null
           setor?: string | null
+          situacao?: string
         }
         Relationships: []
       }
@@ -768,6 +795,47 @@ export type Database = {
         }
         Relationships: []
       }
+      px_empresa_modulos: {
+        Row: {
+          ativo: boolean
+          configuracoes: Json
+          created_at: string
+          empresa_id: string
+          habilitado_em: string
+          id: string
+          modulo_key: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          configuracoes?: Json
+          created_at?: string
+          empresa_id: string
+          habilitado_em?: string
+          id?: string
+          modulo_key: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          configuracoes?: Json
+          created_at?: string
+          empresa_id?: string
+          habilitado_em?: string
+          id?: string
+          modulo_key?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "px_empresa_modulos_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       px_events: {
         Row: {
           created_at: string
@@ -791,6 +859,88 @@ export type Database = {
           tipo?: string
         }
         Relationships: []
+      }
+      px_filiais: {
+        Row: {
+          ativo: boolean
+          cidade: string | null
+          cnpj: string | null
+          created_at: string
+          empresa_id: string
+          id: string
+          nome: string
+          uf: string | null
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          cidade?: string | null
+          cnpj?: string | null
+          created_at?: string
+          empresa_id: string
+          id?: string
+          nome: string
+          uf?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          cidade?: string | null
+          cnpj?: string | null
+          created_at?: string
+          empresa_id?: string
+          id?: string
+          nome?: string
+          uf?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "px_filiais_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      px_shared_resources: {
+        Row: {
+          created_at: string
+          empresa_origem_id: string
+          empresas_compartilhadas: string[]
+          id: string
+          recurso_id: string
+          tipo: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          empresa_origem_id: string
+          empresas_compartilhadas?: string[]
+          id?: string
+          recurso_id: string
+          tipo: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          empresa_origem_id?: string
+          empresas_compartilhadas?: string[]
+          id?: string
+          recurso_id?: string
+          tipo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "px_shared_resources_empresa_origem_id_fkey"
+            columns: ["empresa_origem_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       risks: {
         Row: {
