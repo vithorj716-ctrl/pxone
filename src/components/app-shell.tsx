@@ -4,11 +4,12 @@ import {
   LayoutDashboard, Target, Calculator, TrendingUp, Gavel, ShieldAlert,
   Users, Sparkles, Goal, Rocket, FileText, Clock, Wallet, Building2,
   PanelLeftClose, PanelLeftOpen, Search, Tag, Brain, Menu, X, PanelRight, Boxes,
-  Truck, Package, ScanLine, AlertTriangle, CircleDollarSign,
+  Grid3x3,
 } from "lucide-react";
 import { ExportButton } from "@/components/executive-share";
 import { InstallAppButton } from "@/components/install-app-button";
 import { EmpresaSelector } from "@/components/empresa-selector";
+import { useSystem } from "@/px-platform/system-context";
 
 const navGroups = [
   {
@@ -49,22 +50,6 @@ const navGroups = [
     ],
   },
   {
-    label: "TMS PXLog",
-    items: [
-      { to: "/tms", label: "Dashboard PXLog", icon: Truck, exact: true },
-      { to: "/tms/solicitacoes", label: "Solicitações", icon: FileText },
-      { to: "/tms/conferencia", label: "Conferência", icon: ScanLine },
-      { to: "/tms/embarque", label: "Embarque", icon: Truck },
-      { to: "/tms/recebimento", label: "Recebimento", icon: Package },
-      { to: "/tms/entregas", label: "Entregas", icon: Package },
-      { to: "/tms/tracking", label: "Tracking", icon: Search },
-      { to: "/tms/ocorrencias", label: "Ocorrências", icon: AlertTriangle },
-      { to: "/tms/tabela-frete", label: "Tabela de Fretes", icon: Tag },
-      { to: "/tms/clientes", label: "Clientes TMS", icon: Users },
-      { to: "/tms/financeiro", label: "Financeiro TMS", icon: CircleDollarSign },
-    ],
-  },
-  {
     label: "Plataforma",
     items: [
       { to: "/platform", label: "PX Platform", icon: Boxes },
@@ -95,6 +80,18 @@ export function AppShell({ children, title, subtitle, rightPanel, headerActions 
   const [showSearch, setShowSearch] = useState(false);
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
+  const { setActiveSystem, activeSystem } = useSystem();
+
+  useEffect(() => {
+    if (!activeSystem || activeSystem.key !== "pxone-erp") {
+      setActiveSystem("pxone-erp");
+    }
+  }, [activeSystem, setActiveSystem]);
+
+  function trocarSistema() {
+    setActiveSystem(null);
+    navigate({ to: "/launcher" });
+  }
 
   useEffect(() => {
     try {
@@ -299,6 +296,13 @@ export function AppShell({ children, title, subtitle, rightPanel, headerActions 
               <Search className="size-5" />
             </button>
             {headerActions}
+            <button
+              onClick={trocarSistema}
+              className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md ring-1 ring-border text-xs text-muted-foreground hover:text-foreground"
+              title="Trocar Sistema"
+            >
+              <Grid3x3 className="size-3.5" /> Trocar Sistema
+            </button>
             <EmpresaSelector />
             <InstallAppButton />
             <ExportButton />

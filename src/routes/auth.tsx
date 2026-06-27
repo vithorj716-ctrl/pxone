@@ -1,11 +1,8 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
-// Modo Corporativo Interno: tela de login removida.
-// Qualquer acesso a /auth é redirecionado direto para o Executive Command.
+// Compat: tudo /auth → /login (nova PX Identity)
 export const Route = createFileRoute("/auth")({
   ssr: false,
-  beforeLoad: () => {
-    throw redirect({ to: "/" });
-  },
+  beforeLoad: () => { throw redirect({ to: "/login" }); },
   component: () => null,
 });

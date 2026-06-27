@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { AppShell } from "@/components/app-shell";
+import { TmsShell } from "@/components/tms/tms-shell";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { AlertTriangle } from "lucide-react";
@@ -55,7 +55,7 @@ function OcorrenciasPage() {
   }
 
   return (
-    <AppShell title="Ocorrências" subtitle="Registro rápido de ocorrências operacionais">
+    <TmsShell title="Ocorrências" subtitle="Registro rápido de ocorrências operacionais">
       <form onSubmit={registrar} className="rounded-xl ring-1 ring-border bg-surface/60 p-4 grid grid-cols-1 md:grid-cols-4 gap-3">
         <div className="md:col-span-2">
           <label className="text-[10px] uppercase tracking-wider text-muted-foreground">Código do volume ou número da minuta</label>
@@ -101,6 +101,6 @@ function OcorrenciasPage() {
           ))}
         </div>
       </div>
-    </AppShell>
+    </TmsShell>
   );
 }

@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { AppShell } from "@/components/app-shell";
+import { TmsShell } from "@/components/tms/tms-shell";
 import { supabase } from "@/integrations/supabase/client";
 import { useEmpresaAtiva } from "@/px-core/empresa-context";
 import { calcCubagem, calcPesoCubado, calcPesoTaxado, escolherRegra, calcValorFrete, codigoVolume, type RegraFrete } from "@/lib/tms";
@@ -105,7 +105,7 @@ function NovaSolicitacaoPage() {
   }
 
   return (
-    <AppShell title="Nova Solicitação de Embarque" subtitle="Cálculo automático de cubagem, peso taxado e frete">
+    <TmsShell title="Nova Solicitação de Embarque" subtitle="Cálculo automático de cubagem, peso taxado e frete">
       <form onSubmit={submit} className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2 space-y-4">
           <Card title="Cliente e Rota">
@@ -166,7 +166,7 @@ function NovaSolicitacaoPage() {
           </button>
         </aside>
       </form>
-    </AppShell>
+    </TmsShell>
   );
 }
 

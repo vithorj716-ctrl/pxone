@@ -904,6 +904,65 @@ export type Database = {
           },
         ]
       }
+      px_perfil_permissoes: {
+        Row: {
+          acao: string
+          created_at: string
+          id: string
+          perfil_id: string
+          sistema_key: string
+        }
+        Insert: {
+          acao: string
+          created_at?: string
+          id?: string
+          perfil_id: string
+          sistema_key: string
+        }
+        Update: {
+          acao?: string
+          created_at?: string
+          id?: string
+          perfil_id?: string
+          sistema_key?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "px_perfil_permissoes_perfil_id_fkey"
+            columns: ["perfil_id"]
+            isOneToOne: false
+            referencedRelation: "px_perfis"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      px_perfis: {
+        Row: {
+          created_at: string
+          descricao: string | null
+          id: string
+          is_system: boolean
+          nome: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          is_system?: boolean
+          nome: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          is_system?: boolean
+          nome?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       px_shared_resources: {
         Row: {
           created_at: string
@@ -936,6 +995,106 @@ export type Database = {
           {
             foreignKeyName: "px_shared_resources_empresa_origem_id_fkey"
             columns: ["empresa_origem_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      px_usuario_perfis: {
+        Row: {
+          created_at: string
+          perfil_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          perfil_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          perfil_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "px_usuario_perfis_perfil_id_fkey"
+            columns: ["perfil_id"]
+            isOneToOne: false
+            referencedRelation: "px_perfis"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      px_usuario_sistemas: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          id: string
+          sistema_key: string
+          ultimo_acesso: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          id?: string
+          sistema_key: string
+          ultimo_acesso?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          id?: string
+          sistema_key?: string
+          ultimo_acesso?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      px_usuarios_meta: {
+        Row: {
+          cargo: string | null
+          created_at: string
+          empresa_id: string | null
+          login: string
+          nome: string
+          observacoes: string | null
+          situacao: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cargo?: string | null
+          created_at?: string
+          empresa_id?: string | null
+          login: string
+          nome: string
+          observacoes?: string | null
+          situacao?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cargo?: string | null
+          created_at?: string
+          empresa_id?: string | null
+          login?: string
+          nome?: string
+          observacoes?: string | null
+          situacao?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "px_usuarios_meta_empresa_id_fkey"
+            columns: ["empresa_id"]
             isOneToOne: false
             referencedRelation: "empresas"
             referencedColumns: ["id"]
@@ -1471,6 +1630,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      has_system_access: {
+        Args: { _sistema: string; _user_id: string }
         Returns: boolean
       }
       is_executive: { Args: { _user_id: string }; Returns: boolean }

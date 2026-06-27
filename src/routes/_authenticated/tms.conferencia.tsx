@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { AppShell } from "@/components/app-shell";
+import { TmsShell } from "@/components/tms/tms-shell";
 import { ScanInput } from "@/components/tms/scan-input";
 import { supabase } from "@/integrations/supabase/client";
 import { STATUS_VOL_LABEL } from "@/lib/tms";
@@ -63,7 +63,7 @@ export function ScanOperationPage({ op, extraField }: { op: Operacao; extraField
   const total = historico.filter((h) => h.ok).length;
 
   return (
-    <AppShell title={op.titulo} subtitle={op.subtitulo}>
+    <TmsShell title={op.titulo} subtitle={op.subtitulo}>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2 space-y-3">
           {extraField && (
@@ -99,7 +99,7 @@ export function ScanOperationPage({ op, extraField }: { op: Operacao; extraField
           <div className="mt-3 text-[10px] text-muted-foreground">Status final: <span className="font-medium">{STATUS_VOL_LABEL[op.novoStatus]?.label}</span></div>
         </aside>
       </div>
-    </AppShell>
+    </TmsShell>
   );
 }
 
