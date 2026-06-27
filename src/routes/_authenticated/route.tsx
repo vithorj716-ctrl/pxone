@@ -1,30 +1,20 @@
-import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 
-// Modo Corporativo Interno: sem tela de login.
-// Garante uma sessão interna silenciosa para que o RLS continue funcionando.
-const INTERNAL_EMAIL = "emissao@pxlog.com.br";
-const INTERNAL_PASSWORD = "Tomate26@";
-
-async function ensureInternalSession() {
-  const { data } = await supabase.auth.getUser();
-  if (data.user) return;
-  const { error } = await supabase.auth.signInWithPassword({
-    email: INTERNAL_EMAIL,
-    password: INTERNAL_PASSWORD,
-  });
-  if (error) {
-    // Conta interna ainda não existe — cria silenciosamente.
-    await supabase.auth.signUp({ email: INTERNAL_EMAIL, password: INTERNAL_PASSWORD });
-    await supabase.auth.signInWithPassword({ email: INTERNAL_EMAIL, password: INTERNAL_PASSWORD });
-  }
-}
-
+// PX Platform — exige sessão. Sem auto-login: a tela /login é responsável.
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
-  beforeLoad: async () => {
-    await ensureInternalSession();
+  beforeLoad: async ({ location }) => {
     const { data } = await supabase.auth.getUser();
+    if (!data.user) {
+      throw redirect({ to: "/login" });
+    }
+    // Ao entrar diretamente em "/" (raiz) sem sistema escolhido, manda ao Launcher.
+    if (location.pathname === "/") {
+      let active: string | null = null;
+      try { active = sessionStorage.getItem("px:active-system"); } catch {}
+      if (!active) throw redirect({ to: "/launcher" });
+    }
     return { user: data.user };
   },
   component: () => <Outlet />,
