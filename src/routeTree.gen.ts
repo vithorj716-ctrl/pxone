@@ -21,12 +21,17 @@ import { Route as AuthenticatedMarkupRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedKpisRouteImport } from './routes/_authenticated/kpis'
 import { Route as AuthenticatedInvestorRouteImport } from './routes/_authenticated/investor'
 import { Route as AuthenticatedGrowthRouteImport } from './routes/_authenticated/growth'
+import { Route as AuthenticatedFinancialIntelligenceRouteImport } from './routes/_authenticated/financial-intelligence'
 import { Route as AuthenticatedEmpresasRouteImport } from './routes/_authenticated/empresas'
 import { Route as AuthenticatedDocumentsRouteImport } from './routes/_authenticated/documents'
 import { Route as AuthenticatedDecisionsRouteImport } from './routes/_authenticated/decisions'
 import { Route as AuthenticatedCustosRouteImport } from './routes/_authenticated/custos'
 import { Route as AuthenticatedBusinessPlanRouteImport } from './routes/_authenticated/business-plan'
 import { Route as AuthenticatedAiAnalystRouteImport } from './routes/_authenticated/ai-analyst'
+import { Route as AuthenticatedFinancialIntelligenceIndexRouteImport } from './routes/_authenticated/financial-intelligence.index'
+import { Route as AuthenticatedFinancialIntelligenceDreRouteImport } from './routes/_authenticated/financial-intelligence.dre'
+import { Route as AuthenticatedFinancialIntelligenceDfcRouteImport } from './routes/_authenticated/financial-intelligence.dfc'
+import { Route as AuthenticatedFinancialIntelligenceBreakEvenRouteImport } from './routes/_authenticated/financial-intelligence.break-even'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -87,6 +92,12 @@ const AuthenticatedGrowthRoute = AuthenticatedGrowthRouteImport.update({
   path: '/growth',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedFinancialIntelligenceRoute =
+  AuthenticatedFinancialIntelligenceRouteImport.update({
+    id: '/financial-intelligence',
+    path: '/financial-intelligence',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedEmpresasRoute = AuthenticatedEmpresasRouteImport.update({
   id: '/empresas',
   path: '/empresas',
@@ -118,6 +129,30 @@ const AuthenticatedAiAnalystRoute = AuthenticatedAiAnalystRouteImport.update({
   path: '/ai-analyst',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedFinancialIntelligenceIndexRoute =
+  AuthenticatedFinancialIntelligenceIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedFinancialIntelligenceRoute,
+  } as any)
+const AuthenticatedFinancialIntelligenceDreRoute =
+  AuthenticatedFinancialIntelligenceDreRouteImport.update({
+    id: '/dre',
+    path: '/dre',
+    getParentRoute: () => AuthenticatedFinancialIntelligenceRoute,
+  } as any)
+const AuthenticatedFinancialIntelligenceDfcRoute =
+  AuthenticatedFinancialIntelligenceDfcRouteImport.update({
+    id: '/dfc',
+    path: '/dfc',
+    getParentRoute: () => AuthenticatedFinancialIntelligenceRoute,
+  } as any)
+const AuthenticatedFinancialIntelligenceBreakEvenRoute =
+  AuthenticatedFinancialIntelligenceBreakEvenRouteImport.update({
+    id: '/break-even',
+    path: '/break-even',
+    getParentRoute: () => AuthenticatedFinancialIntelligenceRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
@@ -128,6 +163,7 @@ export interface FileRoutesByFullPath {
   '/decisions': typeof AuthenticatedDecisionsRoute
   '/documents': typeof AuthenticatedDocumentsRoute
   '/empresas': typeof AuthenticatedEmpresasRoute
+  '/financial-intelligence': typeof AuthenticatedFinancialIntelligenceRouteWithChildren
   '/growth': typeof AuthenticatedGrowthRoute
   '/investor': typeof AuthenticatedInvestorRoute
   '/kpis': typeof AuthenticatedKpisRoute
@@ -137,6 +173,10 @@ export interface FileRoutesByFullPath {
   '/risk': typeof AuthenticatedRiskRoute
   '/timeline': typeof AuthenticatedTimelineRoute
   '/valuation': typeof AuthenticatedValuationRoute
+  '/financial-intelligence/break-even': typeof AuthenticatedFinancialIntelligenceBreakEvenRoute
+  '/financial-intelligence/dfc': typeof AuthenticatedFinancialIntelligenceDfcRoute
+  '/financial-intelligence/dre': typeof AuthenticatedFinancialIntelligenceDreRoute
+  '/financial-intelligence/': typeof AuthenticatedFinancialIntelligenceIndexRoute
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
@@ -156,6 +196,10 @@ export interface FileRoutesByTo {
   '/timeline': typeof AuthenticatedTimelineRoute
   '/valuation': typeof AuthenticatedValuationRoute
   '/': typeof AuthenticatedIndexRoute
+  '/financial-intelligence/break-even': typeof AuthenticatedFinancialIntelligenceBreakEvenRoute
+  '/financial-intelligence/dfc': typeof AuthenticatedFinancialIntelligenceDfcRoute
+  '/financial-intelligence/dre': typeof AuthenticatedFinancialIntelligenceDreRoute
+  '/financial-intelligence': typeof AuthenticatedFinancialIntelligenceIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -167,6 +211,7 @@ export interface FileRoutesById {
   '/_authenticated/decisions': typeof AuthenticatedDecisionsRoute
   '/_authenticated/documents': typeof AuthenticatedDocumentsRoute
   '/_authenticated/empresas': typeof AuthenticatedEmpresasRoute
+  '/_authenticated/financial-intelligence': typeof AuthenticatedFinancialIntelligenceRouteWithChildren
   '/_authenticated/growth': typeof AuthenticatedGrowthRoute
   '/_authenticated/investor': typeof AuthenticatedInvestorRoute
   '/_authenticated/kpis': typeof AuthenticatedKpisRoute
@@ -177,6 +222,10 @@ export interface FileRoutesById {
   '/_authenticated/timeline': typeof AuthenticatedTimelineRoute
   '/_authenticated/valuation': typeof AuthenticatedValuationRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/financial-intelligence/break-even': typeof AuthenticatedFinancialIntelligenceBreakEvenRoute
+  '/_authenticated/financial-intelligence/dfc': typeof AuthenticatedFinancialIntelligenceDfcRoute
+  '/_authenticated/financial-intelligence/dre': typeof AuthenticatedFinancialIntelligenceDreRoute
+  '/_authenticated/financial-intelligence/': typeof AuthenticatedFinancialIntelligenceIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -189,6 +238,7 @@ export interface FileRouteTypes {
     | '/decisions'
     | '/documents'
     | '/empresas'
+    | '/financial-intelligence'
     | '/growth'
     | '/investor'
     | '/kpis'
@@ -198,6 +248,10 @@ export interface FileRouteTypes {
     | '/risk'
     | '/timeline'
     | '/valuation'
+    | '/financial-intelligence/break-even'
+    | '/financial-intelligence/dfc'
+    | '/financial-intelligence/dre'
+    | '/financial-intelligence/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/auth'
@@ -217,6 +271,10 @@ export interface FileRouteTypes {
     | '/timeline'
     | '/valuation'
     | '/'
+    | '/financial-intelligence/break-even'
+    | '/financial-intelligence/dfc'
+    | '/financial-intelligence/dre'
+    | '/financial-intelligence'
   id:
     | '__root__'
     | '/_authenticated'
@@ -227,6 +285,7 @@ export interface FileRouteTypes {
     | '/_authenticated/decisions'
     | '/_authenticated/documents'
     | '/_authenticated/empresas'
+    | '/_authenticated/financial-intelligence'
     | '/_authenticated/growth'
     | '/_authenticated/investor'
     | '/_authenticated/kpis'
@@ -237,6 +296,10 @@ export interface FileRouteTypes {
     | '/_authenticated/timeline'
     | '/_authenticated/valuation'
     | '/_authenticated/'
+    | '/_authenticated/financial-intelligence/break-even'
+    | '/_authenticated/financial-intelligence/dfc'
+    | '/_authenticated/financial-intelligence/dre'
+    | '/_authenticated/financial-intelligence/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -330,6 +393,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedGrowthRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/financial-intelligence': {
+      id: '/_authenticated/financial-intelligence'
+      path: '/financial-intelligence'
+      fullPath: '/financial-intelligence'
+      preLoaderRoute: typeof AuthenticatedFinancialIntelligenceRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/empresas': {
       id: '/_authenticated/empresas'
       path: '/empresas'
@@ -372,8 +442,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAiAnalystRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/financial-intelligence/': {
+      id: '/_authenticated/financial-intelligence/'
+      path: '/'
+      fullPath: '/financial-intelligence/'
+      preLoaderRoute: typeof AuthenticatedFinancialIntelligenceIndexRouteImport
+      parentRoute: typeof AuthenticatedFinancialIntelligenceRoute
+    }
+    '/_authenticated/financial-intelligence/dre': {
+      id: '/_authenticated/financial-intelligence/dre'
+      path: '/dre'
+      fullPath: '/financial-intelligence/dre'
+      preLoaderRoute: typeof AuthenticatedFinancialIntelligenceDreRouteImport
+      parentRoute: typeof AuthenticatedFinancialIntelligenceRoute
+    }
+    '/_authenticated/financial-intelligence/dfc': {
+      id: '/_authenticated/financial-intelligence/dfc'
+      path: '/dfc'
+      fullPath: '/financial-intelligence/dfc'
+      preLoaderRoute: typeof AuthenticatedFinancialIntelligenceDfcRouteImport
+      parentRoute: typeof AuthenticatedFinancialIntelligenceRoute
+    }
+    '/_authenticated/financial-intelligence/break-even': {
+      id: '/_authenticated/financial-intelligence/break-even'
+      path: '/break-even'
+      fullPath: '/financial-intelligence/break-even'
+      preLoaderRoute: typeof AuthenticatedFinancialIntelligenceBreakEvenRouteImport
+      parentRoute: typeof AuthenticatedFinancialIntelligenceRoute
+    }
   }
 }
+
+interface AuthenticatedFinancialIntelligenceRouteChildren {
+  AuthenticatedFinancialIntelligenceBreakEvenRoute: typeof AuthenticatedFinancialIntelligenceBreakEvenRoute
+  AuthenticatedFinancialIntelligenceDfcRoute: typeof AuthenticatedFinancialIntelligenceDfcRoute
+  AuthenticatedFinancialIntelligenceDreRoute: typeof AuthenticatedFinancialIntelligenceDreRoute
+  AuthenticatedFinancialIntelligenceIndexRoute: typeof AuthenticatedFinancialIntelligenceIndexRoute
+}
+
+const AuthenticatedFinancialIntelligenceRouteChildren: AuthenticatedFinancialIntelligenceRouteChildren =
+  {
+    AuthenticatedFinancialIntelligenceBreakEvenRoute:
+      AuthenticatedFinancialIntelligenceBreakEvenRoute,
+    AuthenticatedFinancialIntelligenceDfcRoute:
+      AuthenticatedFinancialIntelligenceDfcRoute,
+    AuthenticatedFinancialIntelligenceDreRoute:
+      AuthenticatedFinancialIntelligenceDreRoute,
+    AuthenticatedFinancialIntelligenceIndexRoute:
+      AuthenticatedFinancialIntelligenceIndexRoute,
+  }
+
+const AuthenticatedFinancialIntelligenceRouteWithChildren =
+  AuthenticatedFinancialIntelligenceRoute._addFileChildren(
+    AuthenticatedFinancialIntelligenceRouteChildren,
+  )
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAiAnalystRoute: typeof AuthenticatedAiAnalystRoute
@@ -382,6 +504,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDecisionsRoute: typeof AuthenticatedDecisionsRoute
   AuthenticatedDocumentsRoute: typeof AuthenticatedDocumentsRoute
   AuthenticatedEmpresasRoute: typeof AuthenticatedEmpresasRoute
+  AuthenticatedFinancialIntelligenceRoute: typeof AuthenticatedFinancialIntelligenceRouteWithChildren
   AuthenticatedGrowthRoute: typeof AuthenticatedGrowthRoute
   AuthenticatedInvestorRoute: typeof AuthenticatedInvestorRoute
   AuthenticatedKpisRoute: typeof AuthenticatedKpisRoute
@@ -401,6 +524,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDecisionsRoute: AuthenticatedDecisionsRoute,
   AuthenticatedDocumentsRoute: AuthenticatedDocumentsRoute,
   AuthenticatedEmpresasRoute: AuthenticatedEmpresasRoute,
+  AuthenticatedFinancialIntelligenceRoute:
+    AuthenticatedFinancialIntelligenceRouteWithChildren,
   AuthenticatedGrowthRoute: AuthenticatedGrowthRoute,
   AuthenticatedInvestorRoute: AuthenticatedInvestorRoute,
   AuthenticatedKpisRoute: AuthenticatedKpisRoute,

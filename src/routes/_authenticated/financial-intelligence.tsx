@@ -7,12 +7,13 @@ export const Route = createFileRoute("/_authenticated/financial-intelligence")({
   component: Layout,
 });
 
-const tabs = [
+type Tab = { to: string; label: string; icon: any; exact?: boolean };
+const tabs: Tab[] = [
   { to: "/financial-intelligence", label: "CEO Cockpit", icon: LayoutDashboard, exact: true },
   { to: "/financial-intelligence/dre", label: "DRE Gerencial", icon: FileBarChart },
   { to: "/financial-intelligence/dfc", label: "DFC Inteligente", icon: Waves },
   { to: "/financial-intelligence/break-even", label: "Ponto de Equilíbrio", icon: Scale },
-] as const;
+];
 
 function Layout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });

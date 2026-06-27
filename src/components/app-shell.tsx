@@ -3,7 +3,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import {
   LayoutDashboard, Target, Calculator, TrendingUp, Gavel, ShieldAlert,
   Users, Sparkles, Goal, Rocket, FileText, Clock, Wallet, Building2,
-  PanelLeftClose, PanelLeftOpen, Search, Tag,
+  PanelLeftClose, PanelLeftOpen, Search, Tag, Brain,
 } from "lucide-react";
 import { ExportButton } from "@/components/executive-share";
 
@@ -24,6 +24,7 @@ const navGroups = [
       { to: "/empresas", label: "Empresas", icon: Building2 },
       { to: "/custos", label: "Central de Custos", icon: Wallet },
       { to: "/markup", label: "Markup Engine", icon: Tag },
+      { to: "/financial-intelligence", label: "Financial Intelligence", icon: Brain },
     ],
   },
   {
