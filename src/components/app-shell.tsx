@@ -4,11 +4,12 @@ import {
   LayoutDashboard, Target, Calculator, TrendingUp, Gavel, ShieldAlert,
   Users, Sparkles, Goal, Rocket, FileText, Clock, Wallet, Building2,
   PanelLeftClose, PanelLeftOpen, Search, Tag, Brain, Menu, X, PanelRight, Boxes,
-  Truck, Package, ScanLine, AlertTriangle, CircleDollarSign,
+  Grid3x3,
 } from "lucide-react";
 import { ExportButton } from "@/components/executive-share";
 import { InstallAppButton } from "@/components/install-app-button";
 import { EmpresaSelector } from "@/components/empresa-selector";
+import { useSystem } from "@/px-platform/system-context";
 
 const navGroups = [
   {
