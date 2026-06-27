@@ -1,16 +1,19 @@
-import { createFileRoute, useParams } from "@tanstack/react-router";
+import { createFileRoute, useParams, useSearch } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { QrLabel } from "@/components/tms/qr-label";
 import { Printer } from "lucide-react";
+import { z } from "zod";
 
 export const Route = createFileRoute("/_authenticated/tms/etiquetas/$minuta")({
   head: () => ({ meta: [{ title: "PXLog — Etiquetas" }] }),
+  validateSearch: z.object({ print: z.coerce.number().optional() }),
   component: EtiquetasPage,
 });
 
 function EtiquetasPage() {
   const { minuta: numero } = useParams({ from: "/_authenticated/tms/etiquetas/$minuta" });
+  const { print: printFlag } = useSearch({ from: "/_authenticated/tms/etiquetas/$minuta" });
   const [minuta, setMinuta] = useState<any | null>(null);
   const [volumes, setVolumes] = useState<any[]>([]);
 
@@ -28,6 +31,13 @@ function EtiquetasPage() {
       await supabase.from("tms_eventos").insert({ minuta_id: (m as any).id, tipo: "etiquetado", origem_evento: "Impressão de etiquetas" });
     })();
   }, [numero]);
+
+  useEffect(() => {
+    if (printFlag && minuta && volumes.length > 0) {
+      const t = setTimeout(() => window.print(), 600);
+      return () => clearTimeout(t);
+    }
+  }, [printFlag, minuta, volumes.length]);
 
   if (!minuta) return <div className="p-6">Carregando…</div>;
 
@@ -92,8 +102,10 @@ function EtiquetasPage() {
 
       <style>{`
         @media print {
-          body { background: white !important; }
-          .tms-label { box-shadow: none !important; }
+          html, body { background: white !important; margin: 0 !important; padding: 0 !important; }
+          body * { visibility: hidden !important; }
+          .tms-label, .tms-label * { visibility: visible !important; }
+          .tms-label { box-shadow: none !important; margin: 0 !important; page-break-after: always; }
           @page { size: 100mm 150mm; margin: 0; }
         }
       `}</style>

@@ -53,10 +53,10 @@ function MinutaPage() {
             className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs ring-1 ring-border bg-surface/60 hover:bg-surface">
             <Tag className="size-3.5" /> Etiquetas
           </Link>
-          <button onClick={() => window.print()}
+          <Link to="/tms/etiquetas/$minuta" params={{ minuta: String(minuta.numero) }} search={{ print: 1 } as any}
             className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs bg-brand text-brand-foreground">
             <Printer className="size-3.5" /> Imprimir
-          </button>
+          </Link>
         </div>
       }
     >
