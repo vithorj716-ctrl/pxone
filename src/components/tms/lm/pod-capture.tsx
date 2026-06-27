@@ -65,6 +65,34 @@ export function PodCapture({ entregaId, onSaved }: { entregaId: string; onSaved?
       if (error) throw error;
       await supabase.from("tms_lm_entregas").update({ status: "entregue", concluida_em: new Date().toISOString() }).eq("id", entregaId);
       await supabase.from("tms_lm_eventos").insert({ entrega_id: entregaId, tipo: "entregue", payload: { recebedor, doc } });
+
+      // Verifica se todas as entregas da rota foram concluídas → finaliza rota + lança receita
+      const { data: ent } = await supabase.from("tms_lm_entregas").select("rota_id").eq("id", entregaId).maybeSingle();
+      const rotaId = (ent as any)?.rota_id as string | undefined;
+      if (rotaId) {
+        const { data: irmas } = await supabase.from("tms_lm_entregas").select("status").eq("rota_id", rotaId);
+        const todas = (irmas ?? []) as { status: string }[];
+        if (todas.length > 0 && todas.every((e) => e.status === "entregue")) {
+          const { data: rota } = await supabase.from("tms_lm_rotas")
+            .select("id, numero, valor_rota, faturavel, empresa_id, status")
+            .eq("id", rotaId).maybeSingle();
+          await supabase.from("tms_lm_rotas").update({
+            status: "finalizada", hora_finalizada: new Date().toISOString(),
+          }).eq("id", rotaId);
+          if (rota && (rota as any).faturavel && Number((rota as any).valor_rota) > 0 && (rota as any).status !== "finalizada") {
+            await supabase.from("custos").insert({
+              nome: `Receita Last Mile — Rota #${(rota as any).numero}`,
+              descricao: `[LM] Rota ${(rota as any).numero} finalizada com ${todas.length} entrega(s)`,
+              valor: Number((rota as any).valor_rota),
+              empresa_id: (rota as any).empresa_id ?? null,
+              tipo_custo: "unico",
+              status: "pago",
+              centro_custo: "Receita Last Mile",
+            });
+          }
+        }
+      }
+
       toast.success("Comprovante salvo");
       onSaved?.();
     } catch (e: any) { toast.error(e.message); } finally { setSaving(false); }
