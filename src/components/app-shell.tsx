@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { ExportButton } from "@/components/executive-share";
 import { InstallAppButton } from "@/components/install-app-button";
+import { EmpresaSelector } from "@/components/empresa-selector";
 
 const navGroups = [
   {
@@ -50,6 +51,8 @@ const navGroups = [
     label: "Plataforma",
     items: [
       { to: "/platform", label: "PX Platform", icon: Boxes },
+      { to: "/aplicacoes", label: "Aplicações", icon: Boxes },
+      { to: "/consolidado", label: "Visão Consolidada", icon: LayoutDashboard },
     ],
   },
 ] as const;
