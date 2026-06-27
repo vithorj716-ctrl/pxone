@@ -1,11 +1,13 @@
-import { createFileRoute, useParams } from "@tanstack/react-router";
+import { createFileRoute, useParams, useSearch } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { QrLabel } from "@/components/tms/qr-label";
 import { Printer } from "lucide-react";
+import { z } from "zod";
 
 export const Route = createFileRoute("/_authenticated/tms/etiquetas/$minuta")({
   head: () => ({ meta: [{ title: "PXLog — Etiquetas" }] }),
+  validateSearch: z.object({ print: z.coerce.number().optional() }),
   component: EtiquetasPage,
 });
 
