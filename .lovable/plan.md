@@ -1,139 +1,138 @@
-# Evolução Arquitetural: PXOne → PX Platform
+# Evolução PXOne → PX Platform Multiempresa
 
-Esta atualização **adiciona** uma camada estrutural acima do que já existe. Nenhum módulo atual (Custos, Markup, Financial Intelligence, Dashboard, etc.) será alterado, removido ou refatorado. Tudo continua funcionando exatamente como hoje.
+Atualização **aditiva**: nenhum módulo atual é alterado, nenhuma tabela existente é quebrada. A camada nova introduz multiempresa real, alternância de contexto, gestão de aplicações por empresa e visão consolidada do grupo.
 
 ## Princípio diretor
 
-A camada nova é **aditiva e não-invasiva**: ela envolve e referencia o que já existe, em vez de reescrever. Os módulos atuais continuam lendo/escrevendo nas mesmas tabelas; a camada PX Core apenas as expõe como "fonte única" através de uma API interna padronizada e de um registry.
+A tabela `empresas` já existe e é referenciada por `custos`, `kpis`, `markup_calculations`, `documents`, etc. Vamos **enriquecer** esse cadastro (sem quebrar nada) e adicionar:
+
+1. Um **seletor de empresa global** no topo (com modo "Grupo consolidado").
+2. Um **filtro de contexto** que módulos novos respeitam — módulos atuais continuam mostrando "tudo" como hoje, mas passam a destacar a empresa ativa quando ela existir.
+3. Uma camada de **habilitação de aplicações por empresa** (Module Registry do PX Core × empresa).
+4. Uma **Visão Consolidada do Grupo** com indicadores agregados e ranking entre empresas.
 
 ## O que será adicionado
 
-### 1. PX Core (camada lógica de dados compartilhados)
-Novo diretório `src/px-core/` com adaptadores que apontam para as tabelas já existentes:
-- `empresas.ts` → tabela `empresas`
-- `custos.ts` → tabela `custos` + `categorias_custo`
-- `kpis.ts` → `kpis` + `kpi_snapshots`
-- `documents.ts`, `notifications.ts`, `audit.ts`, `files.ts`
-- Stubs preparados (sem tabela ainda) para: `filiais`, `clientes`, `fornecedores`, `produtos`, `servicos`, `plano_contas`, `colaboradores`
-
-Cada adaptador exporta funções tipadas (`list`, `getById`, etc.). Módulos futuros consomem **somente** via PX Core — nunca tocam tabela de outro módulo direto.
-
-### 2. Module Registry
-`src/px-core/registry.ts` — registro estático em código (não em banco) dos módulos instalados:
+### 1. Enriquecimento da tabela `empresas` (migração aditiva)
+Adicionar colunas opcionais — todas nullable, defaults seguros, zero impacto no que existe:
 
 ```text
-PXOne ERP · Markup Engine · Financial Intelligence · Business Plan ·
-SWOT · KPI Center · Executive Command
+razao_social text · nome_fantasia text · cnpj text · segmento text
+logo_url text · cor_primaria text · cor_secundaria text
+situacao text DEFAULT 'ativa' · configuracoes jsonb DEFAULT '{}'
 ```
 
-Cada entrada: `{ key, nome, icone, versao, status, rotas, permissoes, eventos[], apis[] }`. Módulos futuros (PXSales, PXTMS, PXFleet, PXRH, PXBI, PXDocs, PXAI) ficam declarados como `status: "planejado"` — apenas reservados, não implementados.
+Tabelas novas:
+- `px_filiais` (empresa_id FK, nome, cidade, uf, cnpj, ativo)
+- `px_empresa_modulos` (empresa_id FK, modulo_key, ativo, habilitado_em) — controla quais módulos do Registry estão ligados por empresa
+- `px_shared_resources` (recurso, empresa_origem_id, empresas_compartilhadas uuid[], tipo) — opt-in de compartilhamento de clientes/fornecedores/produtos/etc.
 
-### 3. Event Bus interno
-`src/px-core/events.ts` — barramento pub/sub em memória (client + server) com tipos:
-`venda.criada`, `cliente.criado`, `fornecedor.atualizado`, `custo.lancado`, `despesa.aprovada`, `faturamento.realizado`, `frete.entregue`, `pagamento.recebido`, etc.
+Todas com GRANTs + RLS authenticated.
 
-Nenhum módulo atual passa a emitir agora (não vamos tocar neles). O bus fica disponível para módulos futuros e para opt-in gradual.
+### 2. Contexto de empresa global (frontend)
+Novo `src/px-core/empresa-context.tsx`:
+- `<EmpresaProvider>` no `__root.tsx`
+- `useEmpresaAtiva()` → `{ empresa | null, isGrupo, setEmpresa, listaEmpresas }`
+- Persiste seleção em `localStorage` (`px:empresa-ativa`)
+- Modo "Grupo" (`empresa = null`, `isGrupo = true`) = visão consolidada
 
-Persistência leve: tabela nova `px_events` (id, tipo, payload jsonb, origem, created_at) só para auditoria/replay. RLS + GRANTs padrão.
+### 3. Seletor de empresa no header
+Adicionar dropdown no header do `app-shell.tsx`:
+- Mostra logo + nome fantasia da empresa ativa
+- Opção "🏢 Visão do Grupo" no topo
+- Lista todas as empresas ativas
+- Aplica cor primária da empresa como acento visual sutil (variável CSS `--px-empresa-accent`)
+- Mobile: ícone com sheet drawer
 
-### 4. API Layer interno
-`src/px-core/api/` — server functions (`createServerFn`) padronizadas:
-`coreEmpresas.list`, `coreCustos.summary`, `coreKpis.list`, `coreDashboard.snapshot`, etc.
+### 4. Módulo "Empresas" enriquecido (`/empresas`)
+A rota já existe (CRUD simples). **Não vou substituir** — vou estender:
+- Adicionar todos os novos campos no formulário (razão social, CNPJ, segmento, logo, cores, situação)
+- Adicionar aba "Filiais" e aba "Aplicações habilitadas" por empresa
+- Mantém compatibilidade total com o uso atual
 
-São wrappers finos sobre os adaptadores do PX Core. Módulos novos importam só daqui. Módulos atuais continuam como estão.
+### 5. Nova rota "Aplicações" (`/aplicacoes`)
+Lista todas as aplicações do `PX_MODULES` registry com:
+- Nome, descrição, versão, status, dependências, permissões
+- Quantas empresas usam (count em `px_empresa_modulos`)
+- Última atualização
+- Por empresa ativa: toggle ativar/desativar
 
-### 5. PX AI Core
-`src/px-core/ai/` — consolida o padrão de chamada ao Lovable AI Gateway num único helper (`callPxAI({ mode, context })`) que:
-- Carrega contexto via PX Core (nunca consulta tabelas direto)
-- Aplica seleção de modelo (flash-lite/flash) já existente
-- Reaproveitado pelos arquivos atuais via re-export, sem alterar a assinatura pública deles
+### 6. Visão Consolidada do Grupo (`/platform/consolidado`)
+Quando "Visão do Grupo" está ativa, mostra:
+- Faturamento, lucro, custos, EBITDA agregados (a partir do que já existe em `custos` + `kpis` + `markup_calculations`)
+- Ranking de empresas por desempenho
+- Participação % de cada empresa
+- Comparativos lado a lado
+- Toggle "Consolidado ↔ Por empresa"
 
-### 6. Dashboard Global (`/platform`)
-Nova rota `src/routes/_authenticated/platform.tsx` — painel administrativo da plataforma mostrando:
-- Módulos instalados (do Registry) com versão/status
-- Integrações ativas
-- Eventos processados (contagem de `px_events`)
-- Saúde do sistema (ping a server fn)
-- Uso de armazenamento (tamanho agregado de `documents`)
-- Uso da IA (contador de chamadas — novo)
-- Logs recentes
+### 7. IA Corporativa com contexto de empresa
+Atualizar `src/px-core/ai/core.ts` (a função `callPxAI` já é nova/opt-in) para aceitar `empresaId | "grupo"`:
+- Quando empresa específica: prompt inclui "Análises devem considerar APENAS dados de {nome}"
+- Quando grupo + autorização explícita: prompt permite comparativos entre empresas
+- Server functions atuais (`askAnalyst`, `askFinancialAdvisor`, etc.) **não são alteradas** — apenas ganham um parâmetro opcional `empresaId` que, se enviado, filtra os dados carregados antes de chamar a IA
 
-Adiciona item "PX Platform" no menu lateral (`app-shell.tsx`) — apenas um link novo, sem mexer nos existentes.
+### 8. Arquitetura "Empresa → Aplicações → Dados"
+Documentar no `.lovable/plan.md` e expor helpers em `src/px-core/`:
+- `getEmpresaModulos(empresaId)`
+- `isModuloHabilitado(empresaId, key)`
+- `getRecursosCompartilhados(tipo, empresaId)`
 
-## Migração de banco
+## Compatibilidade
 
-Apenas **uma** migração aditiva:
+- ✅ Módulos atuais (Custos, Markup, Financial Intelligence, Dashboard, KPIs, etc.) continuam funcionando **sem alteração**.
+- ✅ Empresas existentes continuam válidas — só ganham campos novos opcionais.
+- ✅ Quando nenhuma empresa está selecionada (estado atual padrão), tudo se comporta como hoje.
+- ✅ Quando uma empresa é selecionada, módulos novos filtram automaticamente; módulos atuais ignoram o filtro (não quebram).
+
+## Migração de banco (única, aditiva)
 
 ```sql
--- px_events: log de eventos do barramento
-CREATE TABLE public.px_events (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tipo text NOT NULL,
-  origem text,
-  payload jsonb NOT NULL DEFAULT '{}'::jsonb,
-  created_at timestamptz NOT NULL DEFAULT now()
-);
-GRANT SELECT, INSERT ON public.px_events TO authenticated;
-GRANT ALL ON public.px_events TO service_role;
-ALTER TABLE public.px_events ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "auth read events" ON public.px_events FOR SELECT TO authenticated USING (true);
-CREATE POLICY "auth insert events" ON public.px_events FOR INSERT TO authenticated WITH CHECK (true);
+ALTER TABLE public.empresas
+  ADD COLUMN razao_social text,
+  ADD COLUMN nome_fantasia text,
+  ADD COLUMN cnpj text,
+  ADD COLUMN segmento text,
+  ADD COLUMN logo_url text,
+  ADD COLUMN cor_primaria text,
+  ADD COLUMN cor_secundaria text,
+  ADD COLUMN situacao text NOT NULL DEFAULT 'ativa',
+  ADD COLUMN configuracoes jsonb NOT NULL DEFAULT '{}'::jsonb;
 
--- px_ai_usage: contador de chamadas da IA
-CREATE TABLE public.px_ai_usage (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  modulo text NOT NULL,
-  modelo text NOT NULL,
-  tokens_in int DEFAULT 0,
-  tokens_out int DEFAULT 0,
-  created_at timestamptz NOT NULL DEFAULT now()
-);
-GRANT SELECT, INSERT ON public.px_ai_usage TO authenticated;
-GRANT ALL ON public.px_ai_usage TO service_role;
-ALTER TABLE public.px_ai_usage ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "auth read ai usage" ON public.px_ai_usage FOR SELECT TO authenticated USING (true);
-CREATE POLICY "auth insert ai usage" ON public.px_ai_usage FOR INSERT TO authenticated WITH CHECK (true);
+CREATE TABLE public.px_filiais (...);            -- + GRANTs + RLS
+CREATE TABLE public.px_empresa_modulos (...);    -- + GRANTs + RLS
+CREATE TABLE public.px_shared_resources (...);   -- + GRANTs + RLS
 ```
-
-Nenhuma tabela existente é tocada.
 
 ## Arquivos novos
 
 ```text
-src/px-core/
-  registry.ts
-  events.ts
-  types.ts
-  api/
-    empresas.functions.ts
-    custos.functions.ts
-    kpis.functions.ts
-    dashboard.functions.ts
-    events.functions.ts
-    ai-usage.functions.ts
-  adapters/
-    empresas.ts
-    custos.ts
-    kpis.ts
-    documents.ts
-  ai/
-    core.ts            ← wrapper único do gateway
-src/routes/_authenticated/platform.tsx
-supabase/migrations/<ts>_px_platform.sql
+src/px-core/empresa-context.tsx
+src/px-core/api/empresas.functions.ts       (list+enriched)
+src/px-core/api/empresa-modulos.functions.ts
+src/px-core/api/consolidado.functions.ts
+src/components/empresa-selector.tsx
+src/routes/_authenticated/aplicacoes.tsx
+src/routes/_authenticated/platform.consolidado.tsx
+supabase/migrations/<ts>_px_multiempresa.sql
 ```
 
 ## Arquivos editados (mínimo)
 
-- `src/components/app-shell.tsx` → adicionar 1 item de menu "PX Platform"
-- `.lovable/plan.md` → atualizar resumo
+- `src/routes/__root.tsx` → envolver com `<EmpresaProvider>`
+- `src/components/app-shell.tsx` → adicionar `<EmpresaSelector>` no header + 2 itens de menu ("Aplicações", "Consolidado")
+- `src/routes/_authenticated/empresas.tsx` → adicionar campos novos no formulário CRUD existente
+- `.lovable/plan.md` → atualizar
 
-Nada mais é editado. Custos, Markup, Financial Intelligence, Dashboard, KPIs etc. permanecem intactos.
+Nada além disso.
 
 ## Garantias
 
-- ✅ Zero alteração visual ou funcional nos módulos atuais
-- ✅ Zero alteração nas tabelas existentes
-- ✅ Toda a camada nova é opt-in (módulos futuros usam; atuais ignoram)
-- ✅ Preparado para PXSales/PXTMS/PXFleet/PXRH/PXBI/PXDocs/PXAI sem reestruturação
+- ✅ Zero alteração visual/funcional nos módulos existentes
+- ✅ Zero perda de dados — todas as colunas novas são opcionais
+- ✅ Isolamento de dados preparado (FK `empresa_id` já existe nas tabelas principais)
+- ✅ Compartilhamento opt-in via `px_shared_resources`
+- ✅ IA recebe contexto da empresa ativa
+- ✅ Visão consolidada como modo separado, não substitui nada
+- ✅ Arquitetura pronta para PXSales/PXTMS/etc. sem refactor
 
 Posso aplicar?

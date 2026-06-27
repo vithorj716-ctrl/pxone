@@ -27,7 +27,9 @@ import { Route as AuthenticatedEmpresasRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedDocumentsRouteImport } from './routes/_authenticated/documents'
 import { Route as AuthenticatedDecisionsRouteImport } from './routes/_authenticated/decisions'
 import { Route as AuthenticatedCustosRouteImport } from './routes/_authenticated/custos'
+import { Route as AuthenticatedConsolidadoRouteImport } from './routes/_authenticated/consolidado'
 import { Route as AuthenticatedBusinessPlanRouteImport } from './routes/_authenticated/business-plan'
+import { Route as AuthenticatedAplicacoesRouteImport } from './routes/_authenticated/aplicacoes'
 import { Route as AuthenticatedAiAnalystRouteImport } from './routes/_authenticated/ai-analyst'
 import { Route as AuthenticatedFinancialIntelligenceIndexRouteImport } from './routes/_authenticated/financial-intelligence.index'
 import { Route as AuthenticatedFinancialIntelligenceDreRouteImport } from './routes/_authenticated/financial-intelligence.dre'
@@ -124,12 +126,23 @@ const AuthenticatedCustosRoute = AuthenticatedCustosRouteImport.update({
   path: '/custos',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedConsolidadoRoute =
+  AuthenticatedConsolidadoRouteImport.update({
+    id: '/consolidado',
+    path: '/consolidado',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedBusinessPlanRoute =
   AuthenticatedBusinessPlanRouteImport.update({
     id: '/business-plan',
     path: '/business-plan',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAplicacoesRoute = AuthenticatedAplicacoesRouteImport.update({
+  id: '/aplicacoes',
+  path: '/aplicacoes',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAiAnalystRoute = AuthenticatedAiAnalystRouteImport.update({
   id: '/ai-analyst',
   path: '/ai-analyst',
@@ -164,7 +177,9 @@ export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/auth': typeof AuthRoute
   '/ai-analyst': typeof AuthenticatedAiAnalystRoute
+  '/aplicacoes': typeof AuthenticatedAplicacoesRoute
   '/business-plan': typeof AuthenticatedBusinessPlanRoute
+  '/consolidado': typeof AuthenticatedConsolidadoRoute
   '/custos': typeof AuthenticatedCustosRoute
   '/decisions': typeof AuthenticatedDecisionsRoute
   '/documents': typeof AuthenticatedDocumentsRoute
@@ -188,7 +203,9 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/ai-analyst': typeof AuthenticatedAiAnalystRoute
+  '/aplicacoes': typeof AuthenticatedAplicacoesRoute
   '/business-plan': typeof AuthenticatedBusinessPlanRoute
+  '/consolidado': typeof AuthenticatedConsolidadoRoute
   '/custos': typeof AuthenticatedCustosRoute
   '/decisions': typeof AuthenticatedDecisionsRoute
   '/documents': typeof AuthenticatedDocumentsRoute
@@ -214,7 +231,9 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/ai-analyst': typeof AuthenticatedAiAnalystRoute
+  '/_authenticated/aplicacoes': typeof AuthenticatedAplicacoesRoute
   '/_authenticated/business-plan': typeof AuthenticatedBusinessPlanRoute
+  '/_authenticated/consolidado': typeof AuthenticatedConsolidadoRoute
   '/_authenticated/custos': typeof AuthenticatedCustosRoute
   '/_authenticated/decisions': typeof AuthenticatedDecisionsRoute
   '/_authenticated/documents': typeof AuthenticatedDocumentsRoute
@@ -242,7 +261,9 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/ai-analyst'
+    | '/aplicacoes'
     | '/business-plan'
+    | '/consolidado'
     | '/custos'
     | '/decisions'
     | '/documents'
@@ -266,7 +287,9 @@ export interface FileRouteTypes {
   to:
     | '/auth'
     | '/ai-analyst'
+    | '/aplicacoes'
     | '/business-plan'
+    | '/consolidado'
     | '/custos'
     | '/decisions'
     | '/documents'
@@ -291,7 +314,9 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/ai-analyst'
+    | '/_authenticated/aplicacoes'
     | '/_authenticated/business-plan'
+    | '/_authenticated/consolidado'
     | '/_authenticated/custos'
     | '/_authenticated/decisions'
     | '/_authenticated/documents'
@@ -447,11 +472,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCustosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/consolidado': {
+      id: '/_authenticated/consolidado'
+      path: '/consolidado'
+      fullPath: '/consolidado'
+      preLoaderRoute: typeof AuthenticatedConsolidadoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/business-plan': {
       id: '/_authenticated/business-plan'
       path: '/business-plan'
       fullPath: '/business-plan'
       preLoaderRoute: typeof AuthenticatedBusinessPlanRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/aplicacoes': {
+      id: '/_authenticated/aplicacoes'
+      path: '/aplicacoes'
+      fullPath: '/aplicacoes'
+      preLoaderRoute: typeof AuthenticatedAplicacoesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/ai-analyst': {
@@ -518,7 +557,9 @@ const AuthenticatedFinancialIntelligenceRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAiAnalystRoute: typeof AuthenticatedAiAnalystRoute
+  AuthenticatedAplicacoesRoute: typeof AuthenticatedAplicacoesRoute
   AuthenticatedBusinessPlanRoute: typeof AuthenticatedBusinessPlanRoute
+  AuthenticatedConsolidadoRoute: typeof AuthenticatedConsolidadoRoute
   AuthenticatedCustosRoute: typeof AuthenticatedCustosRoute
   AuthenticatedDecisionsRoute: typeof AuthenticatedDecisionsRoute
   AuthenticatedDocumentsRoute: typeof AuthenticatedDocumentsRoute
@@ -539,7 +580,9 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAiAnalystRoute: AuthenticatedAiAnalystRoute,
+  AuthenticatedAplicacoesRoute: AuthenticatedAplicacoesRoute,
   AuthenticatedBusinessPlanRoute: AuthenticatedBusinessPlanRoute,
+  AuthenticatedConsolidadoRoute: AuthenticatedConsolidadoRoute,
   AuthenticatedCustosRoute: AuthenticatedCustosRoute,
   AuthenticatedDecisionsRoute: AuthenticatedDecisionsRoute,
   AuthenticatedDocumentsRoute: AuthenticatedDocumentsRoute,

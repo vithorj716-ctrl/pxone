@@ -12,6 +12,7 @@ import { Toaster } from "sonner";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { EmpresaProvider } from "@/px-core/empresa-context";
 
 function NotFoundComponent() {
   return (
@@ -154,8 +155,10 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
-      <Toaster theme="dark" position="top-right" />
+      <EmpresaProvider>
+        <Outlet />
+        <Toaster theme="dark" position="top-right" />
+      </EmpresaProvider>
     </QueryClientProvider>
   );
 }
