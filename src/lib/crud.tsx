@@ -164,24 +164,24 @@ export function CrudTable({
 
   return (
     <div className="space-y-4 animate-fade-in">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          {title && <h3 className="text-sm font-semibold">{title}</h3>}
-          <span className="text-[11px] text-muted-foreground tabular-nums">{filteredRows.length} registro(s)</span>
+      <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          {title && <h3 className="text-sm font-semibold truncate">{title}</h3>}
+          <span className="text-[11px] text-muted-foreground tabular-nums shrink-0">{filteredRows.length} reg.</span>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="relative">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <div className="relative flex-1 sm:flex-none">
             <Search className="size-3.5 text-muted-foreground absolute left-2.5 top-1/2 -translate-y-1/2" />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Filtrar…"
-              className="input !py-1.5 !pl-8 text-xs w-44"
+              className="input !py-1.5 !pl-8 text-xs w-full sm:w-44"
             />
           </div>
           <button
             onClick={openCreate}
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-brand text-brand-foreground text-xs font-medium hover:opacity-90 transition-opacity hover-glow"
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-brand text-brand-foreground text-xs font-medium hover:opacity-90 transition-opacity hover-glow shrink-0"
           >
             <Plus className="size-3.5" /> Novo
           </button>
