@@ -18,6 +18,16 @@ function TrackingPage() {
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
 
+  async function loadEventos(minutaId: string) {
+    const { data: vols } = await supabase.from("tms_volumes").select("id").eq("minuta_id", minutaId);
+    const volIds = ((vols ?? []) as any[]).map((x) => x.id);
+    const q = supabase.from("tms_eventos").select("*").order("created_at");
+    const { data } = volIds.length
+      ? await q.or(`minuta_id.eq.${minutaId},volume_id.in.(${volIds.join(",")})`)
+      : await q.eq("minuta_id", minutaId);
+    return (data ?? []) as any[];
+  }
+
   async function buscar(e?: React.FormEvent) {
     e?.preventDefault();
     const v = q.trim();
@@ -31,8 +41,7 @@ function TrackingPage() {
         const { data: m } = await supabase.from("tms_minutas").select("*, tms_clientes(nome)").eq("id", (vol as any).minuta_id).maybeSingle();
         if (m) {
           setMinuta(m);
-          const { data: e2 } = await supabase.from("tms_eventos").select("*").eq("minuta_id", (m as any).id).order("created_at");
-          setEventos((e2 ?? []) as any[]);
+          setEventos(await loadEventos((m as any).id));
           setLoading(false);
           return;
         }
@@ -45,8 +54,7 @@ function TrackingPage() {
       const { data: m } = await supabase.from("tms_minutas").select("*, tms_clientes(nome)").eq("numero", num).maybeSingle();
       if (m) {
         setMinuta(m);
-        const { data: e2 } = await supabase.from("tms_eventos").select("*").eq("minuta_id", (m as any).id).order("created_at");
-        setEventos((e2 ?? []) as any[]);
+        setEventos(await loadEventos((m as any).id));
         setLoading(false);
         return;
       }
