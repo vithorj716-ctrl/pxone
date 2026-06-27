@@ -37,7 +37,11 @@ export const askFinancialAdvisor = createServerFn({ method: "POST" })
       { role: "system", content: SYSTEMS[data.mode] },
       { role: "user", content: userMsg.slice(0, 28000) },
     ];
-    const raw = await callGateway(messages);
+    // Análises críticas (radar/cockpit) usam flash; demais usam flash-lite (mais barato).
+    const model = data.mode === "radar" || data.mode === "cockpit"
+      ? "google/gemini-2.5-flash"
+      : "google/gemini-2.5-flash-lite";
+    const raw = await callGateway(messages, model);
     try {
       const clean = raw.replace(/```json|```/g, "").trim();
       return JSON.parse(clean);
