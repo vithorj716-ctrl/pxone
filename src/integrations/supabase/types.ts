@@ -1308,6 +1308,439 @@ export type Database = {
           },
         ]
       }
+      tms_lm_comprovantes: {
+        Row: {
+          assinatura_base64: string | null
+          created_at: string
+          criado_por: string | null
+          entrega_id: string
+          foto_fachada: string | null
+          foto_mercadoria: string | null
+          id: string
+          lat: number | null
+          lng: number | null
+          observacoes: string | null
+          recebedor_doc: string | null
+          recebedor_nome: string | null
+        }
+        Insert: {
+          assinatura_base64?: string | null
+          created_at?: string
+          criado_por?: string | null
+          entrega_id: string
+          foto_fachada?: string | null
+          foto_mercadoria?: string | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          observacoes?: string | null
+          recebedor_doc?: string | null
+          recebedor_nome?: string | null
+        }
+        Update: {
+          assinatura_base64?: string | null
+          created_at?: string
+          criado_por?: string | null
+          entrega_id?: string
+          foto_fachada?: string | null
+          foto_mercadoria?: string | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          observacoes?: string | null
+          recebedor_doc?: string | null
+          recebedor_nome?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tms_lm_comprovantes_entrega_id_fkey"
+            columns: ["entrega_id"]
+            isOneToOne: false
+            referencedRelation: "tms_lm_entregas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tms_lm_entregas: {
+        Row: {
+          cep: string | null
+          cidade: string | null
+          cliente_id: string | null
+          concluida_em: string | null
+          created_at: string
+          cubagem: number
+          destinatario: string
+          distancia_km: number | null
+          endereco: string | null
+          id: string
+          janela_fim: string | null
+          janela_inicio: string | null
+          lat: number | null
+          lng: number | null
+          minuta_id: string | null
+          observacoes: string | null
+          ordem: number
+          peso: number
+          prioridade: string
+          qtd_volumes: number
+          rota_id: string | null
+          status: string
+          telefone: string | null
+          tempo_estimado_min: number | null
+          uf: string | null
+          updated_at: string
+          valor_mercadoria: number
+        }
+        Insert: {
+          cep?: string | null
+          cidade?: string | null
+          cliente_id?: string | null
+          concluida_em?: string | null
+          created_at?: string
+          cubagem?: number
+          destinatario: string
+          distancia_km?: number | null
+          endereco?: string | null
+          id?: string
+          janela_fim?: string | null
+          janela_inicio?: string | null
+          lat?: number | null
+          lng?: number | null
+          minuta_id?: string | null
+          observacoes?: string | null
+          ordem?: number
+          peso?: number
+          prioridade?: string
+          qtd_volumes?: number
+          rota_id?: string | null
+          status?: string
+          telefone?: string | null
+          tempo_estimado_min?: number | null
+          uf?: string | null
+          updated_at?: string
+          valor_mercadoria?: number
+        }
+        Update: {
+          cep?: string | null
+          cidade?: string | null
+          cliente_id?: string | null
+          concluida_em?: string | null
+          created_at?: string
+          cubagem?: number
+          destinatario?: string
+          distancia_km?: number | null
+          endereco?: string | null
+          id?: string
+          janela_fim?: string | null
+          janela_inicio?: string | null
+          lat?: number | null
+          lng?: number | null
+          minuta_id?: string | null
+          observacoes?: string | null
+          ordem?: number
+          peso?: number
+          prioridade?: string
+          qtd_volumes?: number
+          rota_id?: string | null
+          status?: string
+          telefone?: string | null
+          tempo_estimado_min?: number | null
+          uf?: string | null
+          updated_at?: string
+          valor_mercadoria?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tms_lm_entregas_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "tms_clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tms_lm_entregas_minuta_id_fkey"
+            columns: ["minuta_id"]
+            isOneToOne: false
+            referencedRelation: "tms_minutas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tms_lm_entregas_rota_id_fkey"
+            columns: ["rota_id"]
+            isOneToOne: false
+            referencedRelation: "tms_lm_rotas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tms_lm_eventos: {
+        Row: {
+          created_at: string
+          criado_por: string | null
+          entrega_id: string | null
+          id: string
+          payload: Json
+          rota_id: string | null
+          tipo: string
+        }
+        Insert: {
+          created_at?: string
+          criado_por?: string | null
+          entrega_id?: string | null
+          id?: string
+          payload?: Json
+          rota_id?: string | null
+          tipo: string
+        }
+        Update: {
+          created_at?: string
+          criado_por?: string | null
+          entrega_id?: string | null
+          id?: string
+          payload?: Json
+          rota_id?: string | null
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tms_lm_eventos_entrega_id_fkey"
+            columns: ["entrega_id"]
+            isOneToOne: false
+            referencedRelation: "tms_lm_entregas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tms_lm_eventos_rota_id_fkey"
+            columns: ["rota_id"]
+            isOneToOne: false
+            referencedRelation: "tms_lm_rotas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tms_lm_motoristas: {
+        Row: {
+          ativo: boolean
+          cnh: string | null
+          cpf: string | null
+          created_at: string
+          empresa_id: string | null
+          id: string
+          nome: string
+          telefone: string | null
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          cnh?: string | null
+          cpf?: string | null
+          created_at?: string
+          empresa_id?: string | null
+          id?: string
+          nome: string
+          telefone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          cnh?: string | null
+          cpf?: string | null
+          created_at?: string
+          empresa_id?: string | null
+          id?: string
+          nome?: string
+          telefone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      tms_lm_ocorrencias: {
+        Row: {
+          created_at: string
+          criado_por: string | null
+          descricao: string | null
+          entrega_id: string
+          foto_url: string | null
+          id: string
+          tipo: string
+        }
+        Insert: {
+          created_at?: string
+          criado_por?: string | null
+          descricao?: string | null
+          entrega_id: string
+          foto_url?: string | null
+          id?: string
+          tipo: string
+        }
+        Update: {
+          created_at?: string
+          criado_por?: string | null
+          descricao?: string | null
+          entrega_id?: string
+          foto_url?: string | null
+          id?: string
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tms_lm_ocorrencias_entrega_id_fkey"
+            columns: ["entrega_id"]
+            isOneToOne: false
+            referencedRelation: "tms_lm_entregas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tms_lm_rotas: {
+        Row: {
+          cidade: string | null
+          created_at: string
+          data: string
+          empresa_id: string | null
+          faturavel: boolean
+          hora_finalizada: string | null
+          hora_prevista: string | null
+          hora_saida: string | null
+          id: string
+          motorista_id: string | null
+          numero: number
+          observacoes: string | null
+          status: string
+          updated_at: string
+          valor_rota: number
+          veiculo_id: string | null
+        }
+        Insert: {
+          cidade?: string | null
+          created_at?: string
+          data?: string
+          empresa_id?: string | null
+          faturavel?: boolean
+          hora_finalizada?: string | null
+          hora_prevista?: string | null
+          hora_saida?: string | null
+          id?: string
+          motorista_id?: string | null
+          numero?: number
+          observacoes?: string | null
+          status?: string
+          updated_at?: string
+          valor_rota?: number
+          veiculo_id?: string | null
+        }
+        Update: {
+          cidade?: string | null
+          created_at?: string
+          data?: string
+          empresa_id?: string | null
+          faturavel?: boolean
+          hora_finalizada?: string | null
+          hora_prevista?: string | null
+          hora_saida?: string | null
+          id?: string
+          motorista_id?: string | null
+          numero?: number
+          observacoes?: string | null
+          status?: string
+          updated_at?: string
+          valor_rota?: number
+          veiculo_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tms_lm_rotas_motorista_id_fkey"
+            columns: ["motorista_id"]
+            isOneToOne: false
+            referencedRelation: "tms_lm_motoristas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tms_lm_rotas_veiculo_id_fkey"
+            columns: ["veiculo_id"]
+            isOneToOne: false
+            referencedRelation: "tms_lm_veiculos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tms_lm_veiculos: {
+        Row: {
+          ativo: boolean
+          capacidade_kg: number
+          capacidade_m3: number
+          created_at: string
+          empresa_id: string | null
+          id: string
+          modelo: string | null
+          placa: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          capacidade_kg?: number
+          capacidade_m3?: number
+          created_at?: string
+          empresa_id?: string | null
+          id?: string
+          modelo?: string | null
+          placa: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          capacidade_kg?: number
+          capacidade_m3?: number
+          created_at?: string
+          empresa_id?: string | null
+          id?: string
+          modelo?: string | null
+          placa?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      tms_lm_volumes: {
+        Row: {
+          carregado_em: string | null
+          codigo: string
+          created_at: string
+          entrega_id: string
+          entregue_em: string | null
+          id: string
+          separado_em: string | null
+          status: string
+        }
+        Insert: {
+          carregado_em?: string | null
+          codigo: string
+          created_at?: string
+          entrega_id: string
+          entregue_em?: string | null
+          id?: string
+          separado_em?: string | null
+          status?: string
+        }
+        Update: {
+          carregado_em?: string | null
+          codigo?: string
+          created_at?: string
+          entrega_id?: string
+          entregue_em?: string | null
+          id?: string
+          separado_em?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tms_lm_volumes_entrega_id_fkey"
+            columns: ["entrega_id"]
+            isOneToOne: false
+            referencedRelation: "tms_lm_entregas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tms_minutas: {
         Row: {
           cliente_id: string | null
