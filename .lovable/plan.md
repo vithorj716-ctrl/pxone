@@ -1,138 +1,118 @@
-# Evolução PXOne → PX Platform Multiempresa
+# Módulo TMS — PXLog Transfer Hub
 
-Atualização **aditiva**: nenhum módulo atual é alterado, nenhuma tabela existente é quebrada. A camada nova introduz multiempresa real, alternância de contexto, gestão de aplicações por empresa e visão consolidada do grupo.
+Novo módulo da PX Platform, totalmente integrado ao PX Core. Reutiliza Empresas, Clientes (custos), Usuários, Financeiro, IA e Dashboard. **Zero duplicação**: toda minuta entregue gera lançamento em `custos` (receita) automaticamente, alimentando Central de Custos, DRE, Markup e Dashboard Executivo.
 
-## Princípio diretor
+Dado o escopo enorme, vou entregar uma **v1 funcional ponta-a-ponta** desta vez (fluxo completo coleta→entrega + financeiro + IA), com pontos de extensão claros para refinamento posterior.
 
-A tabela `empresas` já existe e é referenciada por `custos`, `kpis`, `markup_calculations`, `documents`, etc. Vamos **enriquecer** esse cadastro (sem quebrar nada) e adicionar:
+## Escopo da v1 (entregue agora)
 
-1. Um **seletor de empresa global** no topo (com modo "Grupo consolidado").
-2. Um **filtro de contexto** que módulos novos respeitam — módulos atuais continuam mostrando "tudo" como hoje, mas passam a destacar a empresa ativa quando ela existir.
-3. Uma camada de **habilitação de aplicações por empresa** (Module Registry do PX Core × empresa).
-4. Uma **Visão Consolidada do Grupo** com indicadores agregados e ranking entre empresas.
-
-## O que será adicionado
-
-### 1. Enriquecimento da tabela `empresas` (migração aditiva)
-Adicionar colunas opcionais — todas nullable, defaults seguros, zero impacto no que existe:
-
+### 1. Migração — 5 tabelas novas + registro no PX Core
 ```text
-razao_social text · nome_fantasia text · cnpj text · segmento text
-logo_url text · cor_primaria text · cor_secundaria text
-situacao text DEFAULT 'ativa' · configuracoes jsonb DEFAULT '{}'
+tms_clientes              empresa_id, nome, cnpj, contato, telefone, email, endereco
+tms_tabela_frete          cliente_id?, origem, destino, tipo_cobranca, valor_coleta,
+                          valor_entrega, valor_kg, valor_m3, faixa_peso_min/max,
+                          faixa_cubagem_min/max, prazo_dias, regra (jsonb), ativo
+tms_minutas               numero (auto), cliente_id, remetente/destinatario (jsonb),
+                          origem, destino, qtd_volumes, peso, cubagem, peso_cubado,
+                          peso_taxado, valor_mercadoria, tipo_mercadoria, valor_frete,
+                          prazo, necessita_coleta, data_coleta, status, responsavel_id,
+                          observacoes, empresa_id
+tms_volumes               minuta_id, numero (1..N), codigo (qr/barras único),
+                          peso, altura, largura, comprimento, status, hub_atual
+tms_eventos               minuta_id?, volume_id?, tipo (enum), origem_evento,
+                          payload jsonb, operador_id, created_at
+```
+RLS authenticated, GRANTs, triggers updated_at, sequence para `numero` da minuta.
+
+### 2. Registry — novo módulo
+Adicionar entry `tms-pxlog` (status: `ativo`) em `src/px-core/registry.ts`.
+
+### 3. Rotas (file-based, todas sob `_authenticated/tms.*`)
+- `/tms` — **Dashboard Operacional** em tempo real (cards: coletas dia, em trânsito, aguardando entrega, entregues, ocorrências, faturamento dia, ranking clientes, linha do tempo recente).
+- `/tms/clientes` — CRUD clientes TMS (CrudTable existente).
+- `/tms/tabela-frete` — CRUD tabela de fretes com regras por cliente/origem/destino/peso/cubagem.
+- `/tms/solicitacoes` — Listagem + form de nova solicitação de embarque.
+- `/tms/solicitacoes/nova` — Form rápido: cliente, remetente/destinatário, volumes, dimensões. Calcula auto: cubagem (LxAxC/6000 m³), peso cubado, peso taxado (max peso×cubado), valor frete (lookup `tms_tabela_frete`), prazo. Ao salvar, cria minuta + N volumes com códigos únicos.
+- `/tms/minutas/$numero` — Visualização da minuta com QR + código de barras (lib `qrcode` SVG inline), botão "Imprimir/PDF", lista de volumes, timeline de eventos, ações rápidas (conferir, embarcar, entregar).
+- `/tms/etiquetas/$minuta` — Folha de etiquetas térmicas (uma por volume) com QR + código de barras, otimizada para impressão (CSS print).
+- `/tms/conferencia` — Tela de bipagem ultrarrápida: input autofocus, scanner-friendly (lê código do volume, registra evento, mostra status, limpa input para próxima leitura). Funciona com leitor USB (que digita + Enter).
+- `/tms/embarque` — Mesma UX (bipagem), tipo de evento = `embarcado`, conta peso/cubagem/qtd carregada.
+- `/tms/recebimento` — Bipagem no HUB destino, identifica recebidos/faltantes/excedentes.
+- `/tms/entregas` — Bipagem `entregue` + campo recebedor + foto/assinatura (upload simples opcional v1: só nome+timestamp).
+- `/tms/tracking` — Busca por número de minuta ou código de volume; mostra timeline visual completa.
+- `/tms/ocorrencias` — Form rápido vinculado a minuta/volume com tipo (avaria, extravio, recusa, etc.) → gera evento.
+- `/tms/financeiro` — Lista de minutas com status financeiro (previsto/realizado/faturado); botão "Liberar faturamento" gera `INSERT INTO custos` (tipo `receita` via descrição, empresa_id da minuta, valor=valor_frete, categoria "TMS — Frete").
+
+### 4. IA Operacional
+Server function `askTmsAnalyst` em `src/lib/tms-ai.functions.ts`:
+- Carrega snapshot via PX Core (custos + tms_minutas/eventos agregados, anonimizado)
+- Chama `callPxAI` com contexto da empresa ativa
+- Responde perguntas tipo "quais rotas estão atrasando?", "ranking de clientes", etc.
+- Botão chat no Dashboard TMS.
+
+### 5. Eventos & Tracking automáticos
+Cada ação operacional grava em `tms_eventos` e atualiza `status` do volume/minuta. Tipo enum:
+`solicitado | coleta_programada | coletado | recebido_hub_origem | conferido | etiquetado | embarcado | em_transferencia | recebido_hub_destino | separado | em_rota | saiu_entrega | entregue | ocorrencia | devolucao`
+
+Tracking público (interno por enquanto): timeline com ícone, label, timestamp, operador.
+
+### 6. Integração financeira sem duplicação
+- "Liberar faturamento" cria 1 registro em `custos` (tabela existente) com descrição "TMS Minuta #N — Cliente X".
+- Dashboard Executivo, Central de Custos, DRE, Markup já consomem `custos` → aparecem automaticamente.
+- Coluna `origem_modulo` não existe; identificamos por prefixo da descrição.
+
+### 7. Menu lateral
+Adicionar grupo "Logística" no `app-shell.tsx` com sub-itens (Dashboard, Solicitações, Conferência, Embarque, Recebimento, Entregas, Tracking, Ocorrências, Tabela de Fretes, Clientes TMS, Financeiro TMS).
+
+## Fora do escopo da v1 (refinamento posterior)
+
+- Romaneios separados por veículo/motorista (entregue como agregação simples via embarques na v1)
+- Upload real de foto/assinatura em entrega (placeholder de campo apenas; bucket de storage pode ser adicionado depois)
+- Geolocalização automática
+- Mapa operacional (placeholder de card; integração com lib de mapa fica para v2)
+- Comprovantes em PDF (a minuta tem print-to-PDF nativo do browser na v1)
+- OTIF, drill-down profundo, rankings avançados — v1 entrega os principais; resto sobre a mesma base de dados
+
+## Arquivos
+
+**Novos (~15):**
+```
+supabase/migrations/<ts>_tms_pxlog.sql
+src/lib/tms.ts                        (helpers cubagem, peso taxado, lookup tabela frete, etiqueta SVG)
+src/lib/tms-ai.functions.ts
+src/components/tms/scan-input.tsx     (input ultrarrápido para bipagem)
+src/components/tms/qr-label.tsx       (etiqueta térmica com QR)
+src/components/tms/timeline.tsx
+src/routes/_authenticated/tms.tsx                  (layout c/ Outlet)
+src/routes/_authenticated/tms.index.tsx            (Dashboard)
+src/routes/_authenticated/tms.clientes.tsx
+src/routes/_authenticated/tms.tabela-frete.tsx
+src/routes/_authenticated/tms.solicitacoes.tsx
+src/routes/_authenticated/tms.solicitacoes.nova.tsx
+src/routes/_authenticated/tms.minutas.$numero.tsx
+src/routes/_authenticated/tms.etiquetas.$minuta.tsx
+src/routes/_authenticated/tms.conferencia.tsx
+src/routes/_authenticated/tms.embarque.tsx
+src/routes/_authenticated/tms.recebimento.tsx
+src/routes/_authenticated/tms.entregas.tsx
+src/routes/_authenticated/tms.tracking.tsx
+src/routes/_authenticated/tms.ocorrencias.tsx
+src/routes/_authenticated/tms.financeiro.tsx
 ```
 
-Tabelas novas:
-- `px_filiais` (empresa_id FK, nome, cidade, uf, cnpj, ativo)
-- `px_empresa_modulos` (empresa_id FK, modulo_key, ativo, habilitado_em) — controla quais módulos do Registry estão ligados por empresa
-- `px_shared_resources` (recurso, empresa_origem_id, empresas_compartilhadas uuid[], tipo) — opt-in de compartilhamento de clientes/fornecedores/produtos/etc.
+**Editados (mínimo):**
+- `src/px-core/registry.ts` (adicionar entry)
+- `src/components/app-shell.tsx` (grupo Logística)
 
-Todas com GRANTs + RLS authenticated.
-
-### 2. Contexto de empresa global (frontend)
-Novo `src/px-core/empresa-context.tsx`:
-- `<EmpresaProvider>` no `__root.tsx`
-- `useEmpresaAtiva()` → `{ empresa | null, isGrupo, setEmpresa, listaEmpresas }`
-- Persiste seleção em `localStorage` (`px:empresa-ativa`)
-- Modo "Grupo" (`empresa = null`, `isGrupo = true`) = visão consolidada
-
-### 3. Seletor de empresa no header
-Adicionar dropdown no header do `app-shell.tsx`:
-- Mostra logo + nome fantasia da empresa ativa
-- Opção "🏢 Visão do Grupo" no topo
-- Lista todas as empresas ativas
-- Aplica cor primária da empresa como acento visual sutil (variável CSS `--px-empresa-accent`)
-- Mobile: ícone com sheet drawer
-
-### 4. Módulo "Empresas" enriquecido (`/empresas`)
-A rota já existe (CRUD simples). **Não vou substituir** — vou estender:
-- Adicionar todos os novos campos no formulário (razão social, CNPJ, segmento, logo, cores, situação)
-- Adicionar aba "Filiais" e aba "Aplicações habilitadas" por empresa
-- Mantém compatibilidade total com o uso atual
-
-### 5. Nova rota "Aplicações" (`/aplicacoes`)
-Lista todas as aplicações do `PX_MODULES` registry com:
-- Nome, descrição, versão, status, dependências, permissões
-- Quantas empresas usam (count em `px_empresa_modulos`)
-- Última atualização
-- Por empresa ativa: toggle ativar/desativar
-
-### 6. Visão Consolidada do Grupo (`/platform/consolidado`)
-Quando "Visão do Grupo" está ativa, mostra:
-- Faturamento, lucro, custos, EBITDA agregados (a partir do que já existe em `custos` + `kpis` + `markup_calculations`)
-- Ranking de empresas por desempenho
-- Participação % de cada empresa
-- Comparativos lado a lado
-- Toggle "Consolidado ↔ Por empresa"
-
-### 7. IA Corporativa com contexto de empresa
-Atualizar `src/px-core/ai/core.ts` (a função `callPxAI` já é nova/opt-in) para aceitar `empresaId | "grupo"`:
-- Quando empresa específica: prompt inclui "Análises devem considerar APENAS dados de {nome}"
-- Quando grupo + autorização explícita: prompt permite comparativos entre empresas
-- Server functions atuais (`askAnalyst`, `askFinancialAdvisor`, etc.) **não são alteradas** — apenas ganham um parâmetro opcional `empresaId` que, se enviado, filtra os dados carregados antes de chamar a IA
-
-### 8. Arquitetura "Empresa → Aplicações → Dados"
-Documentar no `.lovable/plan.md` e expor helpers em `src/px-core/`:
-- `getEmpresaModulos(empresaId)`
-- `isModuloHabilitado(empresaId, key)`
-- `getRecursosCompartilhados(tipo, empresaId)`
-
-## Compatibilidade
-
-- ✅ Módulos atuais (Custos, Markup, Financial Intelligence, Dashboard, KPIs, etc.) continuam funcionando **sem alteração**.
-- ✅ Empresas existentes continuam válidas — só ganham campos novos opcionais.
-- ✅ Quando nenhuma empresa está selecionada (estado atual padrão), tudo se comporta como hoje.
-- ✅ Quando uma empresa é selecionada, módulos novos filtram automaticamente; módulos atuais ignoram o filtro (não quebram).
-
-## Migração de banco (única, aditiva)
-
-```sql
-ALTER TABLE public.empresas
-  ADD COLUMN razao_social text,
-  ADD COLUMN nome_fantasia text,
-  ADD COLUMN cnpj text,
-  ADD COLUMN segmento text,
-  ADD COLUMN logo_url text,
-  ADD COLUMN cor_primaria text,
-  ADD COLUMN cor_secundaria text,
-  ADD COLUMN situacao text NOT NULL DEFAULT 'ativa',
-  ADD COLUMN configuracoes jsonb NOT NULL DEFAULT '{}'::jsonb;
-
-CREATE TABLE public.px_filiais (...);            -- + GRANTs + RLS
-CREATE TABLE public.px_empresa_modulos (...);    -- + GRANTs + RLS
-CREATE TABLE public.px_shared_resources (...);   -- + GRANTs + RLS
-```
-
-## Arquivos novos
-
-```text
-src/px-core/empresa-context.tsx
-src/px-core/api/empresas.functions.ts       (list+enriched)
-src/px-core/api/empresa-modulos.functions.ts
-src/px-core/api/consolidado.functions.ts
-src/components/empresa-selector.tsx
-src/routes/_authenticated/aplicacoes.tsx
-src/routes/_authenticated/platform.consolidado.tsx
-supabase/migrations/<ts>_px_multiempresa.sql
-```
-
-## Arquivos editados (mínimo)
-
-- `src/routes/__root.tsx` → envolver com `<EmpresaProvider>`
-- `src/components/app-shell.tsx` → adicionar `<EmpresaSelector>` no header + 2 itens de menu ("Aplicações", "Consolidado")
-- `src/routes/_authenticated/empresas.tsx` → adicionar campos novos no formulário CRUD existente
-- `.lovable/plan.md` → atualizar
-
-Nada além disso.
+**Dependência nova:** `qrcode` (geração de SVG/PNG inline para etiquetas).
 
 ## Garantias
 
-- ✅ Zero alteração visual/funcional nos módulos existentes
-- ✅ Zero perda de dados — todas as colunas novas são opcionais
-- ✅ Isolamento de dados preparado (FK `empresa_id` já existe nas tabelas principais)
-- ✅ Compartilhamento opt-in via `px_shared_resources`
-- ✅ IA recebe contexto da empresa ativa
-- ✅ Visão consolidada como modo separado, não substitui nada
-- ✅ Arquitetura pronta para PXSales/PXTMS/etc. sem refactor
+- ✅ Não duplica clientes (usa nova `tms_clientes` ligada a `empresa_id`; opt-in para reaproveitar do CRM quando existir)
+- ✅ Não duplica financeiro — tudo flui para `custos` existente
+- ✅ Respeita empresa ativa do seletor multiempresa
+- ✅ IA usa `callPxAI` com contexto de empresa
+- ✅ Bipagem-first: telas operacionais com input autofocus, Enter dispara ação, sem mouse
+- ✅ Zero alteração nos módulos atuais
 
 Posso aplicar?
