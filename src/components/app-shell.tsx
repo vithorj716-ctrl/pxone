@@ -282,6 +282,7 @@ export function AppShell({ children, title, subtitle, rightPanel, headerActions 
               <Search className="size-5" />
             </button>
             {headerActions}
+            <EmpresaSelector />
             <InstallAppButton />
             <ExportButton />
             {rightPanel && (
