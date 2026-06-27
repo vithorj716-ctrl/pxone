@@ -1,89 +1,139 @@
-## Financial Intelligence Suite — Submódulo do Markup Engine
+# Evolução Arquitetural: PXOne → PX Platform
 
-Novo submódulo dentro do Markup Engine com **4 telas integradas** + IA Financeira, alimentado 100% pelos dados já existentes (custos, empresas, markup, KPIs, business plan, valuation, payback).
+Esta atualização **adiciona** uma camada estrutural acima do que já existe. Nenhum módulo atual (Custos, Markup, Financial Intelligence, Dashboard, etc.) será alterado, removido ou refatorado. Tudo continua funcionando exatamente como hoje.
 
-### Arquitetura
+## Princípio diretor
 
-```
-src/routes/_authenticated/markup/
-  └─ financial-intelligence/
-      ├─ route.tsx           (layout com sub-tabs)
-      ├─ index.tsx           (CEO Cockpit — padrão)
-      ├─ dre.tsx             (DRE Gerencial)
-      ├─ dfc.tsx             (DFC Inteligente)
-      └─ break-even.tsx      (Ponto de Equilíbrio + Simulador)
+A camada nova é **aditiva e não-invasiva**: ela envolve e referencia o que já existe, em vez de reescrever. Os módulos atuais continuam lendo/escrevendo nas mesmas tabelas; a camada PX Core apenas as expõe como "fonte única" através de uma API interna padronizada e de um registry.
 
-src/lib/
-  ├─ financial-intelligence.ts            (núcleo: consolidação de dados, fórmulas)
-  ├─ financial-intelligence.functions.ts  (server fns: carregar dados agregados)
-  └─ financial-ai.functions.ts            (IA Financial Advisor — Gemini com resumo agregado)
-```
+## O que será adicionado
 
-Adicionar item "Financial Intelligence" no submenu do Markup Engine (sidebar/app-shell) e atalho na própria página `/markup`.
+### 1. PX Core (camada lógica de dados compartilhados)
+Novo diretório `src/px-core/` com adaptadores que apontam para as tabelas já existentes:
+- `empresas.ts` → tabela `empresas`
+- `custos.ts` → tabela `custos` + `categorias_custo`
+- `kpis.ts` → `kpis` + `kpi_snapshots`
+- `documents.ts`, `notifications.ts`, `audit.ts`, `files.ts`
+- Stubs preparados (sem tabela ainda) para: `filiais`, `clientes`, `fornecedores`, `produtos`, `servicos`, `plano_contas`, `colaboradores`
 
-### 1. DRE Gerencial (`/markup/financial-intelligence/dre`)
+Cada adaptador exporta funções tipadas (`list`, `getById`, etc.). Módulos futuros consomem **somente** via PX Core — nunca tocam tabela de outro módulo direto.
 
-- **Consolidação automática**: lê `custos`, `markup_calculations`, `empresas`, `kpi_snapshots`. Classifica linhas de `custos` por `categoria`/`tipo` em: Devoluções, Impostos, Custos Operacionais, Despesas Operacionais, Administrativas, Financeiras, Depreciação/Amortização.
-- **Receita Bruta** derivada de KPIs de faturamento (`kpi_snapshots` com nome `faturamento`/`receita`) + somatório de markup quando houver volume.
-- **Cascata DRE**: Receita Bruta → Líquida → Lucro Bruto → EBITDA → EBIT → Lucro Líquido.
-- **Dashboard** com cards (Receita, Lucro, EBITDA, Margens, ROI, ROE), **Waterfall Chart** (recharts), comparativos mês/ano e por empresa (BarChart agrupado).
-- **Filtros**: período, empresa, unidade.
-- **IA DRE** (botão "Analisar com IA"): envia resumo agregado (não linhas) → respostas estruturadas: variações, top categorias de impacto, saúde EBITDA, recomendações.
-- Botão "Exportar" (Executive Share da Fase 1).
+### 2. Module Registry
+`src/px-core/registry.ts` — registro estático em código (não em banco) dos módulos instalados:
 
-### 2. DFC Inteligente (`/markup/financial-intelligence/dfc`)
-
-- Classifica lançamentos de `custos` em **Operacional / Investimento / Financiamento** via mapa de categorias (configurável no código; investimento = capex/ativo, financiamento = empréstimo/dividendos).
-- Calcula: Entradas, Saídas, Saldo Inicial/Final, Fluxo Livre, Acumulado, Capital de Giro, Necessidade de Caixa, **Projeção 90 dias** (média móvel + recorrências detectadas).
-- **Dashboard**: entradas/saídas diário e mensal (Area/Bar), saldo acumulado (LineChart), calendário financeiro (heatmap simples), gráfico de tendência.
-- **IA Fluxo**: prevê mês com falta de caixa, saldo projetado, capacidade de investimento/distribuição.
-
-### 3. Ponto de Equilíbrio (`/markup/financial-intelligence/break-even`)
-
-- Busca **Custos Fixos** (categorias fixas em `custos`), **Variáveis**, **Margem de Contribuição** e **Markup médio** (de `markup_calculations`).
-- Calcula 3 pontos de equilíbrio (contábil, financeiro, econômico), receita mínima, dias para atingir, margem de segurança, GAO.
-- **Simulador**: sliders/inputs para preço (+%), custos (−%), vendas (+%), funcionários, impostos. Tudo recalculado em tempo real **client-side** (não grava no banco).
-- Comparação cenário atual vs simulado (dual bar).
-- **IA Break-Even**: responde "qual ação gera maior impacto".
-
-### 4. CEO Financial Cockpit (`/markup/financial-intelligence` — index)
-
-- **Cards executivos**: Receita, Lucro, EBITDA, Caixa, Margem, Markup Médio, Break-Even, Capital de Giro, Liquidez, Rentabilidade, Endividamento, ROI, ROE, CMV, Margem de Contribuição, Receita-alvo, Projeção próximo mês. Cada card: cor (verde/amarelo/vermelho), seta de tendência, vs mês anterior, meta (de `kpis`/`business_plans`), % evolução.
-- **Radar Executivo**: IA classifica automaticamente alertas (custos crescendo, receita caindo, fluxo negativo, fornecedor caro, produto sem lucro, etc.) em 🟢🟡🔴 com descrição, motivo, impacto estimado em R$, prioridade, recomendação, botão "Ver Detalhes" → navega para o registro relacionado (rota da Central de Custos com filtro).
-- **Simulador Estratégico** (drawer): altera Receita, Custos, Impostos, Preço, Markup, Margem, Volume, Colaboradores, Investimentos. Mostra impacto imediato em DRE, DFC, EBITDA, Lucro Líquido, Break-Even, Capital de Giro, Caixa Projetado, Margens, Rentabilidade. Botão "Salvar Cenário" (opcional — só grava se clicar; usa nova tabela `financial_scenarios`).
-
-### IA Financial Advisor
-
-- `financial-ai.functions.ts` usa Gemini 3 Flash via Lovable AI Gateway.
-- **Antes de chamar IA**: monta `executiveSummary` (apenas agregados — receita, despesas por categoria top 10, margens, EBITDA, caixa, BE, tendências, variações MoM/YoY). Nunca envia linhas brutas.
-- Saída estruturada JSON: `{ diagnostico, evidencias[], impactoFinanceiroEstimado, recomendacoes[] }`.
-- Compartilhado pelas 4 telas (mesma server fn com `mode: 'dre'|'dfc'|'break-even'|'cockpit'`).
-
-### Banco
-
-Apenas **uma tabela nova** (cenários salvos opcionais):
-
-```
-financial_scenarios(id, user_id, empresa_id?, nome, payload jsonb, created_at, updated_at)
+```text
+PXOne ERP · Markup Engine · Financial Intelligence · Business Plan ·
+SWOT · KPI Center · Executive Command
 ```
 
-RLS por `user_id`, GRANTs padrão. Nenhuma outra alteração de schema — todo cálculo lê das tabelas existentes.
+Cada entrada: `{ key, nome, icone, versao, status, rotas, permissoes, eventos[], apis[] }`. Módulos futuros (PXSales, PXTMS, PXFleet, PXRH, PXBI, PXDocs, PXAI) ficam declarados como `status: "planejado"` — apenas reservados, não implementados.
 
-### Integração com Fase 1 (Executive Share)
+### 3. Event Bus interno
+`src/px-core/events.ts` — barramento pub/sub em memória (client + server) com tipos:
+`venda.criada`, `cliente.criado`, `fornecedor.atualizado`, `custo.lancado`, `despesa.aprovada`, `faturamento.realizado`, `frete.entregue`, `pagamento.recebido`, etc.
 
-Todas as 4 telas usam o componente `<ExecutiveShare>` no header (WhatsApp/PDF/Excel/CSV/PNG), com payload contendo KPIs + tabela DRE/DFC/BE conforme a tela.
+Nenhum módulo atual passa a emitir agora (não vamos tocar neles). O bus fica disponível para módulos futuros e para opt-in gradual.
 
-### Detalhes técnicos
+Persistência leve: tabela nova `px_events` (id, tipo, payload jsonb, origem, created_at) só para auditoria/replay. RLS + GRANTs padrão.
 
-- **Sem duplicidade**: nenhum input manual de custo/receita. Apenas leitura. Simulador é state local.
-- **Performance**: cálculos memoizados (`useMemo`), server fns retornam dados pré-agregados por mês/categoria.
-- **Stack**: TanStack Start, recharts (já no projeto), shadcn, Tailwind v4 tokens semânticos.
-- **Navegação**: subnav sticky no topo do submódulo com 4 abas (Cockpit / DRE / DFC / Break-Even).
+### 4. API Layer interno
+`src/px-core/api/` — server functions (`createServerFn`) padronizadas:
+`coreEmpresas.list`, `coreCustos.summary`, `coreKpis.list`, `coreDashboard.snapshot`, etc.
 
-### Entregáveis
+São wrappers finos sobre os adaptadores do PX Core. Módulos novos importam só daqui. Módulos atuais continuam como estão.
 
-1. 1 migration: `financial_scenarios` + RLS + GRANTs.
-2. 5 arquivos de rota (layout + 4 telas).
-3. 3 arquivos lib (núcleo + 2 server fns).
-4. Atualização do `app-shell.tsx` (item de menu).
-5. Atalho na página `/markup` para abrir o novo submódulo.
+### 5. PX AI Core
+`src/px-core/ai/` — consolida o padrão de chamada ao Lovable AI Gateway num único helper (`callPxAI({ mode, context })`) que:
+- Carrega contexto via PX Core (nunca consulta tabelas direto)
+- Aplica seleção de modelo (flash-lite/flash) já existente
+- Reaproveitado pelos arquivos atuais via re-export, sem alterar a assinatura pública deles
+
+### 6. Dashboard Global (`/platform`)
+Nova rota `src/routes/_authenticated/platform.tsx` — painel administrativo da plataforma mostrando:
+- Módulos instalados (do Registry) com versão/status
+- Integrações ativas
+- Eventos processados (contagem de `px_events`)
+- Saúde do sistema (ping a server fn)
+- Uso de armazenamento (tamanho agregado de `documents`)
+- Uso da IA (contador de chamadas — novo)
+- Logs recentes
+
+Adiciona item "PX Platform" no menu lateral (`app-shell.tsx`) — apenas um link novo, sem mexer nos existentes.
+
+## Migração de banco
+
+Apenas **uma** migração aditiva:
+
+```sql
+-- px_events: log de eventos do barramento
+CREATE TABLE public.px_events (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  tipo text NOT NULL,
+  origem text,
+  payload jsonb NOT NULL DEFAULT '{}'::jsonb,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+GRANT SELECT, INSERT ON public.px_events TO authenticated;
+GRANT ALL ON public.px_events TO service_role;
+ALTER TABLE public.px_events ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "auth read events" ON public.px_events FOR SELECT TO authenticated USING (true);
+CREATE POLICY "auth insert events" ON public.px_events FOR INSERT TO authenticated WITH CHECK (true);
+
+-- px_ai_usage: contador de chamadas da IA
+CREATE TABLE public.px_ai_usage (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  modulo text NOT NULL,
+  modelo text NOT NULL,
+  tokens_in int DEFAULT 0,
+  tokens_out int DEFAULT 0,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+GRANT SELECT, INSERT ON public.px_ai_usage TO authenticated;
+GRANT ALL ON public.px_ai_usage TO service_role;
+ALTER TABLE public.px_ai_usage ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "auth read ai usage" ON public.px_ai_usage FOR SELECT TO authenticated USING (true);
+CREATE POLICY "auth insert ai usage" ON public.px_ai_usage FOR INSERT TO authenticated WITH CHECK (true);
+```
+
+Nenhuma tabela existente é tocada.
+
+## Arquivos novos
+
+```text
+src/px-core/
+  registry.ts
+  events.ts
+  types.ts
+  api/
+    empresas.functions.ts
+    custos.functions.ts
+    kpis.functions.ts
+    dashboard.functions.ts
+    events.functions.ts
+    ai-usage.functions.ts
+  adapters/
+    empresas.ts
+    custos.ts
+    kpis.ts
+    documents.ts
+  ai/
+    core.ts            ← wrapper único do gateway
+src/routes/_authenticated/platform.tsx
+supabase/migrations/<ts>_px_platform.sql
+```
+
+## Arquivos editados (mínimo)
+
+- `src/components/app-shell.tsx` → adicionar 1 item de menu "PX Platform"
+- `.lovable/plan.md` → atualizar resumo
+
+Nada mais é editado. Custos, Markup, Financial Intelligence, Dashboard, KPIs etc. permanecem intactos.
+
+## Garantias
+
+- ✅ Zero alteração visual ou funcional nos módulos atuais
+- ✅ Zero alteração nas tabelas existentes
+- ✅ Toda a camada nova é opt-in (módulos futuros usam; atuais ignoram)
+- ✅ Preparado para PXSales/PXTMS/PXFleet/PXRH/PXBI/PXDocs/PXAI sem reestruturação
+
+Posso aplicar?

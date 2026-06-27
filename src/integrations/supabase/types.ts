@@ -741,6 +741,57 @@ export type Database = {
         }
         Relationships: []
       }
+      px_ai_usage: {
+        Row: {
+          created_at: string
+          id: string
+          modelo: string
+          modulo: string
+          tokens_in: number
+          tokens_out: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          modelo: string
+          modulo: string
+          tokens_in?: number
+          tokens_out?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          modelo?: string
+          modulo?: string
+          tokens_in?: number
+          tokens_out?: number
+        }
+        Relationships: []
+      }
+      px_events: {
+        Row: {
+          created_at: string
+          id: string
+          origem: string | null
+          payload: Json
+          tipo: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          origem?: string | null
+          payload?: Json
+          tipo: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          origem?: string | null
+          payload?: Json
+          tipo?: string
+        }
+        Relationships: []
+      }
       risks: {
         Row: {
           categoria: string | null
