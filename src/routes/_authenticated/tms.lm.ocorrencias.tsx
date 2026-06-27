@@ -27,8 +27,18 @@ function LmOcor() {
     },
   });
 
+  const { data: entregasAtivas } = useQuery({
+    queryKey: ["lm-entregas-ativas"],
+    queryFn: async () => {
+      const { data } = await supabase.from("tms_lm_entregas")
+        .select("id, destinatario, cidade, status, tms_lm_rotas(numero)")
+        .neq("status", "entregue").order("created_at", { ascending: false }).limit(200);
+      return data ?? [];
+    },
+  });
+
   async function salvar() {
-    if (!entregaId) return toast.error("Informe a entrega");
+    if (!entregaId) return toast.error("Selecione a entrega");
     const { error } = await supabase.from("tms_lm_ocorrencias").insert({ entrega_id: entregaId, tipo, descricao: desc || null });
     if (error) return toast.error(error.message);
     await supabase.from("tms_lm_eventos").insert({ entrega_id: entregaId, tipo: `ocorrencia:${tipo}`, payload: { descricao: desc } });
