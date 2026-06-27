@@ -69,7 +69,7 @@ function TmsDashboard() {
   }, [minutas]);
 
   return (
-    <AppShell
+    <TmsShell
       title="Dashboard PXLog"
       subtitle="Operação em tempo real · Transfer Hub"
       headerActions={

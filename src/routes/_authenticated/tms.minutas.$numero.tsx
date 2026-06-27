@@ -41,7 +41,7 @@ function MinutaPage() {
   const st = STATUS_VOL_LABEL[minuta.status];
 
   return (
-    <AppShell
+    <TmsShell
       title={`Minuta #${minuta.numero}`}
       subtitle={`${minuta.origem} → ${minuta.destino}`}
       headerActions={

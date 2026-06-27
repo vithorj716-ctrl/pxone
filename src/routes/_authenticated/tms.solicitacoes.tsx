@@ -27,7 +27,7 @@ function SolicitacoesPage() {
   }, []);
 
   return (
-    <AppShell
+    <TmsShell
       title="Solicitações de Embarque"
       subtitle="Minutas geradas e seus status"
       headerActions={
