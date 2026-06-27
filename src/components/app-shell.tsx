@@ -216,6 +216,7 @@ export function AppShell({ children, title, subtitle, rightPanel, headerActions 
               <kbd className="ml-2 px-1.5 py-0.5 rounded bg-surface-2 text-[10px] font-mono">⌘K</kbd>
             </button>
             {headerActions}
+            <InstallAppButton />
             <ExportButton />
             <span className="text-[11px] text-muted-foreground tabular-nums hidden md:inline">
               <span className="size-1.5 rounded-full bg-brand inline-block mr-1.5 animate-pulse-glow" /> {now}
