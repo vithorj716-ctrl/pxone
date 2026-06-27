@@ -32,7 +32,9 @@ function LmRotaDetalhe() {
   const meta = LM_STATUS_ROTA[rota.status as keyof typeof LM_STATUS_ROTA];
 
   return (
-    <TmsShell title={`Rota #${rota.numero}`} subtitle={rota.cidade ?? ""}>
+    <TmsShell title={`Rota #${rota.numero}`} subtitle={rota.cidade ?? ""}
+      headerActions={<NovaEntregaDialog rotaId={rota.id} rotaNumero={rota.numero} onCreated={() => refetch()} />}>
+
       <div className="rounded-xl ring-1 ring-border p-4 grid grid-cols-2 md:grid-cols-5 gap-4 text-sm" style={{ background: meta?.bg }}>
         <div><div className="text-[10px] uppercase text-muted-foreground">Status</div><div className="font-bold" style={{ color: meta?.color }}>{meta?.label}</div></div>
         <div><div className="text-[10px] uppercase text-muted-foreground">Motorista</div><div>{rota.tms_lm_motoristas?.nome ?? "—"}</div></div>
