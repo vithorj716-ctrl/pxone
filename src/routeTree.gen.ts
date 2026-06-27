@@ -15,6 +15,7 @@ import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedValuationRouteImport } from './routes/_authenticated/valuation'
 import { Route as AuthenticatedTimelineRouteImport } from './routes/_authenticated/timeline'
 import { Route as AuthenticatedRiskRouteImport } from './routes/_authenticated/risk'
+import { Route as AuthenticatedPlatformRouteImport } from './routes/_authenticated/platform'
 import { Route as AuthenticatedPaybackRouteImport } from './routes/_authenticated/payback'
 import { Route as AuthenticatedOkrRouteImport } from './routes/_authenticated/okr'
 import { Route as AuthenticatedMarkupRouteImport } from './routes/_authenticated/markup'
@@ -60,6 +61,11 @@ const AuthenticatedTimelineRoute = AuthenticatedTimelineRouteImport.update({
 const AuthenticatedRiskRoute = AuthenticatedRiskRouteImport.update({
   id: '/risk',
   path: '/risk',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPlatformRoute = AuthenticatedPlatformRouteImport.update({
+  id: '/platform',
+  path: '/platform',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedPaybackRoute = AuthenticatedPaybackRouteImport.update({
@@ -170,6 +176,7 @@ export interface FileRoutesByFullPath {
   '/markup': typeof AuthenticatedMarkupRoute
   '/okr': typeof AuthenticatedOkrRoute
   '/payback': typeof AuthenticatedPaybackRoute
+  '/platform': typeof AuthenticatedPlatformRoute
   '/risk': typeof AuthenticatedRiskRoute
   '/timeline': typeof AuthenticatedTimelineRoute
   '/valuation': typeof AuthenticatedValuationRoute
@@ -192,6 +199,7 @@ export interface FileRoutesByTo {
   '/markup': typeof AuthenticatedMarkupRoute
   '/okr': typeof AuthenticatedOkrRoute
   '/payback': typeof AuthenticatedPaybackRoute
+  '/platform': typeof AuthenticatedPlatformRoute
   '/risk': typeof AuthenticatedRiskRoute
   '/timeline': typeof AuthenticatedTimelineRoute
   '/valuation': typeof AuthenticatedValuationRoute
@@ -218,6 +226,7 @@ export interface FileRoutesById {
   '/_authenticated/markup': typeof AuthenticatedMarkupRoute
   '/_authenticated/okr': typeof AuthenticatedOkrRoute
   '/_authenticated/payback': typeof AuthenticatedPaybackRoute
+  '/_authenticated/platform': typeof AuthenticatedPlatformRoute
   '/_authenticated/risk': typeof AuthenticatedRiskRoute
   '/_authenticated/timeline': typeof AuthenticatedTimelineRoute
   '/_authenticated/valuation': typeof AuthenticatedValuationRoute
@@ -245,6 +254,7 @@ export interface FileRouteTypes {
     | '/markup'
     | '/okr'
     | '/payback'
+    | '/platform'
     | '/risk'
     | '/timeline'
     | '/valuation'
@@ -267,6 +277,7 @@ export interface FileRouteTypes {
     | '/markup'
     | '/okr'
     | '/payback'
+    | '/platform'
     | '/risk'
     | '/timeline'
     | '/valuation'
@@ -292,6 +303,7 @@ export interface FileRouteTypes {
     | '/_authenticated/markup'
     | '/_authenticated/okr'
     | '/_authenticated/payback'
+    | '/_authenticated/platform'
     | '/_authenticated/risk'
     | '/_authenticated/timeline'
     | '/_authenticated/valuation'
@@ -349,6 +361,13 @@ declare module '@tanstack/react-router' {
       path: '/risk'
       fullPath: '/risk'
       preLoaderRoute: typeof AuthenticatedRiskRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/platform': {
+      id: '/_authenticated/platform'
+      path: '/platform'
+      fullPath: '/platform'
+      preLoaderRoute: typeof AuthenticatedPlatformRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/payback': {
@@ -511,6 +530,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMarkupRoute: typeof AuthenticatedMarkupRoute
   AuthenticatedOkrRoute: typeof AuthenticatedOkrRoute
   AuthenticatedPaybackRoute: typeof AuthenticatedPaybackRoute
+  AuthenticatedPlatformRoute: typeof AuthenticatedPlatformRoute
   AuthenticatedRiskRoute: typeof AuthenticatedRiskRoute
   AuthenticatedTimelineRoute: typeof AuthenticatedTimelineRoute
   AuthenticatedValuationRoute: typeof AuthenticatedValuationRoute
@@ -532,6 +552,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMarkupRoute: AuthenticatedMarkupRoute,
   AuthenticatedOkrRoute: AuthenticatedOkrRoute,
   AuthenticatedPaybackRoute: AuthenticatedPaybackRoute,
+  AuthenticatedPlatformRoute: AuthenticatedPlatformRoute,
   AuthenticatedRiskRoute: AuthenticatedRiskRoute,
   AuthenticatedTimelineRoute: AuthenticatedTimelineRoute,
   AuthenticatedValuationRoute: AuthenticatedValuationRoute,
