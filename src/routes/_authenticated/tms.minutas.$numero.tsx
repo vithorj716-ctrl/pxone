@@ -27,12 +27,15 @@ function MinutaPage() {
         .maybeSingle();
       if (!m) return;
       setMinuta(m as any);
-      const [v, e] = await Promise.all([
-        supabase.from("tms_volumes").select("*").eq("minuta_id", (m as any).id).order("numero"),
-        supabase.from("tms_eventos").select("*").or(`minuta_id.eq.${(m as any).id},volume_id.in.(${(((await supabase.from("tms_volumes").select("id").eq("minuta_id", (m as any).id)).data ?? []) as any[]).map((x) => x.id).join(",") || "00000000-0000-0000-0000-000000000000"})`).order("created_at"),
-      ]);
-      setVolumes((v.data ?? []) as any[]);
-      setEventos((e.data ?? []) as any[]);
+      const { data: vdata } = await supabase.from("tms_volumes").select("*").eq("minuta_id", (m as any).id).order("numero");
+      const vols = (vdata ?? []) as any[];
+      setVolumes(vols);
+      const volIds = vols.map((x) => x.id);
+      let query = supabase.from("tms_eventos").select("*").order("created_at");
+      const { data: edata } = volIds.length
+        ? await query.or(`minuta_id.eq.${(m as any).id},volume_id.in.(${volIds.join(",")})`)
+        : await query.eq("minuta_id", (m as any).id);
+      setEventos((edata ?? []) as any[]);
     })();
   }, [numero]);
 
