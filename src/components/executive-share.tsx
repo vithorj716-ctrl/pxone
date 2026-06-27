@@ -517,10 +517,10 @@ export function ExportButton() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-brand text-brand-foreground text-xs font-medium hover:opacity-90 transition-opacity"
+        className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-md bg-brand text-brand-foreground text-xs font-medium hover:opacity-90 transition-opacity"
         title="Exportar relatório executivo"
       >
-        <Download className="size-3.5" /> Exportar
+        <Download className="size-3.5" /> <span className="hidden sm:inline">Exportar</span>
       </button>
       {open && <ExportModal module={mod} onClose={() => setOpen(false)} />}
     </>
