@@ -82,24 +82,29 @@ export function TmsShell({ children, title, subtitle, headerActions }: TmsShellP
           </div>
         </div>
 
-        <nav className="flex-1 px-2 space-y-0.5 overflow-y-auto thin-scroll pb-4">
-          {TMS_NAV.map((item) => {
-            const Icon = item.icon;
-            const active = isActive(item.to, item.exact);
-            return (
-              <Link
-                key={item.to}
-                to={item.to}
-                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-md text-sm transition ${
-                  active ? "text-foreground" : "text-muted-foreground hover:text-foreground hover:bg-white/5"
-                }`}
-                style={active ? { background: ACCENT_BG, boxShadow: `inset 2px 0 0 ${ACCENT}` } : undefined}
-              >
-                <Icon className="size-4 shrink-0" style={active ? { color: ACCENT } : undefined} />
-                <span className="font-medium truncate">{item.label}</span>
-              </Link>
-            );
-          })}
+        <nav className="flex-1 px-2 space-y-2 overflow-y-auto thin-scroll pb-4">
+          {Array.from(new Set(TMS_NAV.map((i) => i.group))).map((group) => (
+            <div key={group} className="space-y-0.5">
+              <div className="px-3 pt-2 pb-1 text-[9px] uppercase tracking-widest text-muted-foreground/70">{group}</div>
+              {TMS_NAV.filter((i) => i.group === group).map((item) => {
+                const Icon = item.icon;
+                const active = isActive(item.to, item.exact);
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    className={`flex items-center gap-2.5 px-3 py-2 rounded-md text-sm transition ${
+                      active ? "text-foreground" : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+                    }`}
+                    style={active ? { background: ACCENT_BG, boxShadow: `inset 2px 0 0 ${ACCENT}` } : undefined}
+                  >
+                    <Icon className="size-4 shrink-0" style={active ? { color: ACCENT } : undefined} />
+                    <span className="font-medium truncate">{item.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
         </nav>
 
         <div className="p-3 border-t border-border space-y-1">
