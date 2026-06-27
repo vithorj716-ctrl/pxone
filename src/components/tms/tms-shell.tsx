@@ -118,6 +118,7 @@ export function TmsShell({ children, title, subtitle, headerActions }: TmsShellP
             )}
           </div>
           <div className="flex items-center gap-2">
+            {headerActions}
             <button
               onClick={trocarSistema}
               className="text-xs px-2.5 py-1.5 rounded-md ring-1 ring-border text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5"
