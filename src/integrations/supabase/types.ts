@@ -1025,6 +1025,8 @@ export type Database = {
           nome_fantasia: string | null
           numero: string | null
           observacoes: string | null
+          observacoes_comerciais: string | null
+          prazo_padrao_dias: number | null
           razao_social: string | null
           situacao_cadastral: string | null
           tabela_frete_id: string | null
@@ -1062,6 +1064,8 @@ export type Database = {
           nome_fantasia?: string | null
           numero?: string | null
           observacoes?: string | null
+          observacoes_comerciais?: string | null
+          prazo_padrao_dias?: number | null
           razao_social?: string | null
           situacao_cadastral?: string | null
           tabela_frete_id?: string | null
@@ -1099,6 +1103,8 @@ export type Database = {
           nome_fantasia?: string | null
           numero?: string | null
           observacoes?: string | null
+          observacoes_comerciais?: string | null
+          prazo_padrao_dias?: number | null
           razao_social?: string | null
           situacao_cadastral?: string | null
           tabela_frete_id?: string | null
@@ -1109,6 +1115,158 @@ export type Database = {
           whatsapp?: string | null
         }
         Relationships: []
+      }
+      px_registry_contatos: {
+        Row: {
+          cargo: string | null
+          cliente_id: string
+          created_at: string
+          created_by: string | null
+          email: string | null
+          endereco_id: string | null
+          id: string
+          is_principal: boolean
+          nome: string
+          observacoes: string | null
+          setor: string
+          telefone: string | null
+          updated_at: string
+          updated_by: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          cargo?: string | null
+          cliente_id: string
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          endereco_id?: string | null
+          id?: string
+          is_principal?: boolean
+          nome: string
+          observacoes?: string | null
+          setor?: string
+          telefone?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          cargo?: string | null
+          cliente_id?: string
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          endereco_id?: string | null
+          id?: string
+          is_principal?: boolean
+          nome?: string
+          observacoes?: string | null
+          setor?: string
+          telefone?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          whatsapp?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "px_registry_contatos_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "px_registry_clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "px_registry_contatos_endereco_id_fkey"
+            columns: ["endereco_id"]
+            isOneToOne: false
+            referencedRelation: "px_registry_enderecos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      px_registry_enderecos: {
+        Row: {
+          apelido: string | null
+          ativo: boolean
+          bairro: string | null
+          cep: string | null
+          cidade: string | null
+          cliente_id: string
+          complemento: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          is_padrao_destinatario: boolean
+          is_padrao_remetente: boolean
+          janela_recebimento: string | null
+          logradouro: string | null
+          numero: string | null
+          observacoes: string | null
+          ponto_referencia: string | null
+          restricoes: string[]
+          tipo: string
+          uf: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          apelido?: string | null
+          ativo?: boolean
+          bairro?: string | null
+          cep?: string | null
+          cidade?: string | null
+          cliente_id: string
+          complemento?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_padrao_destinatario?: boolean
+          is_padrao_remetente?: boolean
+          janela_recebimento?: string | null
+          logradouro?: string | null
+          numero?: string | null
+          observacoes?: string | null
+          ponto_referencia?: string | null
+          restricoes?: string[]
+          tipo?: string
+          uf?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          apelido?: string | null
+          ativo?: boolean
+          bairro?: string | null
+          cep?: string | null
+          cidade?: string | null
+          cliente_id?: string
+          complemento?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_padrao_destinatario?: boolean
+          is_padrao_remetente?: boolean
+          janela_recebimento?: string | null
+          logradouro?: string | null
+          numero?: string | null
+          observacoes?: string | null
+          ponto_referencia?: string | null
+          restricoes?: string[]
+          tipo?: string
+          uf?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "px_registry_enderecos_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "px_registry_clientes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       px_registry_vinculos: {
         Row: {
