@@ -76,7 +76,7 @@ function TmsClientesPage() {
             {loading ? (
               <tr><td colSpan={6} className="px-3 py-6 text-center text-muted-foreground">Carregando…</td></tr>
             ) : rows.length === 0 ? (
-              <tr><td colSpan={5} className="px-3 py-10 text-center text-muted-foreground">
+              <tr><td colSpan={6} className="px-3 py-10 text-center text-muted-foreground">
                 <Users className="size-6 mx-auto mb-2 opacity-50" />
                 Nenhum cliente vinculado ao PXLog. Clique em <strong>Novo cliente</strong>.
               </td></tr>
