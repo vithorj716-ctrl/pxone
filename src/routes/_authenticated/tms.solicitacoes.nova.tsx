@@ -83,6 +83,9 @@ function NovaSolicitacaoPage() {
   const [enderecos, setEnderecos] = useState<Endereco[]>([]);
   const [contatos, setContatos] = useState<Contato[]>([]);
   const [tmsClienteId, setTmsClienteId] = useState<string | null>(null);
+  const [saldo, setSaldo] = useState<SaldoCliente | null>(null);
+  const [credito, setCredito] = useState<any>(null);
+  const [autorizadoBloqueio, setAutorizadoBloqueio] = useState(false);
 
   const [pagador, setPagador] = useState<string>("contratante");
 
