@@ -177,10 +177,23 @@ function NovaSolicitacaoPage() {
     };
   }, [merc, regras, tmsClienteId, origem, destino, contratante]);
 
+  const excedeLimite = !!(saldo && saldo.limite_credito > 0 && (saldo.utilizado + calc.valor_frete) > saldo.limite_credito);
+  const statusFin: "ok" | "alerta" | "vencido" | "bloqueado" = bloqueadoAtivo
+    ? "bloqueado"
+    : temVencido
+      ? "vencido"
+      : excedeLimite
+        ? "alerta"
+        : "ok";
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!contratante) { toast.error("Selecione o cliente contratante"); return; }
     if (!rem.cidade || !dst.cidade) { toast.error("Selecione remetente e destinatário"); return; }
+    if ((bloqueadoAtivo || excedeLimite || temVencido) && !autorizadoBloqueio) {
+      toast.error("Cliente bloqueado — autorize na seção financeira para continuar");
+      return;
+    }
     setSaving(true);
     try {
       const { data, error } = await supabase
