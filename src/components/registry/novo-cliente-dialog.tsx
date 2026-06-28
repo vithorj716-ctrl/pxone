@@ -30,13 +30,32 @@ export function NovoClienteDialog({
   onOpenChange,
   sistema,
   onSaved,
+  initialCliente,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   sistema: SistemaKey;
   onSaved?: (cliente: any) => void;
+  initialCliente?: any | null;
 }) {
   const [cnpj, setCnpj] = useState("");
+  const [mode, setMode] = useState<Mode>("search");
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState<ClienteFormState>(emptyCliente());
+  const [existing, setExisting] = useState<any | null>(null);
+  const [readOnly, setReadOnly] = useState(false);
+  const [confirmInapta, setConfirmInapta] = useState(false);
+
+  useEffect(() => {
+    if (open && initialCliente) {
+      setExisting(initialCliente);
+      setForm(fromExisting(initialCliente));
+      setMode("edit");
+      setReadOnly(false);
+      setCnpj(initialCliente.cnpj ?? "");
+    }
+  }, [open, initialCliente]);
   const [mode, setMode] = useState<Mode>("search");
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
