@@ -70,30 +70,26 @@ function EtiquetasPage() {
             <QrLabel
               key={v.id}
               codigo={v.codigo}
+              publicToken={v.id}
               numeroMinuta={minuta.numero}
               numeroVol={v.numero}
               totalVol={minuta.qtd_volumes}
-              status={minuta.status}
               flags={flags}
               cliente={minuta.tms_clientes?.nome}
               remetente={rem.nome}
+              remetenteTel={rem.telefone}
               destinatario={dest.nome}
               telefone={dest.telefone}
               rua={dest.rua || dest.endereco}
               numero={dest.numero}
               bairro={dest.bairro}
               cidadeDestino={dest.cidade}
+              ufDestino={dest.uf || minuta.destino}
               cep={dest.cep}
               origem={minuta.origem}
-              destino={minuta.destino}
               pesoReal={Number(v.peso ?? minuta.peso ?? 0)}
               pesoCubado={Number(minuta.peso_cubado ?? 0)}
               pesoTaxado={Number(minuta.peso_taxado ?? 0)}
-              cubagem={Number(minuta.cubagem ?? 0)}
-              tipoMercadoria={minuta.tipo_mercadoria}
-              hubOrigem={minuta.origem}
-              hubDestino={minuta.destino}
-              prazoDias={minuta.prazo_dias}
               data={new Date(minuta.created_at).toLocaleDateString("pt-BR")}
             />
           ))}
