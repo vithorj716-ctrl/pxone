@@ -48,6 +48,7 @@ import { Route as AuthenticatedTmsEntregasRouteImport } from './routes/_authenti
 import { Route as AuthenticatedTmsEmbarqueRouteImport } from './routes/_authenticated/tms.embarque'
 import { Route as AuthenticatedTmsConferenciaRouteImport } from './routes/_authenticated/tms.conferencia'
 import { Route as AuthenticatedTmsClientesRouteImport } from './routes/_authenticated/tms.clientes'
+import { Route as AuthenticatedRegistryClientesRouteImport } from './routes/_authenticated/registry.clientes'
 import { Route as AuthenticatedFinancialIntelligenceDreRouteImport } from './routes/_authenticated/financial-intelligence.dre'
 import { Route as AuthenticatedFinancialIntelligenceDfcRouteImport } from './routes/_authenticated/financial-intelligence.dfc'
 import { Route as AuthenticatedFinancialIntelligenceBreakEvenRouteImport } from './routes/_authenticated/financial-intelligence.break-even'
@@ -279,6 +280,12 @@ const AuthenticatedTmsClientesRoute =
     path: '/tms/clientes',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedRegistryClientesRoute =
+  AuthenticatedRegistryClientesRouteImport.update({
+    id: '/registry/clientes',
+    path: '/registry/clientes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedFinancialIntelligenceDreRoute =
   AuthenticatedFinancialIntelligenceDreRouteImport.update({
     id: '/dre',
@@ -440,6 +447,7 @@ export interface FileRoutesByFullPath {
   '/financial-intelligence/break-even': typeof AuthenticatedFinancialIntelligenceBreakEvenRoute
   '/financial-intelligence/dfc': typeof AuthenticatedFinancialIntelligenceDfcRoute
   '/financial-intelligence/dre': typeof AuthenticatedFinancialIntelligenceDreRoute
+  '/registry/clientes': typeof AuthenticatedRegistryClientesRoute
   '/tms/clientes': typeof AuthenticatedTmsClientesRoute
   '/tms/conferencia': typeof AuthenticatedTmsConferenciaRoute
   '/tms/embarque': typeof AuthenticatedTmsEmbarqueRoute
@@ -501,6 +509,7 @@ export interface FileRoutesByTo {
   '/financial-intelligence/break-even': typeof AuthenticatedFinancialIntelligenceBreakEvenRoute
   '/financial-intelligence/dfc': typeof AuthenticatedFinancialIntelligenceDfcRoute
   '/financial-intelligence/dre': typeof AuthenticatedFinancialIntelligenceDreRoute
+  '/registry/clientes': typeof AuthenticatedRegistryClientesRoute
   '/tms/clientes': typeof AuthenticatedTmsClientesRoute
   '/tms/conferencia': typeof AuthenticatedTmsConferenciaRoute
   '/tms/embarque': typeof AuthenticatedTmsEmbarqueRoute
@@ -564,6 +573,7 @@ export interface FileRoutesById {
   '/_authenticated/financial-intelligence/break-even': typeof AuthenticatedFinancialIntelligenceBreakEvenRoute
   '/_authenticated/financial-intelligence/dfc': typeof AuthenticatedFinancialIntelligenceDfcRoute
   '/_authenticated/financial-intelligence/dre': typeof AuthenticatedFinancialIntelligenceDreRoute
+  '/_authenticated/registry/clientes': typeof AuthenticatedRegistryClientesRoute
   '/_authenticated/tms/clientes': typeof AuthenticatedTmsClientesRoute
   '/_authenticated/tms/conferencia': typeof AuthenticatedTmsConferenciaRoute
   '/_authenticated/tms/embarque': typeof AuthenticatedTmsEmbarqueRoute
@@ -628,6 +638,7 @@ export interface FileRouteTypes {
     | '/financial-intelligence/break-even'
     | '/financial-intelligence/dfc'
     | '/financial-intelligence/dre'
+    | '/registry/clientes'
     | '/tms/clientes'
     | '/tms/conferencia'
     | '/tms/embarque'
@@ -689,6 +700,7 @@ export interface FileRouteTypes {
     | '/financial-intelligence/break-even'
     | '/financial-intelligence/dfc'
     | '/financial-intelligence/dre'
+    | '/registry/clientes'
     | '/tms/clientes'
     | '/tms/conferencia'
     | '/tms/embarque'
@@ -751,6 +763,7 @@ export interface FileRouteTypes {
     | '/_authenticated/financial-intelligence/break-even'
     | '/_authenticated/financial-intelligence/dfc'
     | '/_authenticated/financial-intelligence/dre'
+    | '/_authenticated/registry/clientes'
     | '/_authenticated/tms/clientes'
     | '/_authenticated/tms/conferencia'
     | '/_authenticated/tms/embarque'
@@ -1065,6 +1078,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTmsClientesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/registry/clientes': {
+      id: '/_authenticated/registry/clientes'
+      path: '/registry/clientes'
+      fullPath: '/registry/clientes'
+      preLoaderRoute: typeof AuthenticatedRegistryClientesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/financial-intelligence/dre': {
       id: '/_authenticated/financial-intelligence/dre'
       path: '/dre'
@@ -1317,6 +1337,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedAdminPerfisRoute: typeof AuthenticatedAdminPerfisRoute
   AuthenticatedAdminUsuariosRoute: typeof AuthenticatedAdminUsuariosRoute
+  AuthenticatedRegistryClientesRoute: typeof AuthenticatedRegistryClientesRoute
   AuthenticatedTmsClientesRoute: typeof AuthenticatedTmsClientesRoute
   AuthenticatedTmsConferenciaRoute: typeof AuthenticatedTmsConferenciaRoute
   AuthenticatedTmsEmbarqueRoute: typeof AuthenticatedTmsEmbarqueRoute
@@ -1371,6 +1392,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedAdminPerfisRoute: AuthenticatedAdminPerfisRoute,
   AuthenticatedAdminUsuariosRoute: AuthenticatedAdminUsuariosRoute,
+  AuthenticatedRegistryClientesRoute: AuthenticatedRegistryClientesRoute,
   AuthenticatedTmsClientesRoute: AuthenticatedTmsClientesRoute,
   AuthenticatedTmsConferenciaRoute: AuthenticatedTmsConferenciaRoute,
   AuthenticatedTmsEmbarqueRoute: AuthenticatedTmsEmbarqueRoute,

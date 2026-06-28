@@ -20,7 +20,7 @@ export type CnpjData = {
   uf: string | null;
   telefone: string | null;
   email: string | null;
-  raw: unknown;
+  raw: Record<string, any>;
 };
 
 export interface CnpjProvider {
