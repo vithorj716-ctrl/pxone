@@ -106,7 +106,7 @@ function EtiquetasPage() {
           body * { visibility: hidden !important; }
           .tms-label, .tms-label * { visibility: visible !important; }
           .tms-label { box-shadow: none !important; margin: 0 !important; page-break-after: always; }
-          @page { size: 100mm 150mm; margin: 0; }
+          @page { size: 100mm 100mm; margin: 0; }
         }
       `}</style>
     </div>
