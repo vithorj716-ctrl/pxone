@@ -135,13 +135,8 @@ function NovaSolicitacaoPage() {
 
   const liberadoVigente = !!(credito?.liberado_ate && new Date(credito.liberado_ate) > new Date());
   const bloqueadoAtivo = !!(saldo?.bloqueado && !liberadoVigente);
-  const excedeLimite = !!(saldo && saldo.limite_credito > 0 && saldo.utilizado + calc_valor_preview() > saldo.limite_credito);
   const temVencido = !!(saldo && saldo.vencido > 0);
 
-  function calc_valor_preview() {
-    // chamada antes de calc estar definido — recalcula minimamente
-    return 0;
-  }
 
 
   function aplicarEndereco(end: Endereco, allContatos: Contato[], setter: (v: EndSnap) => void) {
