@@ -243,18 +243,6 @@ function EmbarqueOperacao({ viagemId, onSair }: { viagemId: string; onSair: () =
   const [tempo, setTempo] = useState("00:00");
   const operadorRef = useRef<string>("Você");
 
-  async function refresh() {
-    try {
-      const r = await (async () => {
-        const fn = useServerFn; void fn; // satisfy linter
-        // call server fn directly via dynamic import-style: use useServerFn caller from outer
-        return null as any;
-      })();
-      void r;
-    } catch {}
-  }
-  void refresh;
-
   const getPainel = useServerFn(getPainelViagem);
 
   async function load() {
