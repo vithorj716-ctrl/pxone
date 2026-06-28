@@ -44,9 +44,11 @@ export function emptyCliente(): ClienteFormState {
     cep: "", logradouro: "", numero: "", complemento: "", bairro: "", cidade: "", uf: "",
     contato_nome: "", contato_cargo: "", telefone: "", whatsapp: "", email: "",
     observacoes: "", condicao_pagamento: "", limite_credito: "",
+    prazo_padrao_dias: "", observacoes_comerciais: "",
     categorias: ["cliente"],
   };
 }
+
 
 export function fromCnpjData(d: any, current: ClienteFormState): ClienteFormState {
   return {
@@ -99,7 +101,10 @@ export function fromExisting(row: any): ClienteFormState {
     observacoes: row.observacoes ?? "",
     condicao_pagamento: row.condicao_pagamento ?? "",
     limite_credito: row.limite_credito != null ? String(row.limite_credito) : "",
+    prazo_padrao_dias: row.prazo_padrao_dias != null ? String(row.prazo_padrao_dias) : "",
+    observacoes_comerciais: row.observacoes_comerciais ?? "",
     categorias: Array.isArray(row.categorias) && row.categorias.length ? row.categorias : ["cliente"],
+
   };
 }
 
@@ -175,11 +180,23 @@ export function ClienteForm({
               readOnly={readOnly}
             />
           </F>
-          <F label="Observações" span={4}>
+          <F label="Prazo padrão (dias)" span={2}>
+            <NumericInput
+              variant="integer"
+              value={value.prazo_padrao_dias ? Number(value.prazo_padrao_dias) : null}
+              onValueChange={(n) => set("prazo_padrao_dias", n != null ? String(n) : "")}
+              readOnly={readOnly}
+            />
+          </F>
+          <F label="Observações operacionais" span={4}>
             <Textarea value={value.observacoes} onChange={(e) => set("observacoes", e.target.value)} readOnly={readOnly} rows={2} />
+          </F>
+          <F label="Observações comerciais" span={4}>
+            <Textarea value={value.observacoes_comerciais} onChange={(e) => set("observacoes_comerciais", e.target.value)} readOnly={readOnly} rows={2} placeholder="Acordos comerciais, descontos especiais, condições negociadas..." />
           </F>
         </div>
       </section>
+
 
       <section className="space-y-2">
         <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Categorias</h3>
