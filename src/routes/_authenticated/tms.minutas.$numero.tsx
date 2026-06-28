@@ -141,6 +141,9 @@ function MinutaPage() {
           <Timeline eventos={eventos} />
         </aside>
       </div>
+      <CancelarMinutaDialog open={cancelOpen} onOpenChange={setCancelOpen}
+        minutaId={minuta.id} numero={minuta.numero}
+        onCancelled={() => { setCancelOpen(false); window.location.reload(); }} />
     </TmsShell>
   );
 }
