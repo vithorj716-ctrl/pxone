@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 export type NumericVariant = "currency" | "weight" | "volume" | "percent" | "integer" | "decimal";
 
-type Props = Omit<React.ComponentProps<"input">, "type" | "value" | "onChange"> & {
+type Props = Omit<React.ComponentProps<"input">, "type" | "value"> & {
   value: number | string | null | undefined;
   onValueChange?: (value: number | null, raw: string) => void;
   variant?: NumericVariant;
