@@ -52,16 +52,8 @@ export const iniciarEmbarque = createServerFn({ method: "POST" })
     let viagemId = data.viagem_id ?? null;
 
     if (!viagemId) {
-      // gera código tipo "GOI-00021"
-      const { data: seq } = await supabase.rpc("nextval" as any, { sequence_name: "tms_viagem_seq" } as any).single() as any;
-      let codigo: string;
-      if (seq && typeof seq === "number") {
-        codigo = `${data.origem.slice(0, 3).toUpperCase()}-${String(seq).padStart(5, "0")}`;
-      } else {
-        // fallback: count + 1
-        const { count } = await supabase.from("tms_viagens").select("id", { count: "exact", head: true });
-        codigo = `${data.origem.slice(0, 3).toUpperCase()}-${String((count ?? 0) + 1).padStart(5, "0")}`;
-      }
+      const { count } = await supabase.from("tms_viagens").select("id", { count: "exact", head: true });
+      const codigo = `${data.origem.slice(0, 3).toUpperCase()}-${String((count ?? 0) + 1).padStart(5, "0")}`;
 
       const { data: nova, error: vErr } = await supabase
         .from("tms_viagens")
