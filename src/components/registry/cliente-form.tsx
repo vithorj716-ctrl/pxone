@@ -31,7 +31,10 @@ export type ClienteFormState = {
   observacoes: string;
   condicao_pagamento: string;
   limite_credito: string;
+  prazo_padrao_dias: string;
+  observacoes_comerciais: string;
   categorias: string[];
+
 };
 
 export function emptyCliente(): ClienteFormState {
