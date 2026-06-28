@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -30,11 +30,13 @@ export function NovoClienteDialog({
   onOpenChange,
   sistema,
   onSaved,
+  initialCliente,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   sistema: SistemaKey;
   onSaved?: (cliente: any) => void;
+  initialCliente?: any | null;
 }) {
   const [cnpj, setCnpj] = useState("");
   const [mode, setMode] = useState<Mode>("search");
@@ -44,6 +46,16 @@ export function NovoClienteDialog({
   const [existing, setExisting] = useState<any | null>(null);
   const [readOnly, setReadOnly] = useState(false);
   const [confirmInapta, setConfirmInapta] = useState(false);
+
+  useEffect(() => {
+    if (open && initialCliente) {
+      setExisting(initialCliente);
+      setForm(fromExisting(initialCliente));
+      setMode("edit");
+      setReadOnly(false);
+      setCnpj(initialCliente.cnpj ?? "");
+    }
+  }, [open, initialCliente]);
 
   const fnLookup = useServerFn(lookupCnpj);
   const fnFind = useServerFn(findClienteByCnpj);

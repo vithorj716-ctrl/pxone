@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Search, Users } from "lucide-react";
+import { Plus, Search, Users, Pencil } from "lucide-react";
 import { NovoClienteDialog } from "@/components/registry/novo-cliente-dialog";
 import { CATEGORIAS_CLIENTE, listClientes } from "@/lib/px-registry.functions";
 import { formatCnpj } from "@/lib/cnpj";
@@ -22,6 +22,7 @@ function RegistryClientesPage() {
   const [search, setSearch] = useState("");
   const [categoria, setCategoria] = useState<string>("");
   const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<any | null>(null);
   const fn = useServerFn(listClientes);
 
   async function reload() {
@@ -70,13 +71,14 @@ function RegistryClientesPage() {
               <th className="text-left px-3 py-2">Cidade/UF</th>
               <th className="text-left px-3 py-2">Categorias</th>
               <th className="text-left px-3 py-2">Situação</th>
+              <th className="text-right px-3 py-2 w-20">Ações</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={5} className="px-3 py-6 text-center text-muted-foreground">Carregando…</td></tr>
+              <tr><td colSpan={6} className="px-3 py-6 text-center text-muted-foreground">Carregando…</td></tr>
             ) : rows.length === 0 ? (
-              <tr><td colSpan={5} className="px-3 py-10 text-center text-muted-foreground">
+              <tr><td colSpan={6} className="px-3 py-10 text-center text-muted-foreground">
                 <Users className="size-6 mx-auto mb-2 opacity-50" />
                 Nenhum cliente. Clique em <strong>Novo cliente</strong>.
               </td></tr>
@@ -100,6 +102,16 @@ function RegistryClientesPage() {
                   </div>
                 </td>
                 <td className="px-3 py-2 text-xs">{r.situacao_cadastral ?? "—"}</td>
+                <td className="px-3 py-2 text-right">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => { setEditing(r); setOpen(true); }}
+                    title="Editar cliente"
+                  >
+                    <Pencil className="size-4" />
+                  </Button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -108,8 +120,9 @@ function RegistryClientesPage() {
 
       <NovoClienteDialog
         open={open}
-        onOpenChange={setOpen}
+        onOpenChange={(v) => { setOpen(v); if (!v) setEditing(null); }}
         sistema="pxone"
+        initialCliente={editing}
         onSaved={() => reload()}
       />
     </AppShell>
