@@ -1,90 +1,56 @@
+Esta é uma refatoração estrutural grande. Proponho dividir em **3 fases entregáveis**, cada uma funcional por si. Confirme a fase 1 e seguimos.
 
-# PX Registry — Cadastro Inteligente de Clientes
+---
 
-Criar um serviço central de cadastro de pessoas jurídicas, compartilhado por todos os sistemas da PX Platform (PXLog, PXOne, PXMed, PXFarma). CNPJ é a chave única — um cliente nunca é duplicado.
+## FASE 1 — Fundação (entrego nesta rodada)
 
-## 1. Banco de dados (migration)
+### 1.1 Campos numéricos padronizados (global)
+- Criar `src/components/ui/numeric-input.tsx` com variantes: `currency` (BRL), `weight` (kg), `volume` (m³), `percent`, `integer`, `decimal`.
+- CSS global em `src/styles.css` removendo setas: `input[type=number]::-webkit-{inner,outer}-spinner-button { -webkit-appearance: none; margin: 0; } input[type=number] { -moz-appearance: textfield; }`
+- Comportamentos: `inputMode="decimal"`, seleciona tudo no foco, aceita colar, formatação on-blur, validação em tempo real.
+- Substituir os `type="number"` mais sensíveis (frete, peso, cubagem, limite_credito, valor_mercadoria) — os demais herdam o CSS global automaticamente.
 
-Nova tabela **`px_registry_clientes`** no schema `public`:
+### 1.2 CRUD padrão + Histórico (PX Core)
+- Migration: tabela `px_audit_log` (entity_type, entity_id, action `create|update|inactivate|reactivate|duplicate`, diff jsonb, user_id, created_at).
+- Adicionar colunas `ativo boolean default true`, `inativado_em`, `inativado_por` em `px_registry_clientes`.
+- Helper `src/lib/px-audit.ts` + server fn `logAudit` chamado nos upserts.
+- Componente `<HistoricoTab entityType entityId />` reutilizável.
 
-- `id` (uuid)
-- `cnpj` (text, UNIQUE — apenas dígitos, 14 chars)
-- `razao_social`, `nome_fantasia`, `situacao_cadastral`, `data_abertura`, `natureza_juridica`, `cnae_principal`, `cnae_descricao`
-- Endereço: `cep`, `logradouro`, `numero`, `complemento`, `bairro`, `cidade`, `uf`
-- Comercial: `contato_nome`, `contato_cargo`, `telefone`, `whatsapp`, `email`, `observacoes`, `condicao_pagamento`, `tabela_frete_id` (fk opcional), `limite_credito` (numeric)
-- Classificação: `categorias` (text[] — multi: cliente, fornecedor, transportadora, distribuidora, farmacia, hospital, clinica, industria, operador_logistico, outros)
-- Auditoria: `created_by`, `updated_by`, `created_at`, `updated_at`, `api_payload` (jsonb — última resposta da API)
-- RLS: todo authenticated lê/escreve; service_role full.
-- Trigger `updated_at`.
-- Índice em `cnpj`, GIN em `categorias`.
+### 1.3 Ações padrão no cadastro de clientes
+- Botões: Visualizar, Editar, Duplicar, Inativar/Reativar.
+- Aba "Histórico" no `NovoClienteDialog` (já estruturado em tabs).
+- Indicador visual de status (verde/amarelo/vermelho/cinza) na listagem.
 
-Nova tabela **`px_registry_vinculos`** (qual sistema usa qual cliente — opcional, p/ relatórios):
-- `cliente_id`, `sistema_key` (pxlog/pxone/pxmed/pxfarma), `vinculado_em`, `vinculado_por`
-- UNIQUE(cliente_id, sistema_key).
+---
 
-Compatibilidade com `tms_clientes` existente: adicionar coluna `registry_id uuid REFERENCES px_registry_clientes(id)` em `tms_clientes`. Nenhum dado existente é removido.
+## FASE 2 — Conta Corrente do cliente (próxima rodada)
 
-## 2. PX Registry — camada de serviço
+- Migrations:
+  - `px_cliente_credito` (cliente_id, limite, situacao `normal|bloqueado_manual|inativo`, bloqueado_por, motivo_bloqueio)
+  - `px_cliente_lancamentos` (cliente_id, data, tipo `debito|credito`, documento, descricao, valor, origem `tms|pxone|manual`, sistema_key, ref_id, user_id, situacao `aberto|pago|vencido|cancelado`, vencimento)
+  - `px_cliente_liberacoes` (auditoria de exceções: cliente_id, embarque_id, user_id, motivo)
+  - View `px_cliente_saldo` calculando: utilizado, disponível, vencido, em aberto, maior atraso, último pagamento.
+- Server fns: `getContaCorrente`, `listLancamentos`, `setLimiteCredito`, `bloquearCliente`, `desbloquearCliente`, `lancarDebito`, `lancarCredito`, `checkEmbarqueAllowed`, `liberarEmbarqueManual`.
+- Aba "Conta Corrente" no dialog do cliente: KPIs + extrato com filtros.
 
-`src/px-core/registry/cnpj-provider.ts` — interface `CnpjProvider` com `lookup(cnpj): Promise<CnpjData>`. Implementação default `BrasilApiProvider` (fetch `https://brasilapi.com.br/api/cnpj/v1/{cnpj}`). Troca futura sem tocar consumidores.
+---
 
-`src/lib/px-registry.functions.ts` (server functions, `requireSupabaseAuth`):
-- `lookupCnpj({ cnpj })` — valida formato + DV, chama provider, retorna dados normalizados. Não persiste.
-- `findClienteByCnpj({ cnpj })` — retorna registro existente ou null.
-- `upsertCliente({ ... })` — cria ou atualiza, preenche `created_by`/`updated_by`, retorna registro.
-- `linkClienteToSistema({ cliente_id, sistema_key })` — registra vínculo.
-- `listClientes({ categoria?, search?, sistema? })`.
+## FASE 3 — Integração operacional + IA + Dashboard
 
-Helpers em `src/lib/cnpj.ts`: `onlyDigits`, `isValidCnpj` (DV), `formatCnpj`.
+- Hook no faturamento TMS (`tms.financeiro.tsx`) → gera débito automático ao faturar minuta; pagamento gera crédito e libera limite.
+- Guard no embarque (`tms.embarque.tsx`): antes de embarcar, chama `checkEmbarqueAllowed` → se bloqueado, abre dialog "EMBARQUE BLOQUEADO" com motivo, limite, utilizado, saldo, e ações (Cancelar / Solicitar liberação / Abrir CC). Liberação só com role autorizada (registra auditoria).
+- Indicador financeiro (semáforo) onde cliente aparece (listagens, minutas, embarque).
+- Rota `/financeiro/dashboard` com KPIs (bloqueados, utilizado, vencido, top devedores, maior atraso, recebido no mês).
+- Estender `tms-ai.functions.ts` com contexto de crédito para responder as perguntas do item 13.
 
-## 3. UI — Novo Cliente
+---
 
-Nova rota **`/registry/clientes`** (lista global) e dialog **`<NovoClienteDialog>`** reaproveitável.
+## Detalhes técnicos relevantes
+- Tudo em `px_*` no PX Core → reutilizado por PXLog/PXOne/PXMed/PXFarma via `sistema_key`.
+- RLS: todas as tabelas com `authenticated` + `service_role`; liberações exigem `has_role('admin'|'gerente'|'financeiro')`.
+- Lançamentos imutáveis (estorno via lançamento contrário) para preservar trilha de auditoria.
+- View materializada não — usar view normal para refletir saldo em tempo real.
 
-Fluxo do dialog:
-1. Etapa 1 — só campo CNPJ + botão "🔍 Buscar Dados". Loading spinner.
-2. Antes de chamar API, `findClienteByCnpj`. Se existir → toast "Este CNPJ já está cadastrado" + abre em modo edição/visualização.
-3. Senão → `lookupCnpj`, preenche todos os campos (editáveis se vazios).
-4. Se `situacao_cadastral` ≠ ATIVA → banner amarelo "Empresa {situacao}. Cadastro requer confirmação." + checkbox "Confirmo cadastro mesmo assim" (gating do submit; só usuários com role admin/socio/diretor liberam).
-5. Etapa 2 — campos comerciais + categorias (multi-select).
-6. Salvar → `upsertCliente` + `linkClienteToSistema` (sistema atual do contexto).
+---
 
-Componentes:
-- `src/components/registry/novo-cliente-dialog.tsx`
-- `src/components/registry/cliente-form.tsx`
-- `src/routes/_authenticated/registry.clientes.tsx` (lista + filtros por categoria/sistema, abre dialog)
-
-## 4. Integração com módulos existentes
-
-- `/tms/clientes` (`tms.clientes.tsx`): trocar `CrudTable` por lista que lê de `px_registry_clientes` filtrando categorias relevantes (cliente, transportadora, distribuidora), com botão "Novo Cliente" abrindo `<NovoClienteDialog sistema="pxlog">`. Migration de compatibilidade: para `tms_clientes` sem `registry_id`, manter registro legado visível mas marcar "legado" e oferecer migração 1-clique (cria em `px_registry_clientes` via CNPJ se houver).
-- Os demais sistemas (PXOne/PXMed/PXFarma) ainda não consomem; deixar o serviço pronto.
-
-## 5. Validações
-
-- CNPJ: regex 14 dígitos + cálculo de DV (rejeita inválido com mensagem clara).
-- Situação inapta/baixada/suspensa: warning + bypass restrito por role.
-- Email opcional mas validado quando preenchido (zod).
-- Telefone/WhatsApp: máscara BR.
-
-## 6. Auditoria
-
-`created_by`/`updated_by` setados nos server functions a partir de `context.userId`. Resposta crua da API guardada em `api_payload` para auditoria/diagnóstico.
-
-## Arquivos novos
-- `supabase/migrations/*_px_registry.sql`
-- `src/lib/cnpj.ts`
-- `src/lib/px-registry.functions.ts`
-- `src/px-core/registry/cnpj-provider.ts`
-- `src/px-core/registry/brasilapi-provider.ts`
-- `src/components/registry/novo-cliente-dialog.tsx`
-- `src/components/registry/cliente-form.tsx`
-- `src/routes/_authenticated/registry.clientes.tsx`
-
-## Arquivos editados
-- `src/routes/_authenticated/tms.clientes.tsx` (passa a usar registry)
-- `src/components/tms/tms-shell.tsx` (link "Clientes" aponta para flow novo)
-
-## Fora de escopo
-- Migração em massa de `tms_clientes` legados (oferece-se 1-clique mas não automatiza tudo).
-- Telas dedicadas em PXOne/PXMed/PXFarma — apenas o serviço fica pronto.
-- Cache local persistente da API (consulta é sempre fresh; `api_payload` guarda último resultado).
+**Posso começar pela Fase 1 agora?** Responda "sim" ou diga o que ajustar. Fases 2 e 3 viram nas próximas rodadas para manter cada entrega revisável.
