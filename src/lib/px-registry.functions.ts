@@ -71,8 +71,6 @@ type UpsertInput = {
   condicao_pagamento?: string | null;
   limite_credito?: number | null;
   categorias?: string[];
-  api_payload?: unknown;
-};
 
 export const upsertCliente = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
