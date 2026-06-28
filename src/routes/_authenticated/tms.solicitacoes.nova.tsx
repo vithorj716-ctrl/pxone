@@ -675,3 +675,102 @@ function EnderecoCard({
     </SectionCard>
   );
 }
+
+function brl(n: number) {
+  return Number(n || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+
+function StatusFinanceiroBadge({ status }: { status: "ok" | "alerta" | "vencido" | "bloqueado" }) {
+  const meta = {
+    ok:        { label: "OK",         dot: "bg-emerald-400", cls: "text-emerald-300" },
+    alerta:    { label: "Próx limite",dot: "bg-amber-400",   cls: "text-amber-300"   },
+    vencido:   { label: "Em atraso",  dot: "bg-orange-400",  cls: "text-orange-300"  },
+    bloqueado: { label: "Bloqueado",  dot: "bg-red-500",     cls: "text-red-300"     },
+  }[status];
+  return (
+    <span className={`inline-flex items-center gap-1.5 ${meta.cls}`}>
+      <span className={`size-2 rounded-full ${meta.dot}`} />{meta.label}
+    </span>
+  );
+}
+
+function ContaCorrenteCard({
+  saldo, bloqueado, vencido, excede, autorizado, liberadoVigente, onAutorizar, onLiberar,
+}: {
+  saldo: SaldoCliente | null;
+  bloqueado: boolean;
+  vencido: boolean;
+  excede: boolean;
+  autorizado: boolean;
+  liberadoVigente: boolean;
+  onAutorizar: () => void;
+  onLiberar: (ate: string) => void;
+}) {
+  const [liberarAte, setLiberarAte] = useState<string>(() => {
+    const d = new Date(); d.setDate(d.getDate() + 7);
+    return d.toISOString().slice(0, 10);
+  });
+
+  if (!saldo) {
+    return (
+      <div className="mt-3 rounded-md border border-border bg-surface/40 p-3 text-xs text-muted-foreground">
+        Sem conta corrente cadastrada para este cliente.
+      </div>
+    );
+  }
+
+  const tone = bloqueado
+    ? "border-red-500/40 bg-red-500/5"
+    : vencido || excede
+      ? "border-amber-500/40 bg-amber-500/5"
+      : "border-emerald-500/30 bg-emerald-500/5";
+
+  return (
+    <div className={`mt-3 rounded-md border ${tone} p-3 space-y-2`}>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+        <MetaPill label="Limite" value={brl(saldo.limite_credito)} />
+        <MetaPill label="Utilizado" value={brl(saldo.utilizado)} />
+        <MetaPill label="Disponível" value={brl(saldo.disponivel)} />
+        <MetaPill label="Vencido" value={brl(saldo.vencido)} />
+      </div>
+
+      {liberadoVigente && (
+        <div className="text-[11px] text-emerald-300 flex items-center gap-1.5">
+          <Check className="size-3.5" /> Liberação ativa até {new Date(saldo.liberado_ate!).toLocaleDateString("pt-BR")}
+        </div>
+      )}
+
+      {(bloqueado || excede || vencido) && !autorizado && (
+        <div className="border-t border-current/20 pt-2 space-y-2">
+          <div className="flex items-start gap-2 text-xs">
+            <AlertTriangle className="size-4 text-red-400 shrink-0 mt-0.5" />
+            <div>
+              <div className="font-semibold text-red-300">
+                {bloqueado ? "CLIENTE BLOQUEADO" : excede ? "EXCEDE LIMITE DE CRÉDITO" : "POSSUI TÍTULOS EM ATRASO"}
+              </div>
+              {saldo.motivo_bloqueio && <div className="text-muted-foreground">{saldo.motivo_bloqueio}</div>}
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2 items-center">
+            <Button type="button" size="sm" variant="outline" onClick={onAutorizar}>
+              Continuar (autorizado)
+            </Button>
+            <div className="flex items-center gap-1">
+              <Input type="date" value={liberarAte} onChange={(e) => setLiberarAte(e.target.value)} className="h-8 w-36" />
+              <Button type="button" size="sm" variant="secondary" onClick={() => onLiberar(liberarAte)}>
+                Liberar até
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {autorizado && (
+        <div className="text-[11px] text-amber-300 flex items-center gap-1.5">
+          <Check className="size-3.5" /> Emissão autorizada manualmente para esta minuta
+        </div>
+      )}
+    </div>
+  );
+}
+
