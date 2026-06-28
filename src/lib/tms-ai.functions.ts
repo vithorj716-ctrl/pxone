@@ -12,7 +12,7 @@ export const askTmsAnalyst = createServerFn({ method: "POST" })
 
     // Snapshot agregado (sem expor PII bruta)
     const [{ data: minutas }, { data: eventos }, { data: clientes }, { data: viagens }, { data: vEventos }, { data: cancel }] = await Promise.all([
-      supabase.from("tms_minutas").select("numero, status, status_financeiro, origem, destino, qtd_volumes, peso_taxado, valor_frete, prazo_dias, cliente_id, cancelada_em, cancelamento_motivo, created_at").limit(500),
+      supabase.from("tms_minutas").select("id, numero, status, status_financeiro, origem, destino, qtd_volumes, peso_taxado, valor_frete, prazo_dias, cliente_id, cancelada_em, cancelamento_motivo, created_at").limit(500),
       supabase.from("tms_eventos").select("tipo, created_at, minuta_id").order("created_at", { ascending: false }).limit(500),
       supabase.from("tms_clientes").select("id, nome").limit(200),
       supabase.from("tms_viagens").select("codigo, status, origem, destino, qtd_volumes_prev, qtd_volumes_emb, tempo_operacao_min, operador_id, iniciada_em").limit(200),
