@@ -19,10 +19,37 @@ export const loadClienteCompleto = createServerFn({ method: "POST" })
         .order("is_principal", { ascending: false }),
       sb.from("tms_clientes").select("id").eq("registry_id", data.cliente_id).maybeSingle(),
     ]);
+    let enderecos = ends.data ?? [];
+    const c = cli.data;
+    // Fallback: sintetiza endereço virtual a partir dos campos legados do cadastro
+    // quando o cliente ainda não possui rows em px_registry_enderecos.
+    if (enderecos.length === 0 && c && (c.logradouro || c.cidade || c.cep)) {
+      enderecos = [{
+        id: `legacy:${c.id}`,
+        cliente_id: c.id,
+        tipo: "matriz",
+        apelido: "Endereço principal (cadastro)",
+        cep: c.cep ?? null,
+        logradouro: c.logradouro ?? null,
+        numero: c.numero ?? null,
+        complemento: c.complemento ?? null,
+        bairro: c.bairro ?? null,
+        cidade: c.cidade ?? null,
+        uf: c.uf ?? null,
+        ponto_referencia: null,
+        observacoes: c.observacoes ?? null,
+        janela_recebimento: null,
+        restricoes: [],
+        is_padrao_remetente: true,
+        is_padrao_destinatario: true,
+        ativo: true,
+      } as any];
+    }
     return {
-      cliente: cli.data ?? null,
-      enderecos: ends.data ?? [],
+      cliente: c ?? null,
+      enderecos,
       contatos: conts.data ?? [],
       tms_cliente_id: tms.data?.id ?? null,
     };
   });
+
