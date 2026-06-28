@@ -1201,6 +1201,64 @@ export type Database = {
           },
         ]
       }
+      tms_cancelamentos: {
+        Row: {
+          created_at: string
+          escopo: string
+          id: string
+          minuta_id: string | null
+          motivo: string
+          motivo_texto: string | null
+          usuario_id: string | null
+          viagem_id: string | null
+          volume_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          escopo: string
+          id?: string
+          minuta_id?: string | null
+          motivo: string
+          motivo_texto?: string | null
+          usuario_id?: string | null
+          viagem_id?: string | null
+          volume_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          escopo?: string
+          id?: string
+          minuta_id?: string | null
+          motivo?: string
+          motivo_texto?: string | null
+          usuario_id?: string | null
+          viagem_id?: string | null
+          volume_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tms_cancelamentos_minuta_id_fkey"
+            columns: ["minuta_id"]
+            isOneToOne: false
+            referencedRelation: "tms_minutas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tms_cancelamentos_viagem_id_fkey"
+            columns: ["viagem_id"]
+            isOneToOne: false
+            referencedRelation: "tms_viagens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tms_cancelamentos_volume_id_fkey"
+            columns: ["volume_id"]
+            isOneToOne: false
+            referencedRelation: "tms_volumes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tms_clientes: {
         Row: {
           ativo: boolean
@@ -1743,6 +1801,9 @@ export type Database = {
       }
       tms_minutas: {
         Row: {
+          cancelada_em: string | null
+          cancelada_por: string | null
+          cancelamento_motivo: string | null
           cliente_id: string | null
           created_at: string
           cubagem: number
@@ -1771,6 +1832,9 @@ export type Database = {
           valor_mercadoria: number
         }
         Insert: {
+          cancelada_em?: string | null
+          cancelada_por?: string | null
+          cancelamento_motivo?: string | null
           cliente_id?: string | null
           created_at?: string
           cubagem?: number
@@ -1799,6 +1863,9 @@ export type Database = {
           valor_mercadoria?: number
         }
         Update: {
+          cancelada_em?: string | null
+          cancelada_por?: string | null
+          cancelamento_motivo?: string | null
           cliente_id?: string | null
           created_at?: string
           cubagem?: number
@@ -1920,12 +1987,206 @@ export type Database = {
           },
         ]
       }
+      tms_viagem_eventos: {
+        Row: {
+          codigo: string | null
+          created_at: string
+          id: string
+          motivo: string | null
+          operador_id: string | null
+          payload: Json
+          tipo: string
+          viagem_id: string
+          volume_id: string | null
+        }
+        Insert: {
+          codigo?: string | null
+          created_at?: string
+          id?: string
+          motivo?: string | null
+          operador_id?: string | null
+          payload?: Json
+          tipo: string
+          viagem_id: string
+          volume_id?: string | null
+        }
+        Update: {
+          codigo?: string | null
+          created_at?: string
+          id?: string
+          motivo?: string | null
+          operador_id?: string | null
+          payload?: Json
+          tipo?: string
+          viagem_id?: string
+          volume_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tms_viagem_eventos_viagem_id_fkey"
+            columns: ["viagem_id"]
+            isOneToOne: false
+            referencedRelation: "tms_viagens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tms_viagem_eventos_volume_id_fkey"
+            columns: ["volume_id"]
+            isOneToOne: false
+            referencedRelation: "tms_volumes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tms_viagem_minutas: {
+        Row: {
+          created_at: string
+          minuta_id: string
+          viagem_id: string
+        }
+        Insert: {
+          created_at?: string
+          minuta_id: string
+          viagem_id: string
+        }
+        Update: {
+          created_at?: string
+          minuta_id?: string
+          viagem_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tms_viagem_minutas_minuta_id_fkey"
+            columns: ["minuta_id"]
+            isOneToOne: false
+            referencedRelation: "tms_minutas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tms_viagem_minutas_viagem_id_fkey"
+            columns: ["viagem_id"]
+            isOneToOne: false
+            referencedRelation: "tms_viagens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tms_viagens: {
+        Row: {
+          codigo: string
+          created_at: string
+          cubagem_prev: number
+          data_prevista: string | null
+          destino: string
+          empresa_id: string | null
+          finalizada_em: string | null
+          id: string
+          iniciada_em: string | null
+          motorista_id: string | null
+          motorista_nome: string | null
+          observacoes: string | null
+          operador_id: string | null
+          origem: string
+          peso_emb: number
+          peso_prev: number
+          placa: string | null
+          qtd_volumes_emb: number
+          qtd_volumes_prev: number
+          resumo: Json | null
+          rota: string | null
+          status: string
+          tempo_operacao_min: number | null
+          updated_at: string
+          veiculo_id: string | null
+        }
+        Insert: {
+          codigo: string
+          created_at?: string
+          cubagem_prev?: number
+          data_prevista?: string | null
+          destino: string
+          empresa_id?: string | null
+          finalizada_em?: string | null
+          id?: string
+          iniciada_em?: string | null
+          motorista_id?: string | null
+          motorista_nome?: string | null
+          observacoes?: string | null
+          operador_id?: string | null
+          origem: string
+          peso_emb?: number
+          peso_prev?: number
+          placa?: string | null
+          qtd_volumes_emb?: number
+          qtd_volumes_prev?: number
+          resumo?: Json | null
+          rota?: string | null
+          status?: string
+          tempo_operacao_min?: number | null
+          updated_at?: string
+          veiculo_id?: string | null
+        }
+        Update: {
+          codigo?: string
+          created_at?: string
+          cubagem_prev?: number
+          data_prevista?: string | null
+          destino?: string
+          empresa_id?: string | null
+          finalizada_em?: string | null
+          id?: string
+          iniciada_em?: string | null
+          motorista_id?: string | null
+          motorista_nome?: string | null
+          observacoes?: string | null
+          operador_id?: string | null
+          origem?: string
+          peso_emb?: number
+          peso_prev?: number
+          placa?: string | null
+          qtd_volumes_emb?: number
+          qtd_volumes_prev?: number
+          resumo?: Json | null
+          rota?: string | null
+          status?: string
+          tempo_operacao_min?: number | null
+          updated_at?: string
+          veiculo_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tms_viagens_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tms_viagens_motorista_id_fkey"
+            columns: ["motorista_id"]
+            isOneToOne: false
+            referencedRelation: "tms_lm_motoristas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tms_viagens_veiculo_id_fkey"
+            columns: ["veiculo_id"]
+            isOneToOne: false
+            referencedRelation: "tms_lm_veiculos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tms_volumes: {
         Row: {
           altura: number | null
+          bloqueado: boolean
+          bloqueio_motivo: string | null
           codigo: string
           comprimento: number | null
           created_at: string
+          embarcado_em: string | null
+          embarcado_por: string | null
           hub_atual: string | null
           id: string
           largura: number | null
@@ -1934,12 +2195,17 @@ export type Database = {
           peso: number
           status: string
           updated_at: string
+          viagem_id: string | null
         }
         Insert: {
           altura?: number | null
+          bloqueado?: boolean
+          bloqueio_motivo?: string | null
           codigo: string
           comprimento?: number | null
           created_at?: string
+          embarcado_em?: string | null
+          embarcado_por?: string | null
           hub_atual?: string | null
           id?: string
           largura?: number | null
@@ -1948,12 +2214,17 @@ export type Database = {
           peso?: number
           status?: string
           updated_at?: string
+          viagem_id?: string | null
         }
         Update: {
           altura?: number | null
+          bloqueado?: boolean
+          bloqueio_motivo?: string | null
           codigo?: string
           comprimento?: number | null
           created_at?: string
+          embarcado_em?: string | null
+          embarcado_por?: string | null
           hub_atual?: string | null
           id?: string
           largura?: number | null
@@ -1962,6 +2233,7 @@ export type Database = {
           peso?: number
           status?: string
           updated_at?: string
+          viagem_id?: string | null
         }
         Relationships: [
           {
@@ -1969,6 +2241,13 @@ export type Database = {
             columns: ["minuta_id"]
             isOneToOne: false
             referencedRelation: "tms_minutas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tms_volumes_viagem_id_fkey"
+            columns: ["viagem_id"]
+            isOneToOne: false
+            referencedRelation: "tms_viagens"
             referencedColumns: ["id"]
           },
         ]
