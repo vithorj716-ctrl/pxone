@@ -1,127 +1,90 @@
-## Refatoração Operacional do PXLog TMS
 
-Transformar o TMS de um conjunto de CRUDs em um fluxo operacional real centrado em **Viagens**, com embarque inteligente, cancelamento de minuta, painel ao vivo e IA operacional.
+# PX Registry — Cadastro Inteligente de Clientes
 
----
+Criar um serviço central de cadastro de pessoas jurídicas, compartilhado por todos os sistemas da PX Platform (PXLog, PXOne, PXMed, PXFarma). CNPJ é a chave única — um cliente nunca é duplicado.
 
-### 1. Nova entidade: Viagens (banco)
+## 1. Banco de dados (migration)
 
-Migration única criando:
+Nova tabela **`px_registry_clientes`** no schema `public`:
 
-- `tms_viagens` — código (`GOI-00021`), origem, destino, motorista_id, veiculo_id, placa, rota, status (`planejada|em_embarque|em_transito|finalizada|cancelada`), data_prevista, iniciada_em, finalizada_em, operador_id, totais previstos/embarcados (volumes, peso, cubagem), tempo_operacao_min, observacoes.
-- `tms_viagem_minutas` — vínculo viagem↔minuta (define o "previsto").
-- `tms_viagem_eventos` — auditoria de embarque/divergência/finalização.
-- `tms_cancelamentos` — minuta_id, motivo (enum), motivo_texto, usuario_id, cancelado_em. Reaproveitada também para volumes deixados no HUB.
-- Colunas novas em `tms_minutas`: `cancelada_em`, `cancelamento_motivo`, `cancelada_por`.
-- Colunas em `tms_volumes`: `viagem_id`, `embarcado_em`, `embarcado_por`, `bloqueado`, `bloqueio_motivo`.
-- RLS + GRANTs em todas as novas tabelas (authenticated + service_role).
+- `id` (uuid)
+- `cnpj` (text, UNIQUE — apenas dígitos, 14 chars)
+- `razao_social`, `nome_fantasia`, `situacao_cadastral`, `data_abertura`, `natureza_juridica`, `cnae_principal`, `cnae_descricao`
+- Endereço: `cep`, `logradouro`, `numero`, `complemento`, `bairro`, `cidade`, `uf`
+- Comercial: `contato_nome`, `contato_cargo`, `telefone`, `whatsapp`, `email`, `observacoes`, `condicao_pagamento`, `tabela_frete_id` (fk opcional), `limite_credito` (numeric)
+- Classificação: `categorias` (text[] — multi: cliente, fornecedor, transportadora, distribuidora, farmacia, hospital, clinica, industria, operador_logistico, outros)
+- Auditoria: `created_by`, `updated_by`, `created_at`, `updated_at`, `api_payload` (jsonb — última resposta da API)
+- RLS: todo authenticated lê/escreve; service_role full.
+- Trigger `updated_at`.
+- Índice em `cnpj`, GIN em `categorias`.
 
-Cancelamento **nunca** apaga registros — apenas muda status e grava auditoria. Embarque/faturamento bloqueados via checagem de status.
+Nova tabela **`px_registry_vinculos`** (qual sistema usa qual cliente — opcional, p/ relatórios):
+- `cliente_id`, `sistema_key` (pxlog/pxone/pxmed/pxfarma), `vinculado_em`, `vinculado_por`
+- UNIQUE(cliente_id, sistema_key).
 
----
+Compatibilidade com `tms_clientes` existente: adicionar coluna `registry_id uuid REFERENCES px_registry_clientes(id)` em `tms_clientes`. Nenhum dado existente é removido.
 
-### 2. Eliminar módulo Conferência
+## 2. PX Registry — camada de serviço
 
-- Remover rota `/tms/conferencia` do menu (`tms-shell.tsx`).
-- Manter `ScanOperationPage` reutilizável (usado por recebimento/entrega/coleta).
-- Embarque vira tela própria que **também conta como conferência**: ao bipar, grava eventos `conferido` + `embarcado` na mesma transação.
+`src/px-core/registry/cnpj-provider.ts` — interface `CnpjProvider` com `lookup(cnpj): Promise<CnpjData>`. Implementação default `BrasilApiProvider` (fetch `https://brasilapi.com.br/api/cnpj/v1/{cnpj}`). Troca futura sem tocar consumidores.
 
----
+`src/lib/px-registry.functions.ts` (server functions, `requireSupabaseAuth`):
+- `lookupCnpj({ cnpj })` — valida formato + DV, chama provider, retorna dados normalizados. Não persiste.
+- `findClienteByCnpj({ cnpj })` — retorna registro existente ou null.
+- `upsertCliente({ ... })` — cria ou atualiza, preenche `created_by`/`updated_by`, retorna registro.
+- `linkClienteToSistema({ cliente_id, sistema_key })` — registra vínculo.
+- `listClientes({ categoria?, search?, sistema? })`.
 
-### 3. Nova tela `/tms/embarque` (fluxo guiado)
+Helpers em `src/lib/cnpj.ts`: `onlyDigits`, `isValidCnpj` (DV), `formatCnpj`.
 
-**Etapa 1 — Setup da viagem** (formulário inicial):
-- Select Viagem existente (planejada) **ou** "Nova viagem".
-- Select Motorista, Veículo (auto-preenche placa), Rota, Origem, Destino, Horário previsto.
-- Multi-select de Minutas disponíveis no HUB atual → calcula automaticamente: qtd volumes prevista, peso previsto, cubagem prevista, clientes envolvidos.
-- Botão "Iniciar Embarque" → cria/atualiza viagem com status `em_embarque`, vincula minutas, marca `iniciada_em`.
+## 3. UI — Novo Cliente
 
-**Etapa 2 — Bipagem (tela operacional cheia)**:
+Nova rota **`/registry/clientes`** (lista global) e dialog **`<NovoClienteDialog>`** reaproveitável.
 
-Layout: scanner + lista de leituras à esquerda (2/3), **Painel da Viagem** à direita (1/3, sticky).
+Fluxo do dialog:
+1. Etapa 1 — só campo CNPJ + botão "🔍 Buscar Dados". Loading spinner.
+2. Antes de chamar API, `findClienteByCnpj`. Se existir → toast "Este CNPJ já está cadastrado" + abre em modo edição/visualização.
+3. Senão → `lookupCnpj`, preenche todos os campos (editáveis se vazios).
+4. Se `situacao_cadastral` ≠ ATIVA → banner amarelo "Empresa {situacao}. Cadastro requer confirmação." + checkbox "Confirmo cadastro mesmo assim" (gating do submit; só usuários com role admin/socio/diretor liberam).
+5. Etapa 2 — campos comerciais + categorias (multi-select).
+6. Salvar → `upsertCliente` + `linkClienteToSistema` (sistema atual do contexto).
 
-**Validações em cada bip** (server fn `bipVolumeEmbarque`):
-1. Volume existe?
-2. Pertence a alguma minuta da viagem?
-3. Está no HUB atual (`hub_atual === origem`)?
-4. Status não é `cancelado|bloqueado|entregue|embarcado`?
-5. Minuta não cancelada?
-6. Não foi bipado nessa viagem ainda (duplicado)?
+Componentes:
+- `src/components/registry/novo-cliente-dialog.tsx`
+- `src/components/registry/cliente-form.tsx`
+- `src/routes/_authenticated/registry.clientes.tsx` (lista + filtros por categoria/sistema, abre dialog)
 
-Falha → toast vermelho + som longo + card vermelho na lista + razão clara. Sucesso → som curto + card verde + atualiza painel.
+## 4. Integração com módulos existentes
 
-**Painel lateral ao vivo**:
-- Viagem, motorista, veículo+placa, rota, origem→destino.
-- Clientes (chips), Minutas (chips).
-- Volumes previstos / embarcados / restantes (barra de progresso %).
-- Peso previsto / embarcado, cubagem.
-- Tempo decorrido (cronômetro vivo desde `iniciada_em`).
-- Tabs: Pendentes · Divergentes · Duplicados · Bloqueados · Cancelados.
+- `/tms/clientes` (`tms.clientes.tsx`): trocar `CrudTable` por lista que lê de `px_registry_clientes` filtrando categorias relevantes (cliente, transportadora, distribuidora), com botão "Novo Cliente" abrindo `<NovoClienteDialog sistema="pxlog">`. Migration de compatibilidade: para `tms_clientes` sem `registry_id`, manter registro legado visível mas marcar "legado" e oferecer migração 1-clique (cria em `px_registry_clientes` via CNPJ se houver).
+- Os demais sistemas (PXOne/PXMed/PXFarma) ainda não consomem; deixar o serviço pronto.
 
-**Finalizar Embarque**:
-- Se restantes > 0 → AlertDialog "Existem N volumes não embarcados. Finalizar mesmo assim?"
-- Confirmação → cada volume pendente vira ocorrência (`tms_lm_ocorrencias` ou novo `tms_ocorrencias`) com motivo "ficou_no_hub", tracking atualizado, viagem `finalizada`, calcula `tempo_operacao_min`, gera **Resumo Operacional** persistido em `tms_viagem_eventos` tipo `resumo`.
+## 5. Validações
 
-**Áudio**: dois `<audio>` (beep curto OK / beep longo erro) via WebAudio inline (sem assets externos).
+- CNPJ: regex 14 dígitos + cálculo de DV (rejeita inválido com mensagem clara).
+- Situação inapta/baixada/suspensa: warning + bypass restrito por role.
+- Email opcional mas validado quando preenchido (zod).
+- Telefone/WhatsApp: máscara BR.
 
----
+## 6. Auditoria
 
-### 4. Cancelamento de Minuta
+`created_by`/`updated_by` setados nos server functions a partir de `context.userId`. Resposta crua da API guardada em `api_payload` para auditoria/diagnóstico.
 
-- Botão "Cancelar Minuta" em `/tms/minutas/$numero` (header, ao lado de Imprimir).
-- Dialog com select de motivo (enum acima) + textarea opcional + confirmação dupla.
-- Server fn `cancelarMinuta`: muda status para `cancelada`, marca todos os volumes como `cancelado`, grava `tms_cancelamentos`, emite evento.
-- UI da minuta passa a mostrar banner vermelho "MINUTA CANCELADA — motivo · usuário · data". Botões Imprimir/Embarcar/Faturar ficam desabilitados.
-- Lista de minutas: badge "Cancelada" + filtro.
+## Arquivos novos
+- `supabase/migrations/*_px_registry.sql`
+- `src/lib/cnpj.ts`
+- `src/lib/px-registry.functions.ts`
+- `src/px-core/registry/cnpj-provider.ts`
+- `src/px-core/registry/brasilapi-provider.ts`
+- `src/components/registry/novo-cliente-dialog.tsx`
+- `src/components/registry/cliente-form.tsx`
+- `src/routes/_authenticated/registry.clientes.tsx`
 
----
+## Arquivos editados
+- `src/routes/_authenticated/tms.clientes.tsx` (passa a usar registry)
+- `src/components/tms/tms-shell.tsx` (link "Clientes" aponta para flow novo)
 
-### 5. Resumo Operacional (pós-viagem)
-
-Rota `/tms/viagens/$codigo` exibe:
-- Cabeçalho da viagem + status.
-- KPIs: previstos, embarcados, faltantes, % conferência, peso previsto/embarcado, tempo, operador.
-- Lista de volumes pendentes (com motivos).
-- Timeline de eventos.
-- Botão exportar/imprimir.
-
-Lista `/tms/viagens` com filtros (status, motorista, data, divergências).
-
----
-
-### 6. IA Operacional
-
-Estender `src/lib/tms-ai.functions.ts` com novo contexto agregado:
-- Divergência por viagem (`embarcados/previstos`).
-- Erros por operador (bips com falha em `tms_viagem_eventos`).
-- Cancelamentos por cliente e motivo (`tms_cancelamentos` + join com minuta→cliente).
-- Volumes esquecidos no HUB (`status != entregue` e parados > X dias).
-- Viagens incompletas, taxa média de conferência correta, top motivos de cancelamento.
-
-Atalhos prontos no `/tms/ai-analyst` (perguntas sugeridas).
-
----
-
-### 7. Menu/Shell
-
-`tms-shell.tsx`:
-- Remover "Conferência".
-- Renomear/ordenar: Solicitações · Minutas · **Embarque** · Recebimento · Entrega · **Viagens** · Tracking · Ocorrências · Tabela de Frete · Clientes · Financeiro · IA.
-
----
-
-### Detalhes técnicos
-
-- Server fns novos (em `src/lib/tms-viagens.functions.ts` e `src/lib/tms-minutas.functions.ts`):
-  `criarViagem`, `iniciarEmbarque`, `bipVolumeEmbarque`, `finalizarEmbarque`, `cancelarMinuta`, `getViagemPainel`, `listVolumesPendentes`.
-- Todos com `requireSupabaseAuth`; mutações invalidam queries de viagem/minuta.
-- Componentes novos: `EmbarqueSetup`, `EmbarqueScanner`, `PainelViagem`, `CancelarMinutaDialog`, `ResumoViagem`.
-- Áudio: utilitário `playBeep(type)` usando `AudioContext` (sem arquivos).
-- Rotas novas: `/tms/embarque` (substitui a atual), `/tms/viagens`, `/tms/viagens/$codigo`.
-- Rota `/tms/conferencia` permanece no código (reutilizada por recebimento/embarque scan genérico antigo é removido do menu).
-
-### Fora de escopo desta entrega
-
-- Last Mile (já tem fluxo próprio).
-- Refatoração de impressão de etiqueta (já feita).
-- Alterações em pricing/financeiro além do bloqueio por minuta cancelada.
+## Fora de escopo
+- Migração em massa de `tms_clientes` legados (oferece-se 1-clique mas não automatiza tudo).
+- Telas dedicadas em PXOne/PXMed/PXFarma — apenas o serviço fica pronto.
+- Cache local persistente da API (consulta é sempre fresh; `api_payload` guarda último resultado).
