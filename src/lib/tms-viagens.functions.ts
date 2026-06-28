@@ -188,7 +188,6 @@ export const bipVolumeEmbarque = createServerFn({ method: "POST" })
     } as any);
 
     // atualiza contadores
-    await supabase.rpc("nextval" as any, {} as any).then(() => null).catch(() => null); // noop
     const { data: emb } = await supabase
       .from("tms_volumes")
       .select("peso")
