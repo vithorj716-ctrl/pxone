@@ -37,6 +37,7 @@ import { Route as AuthenticatedAiAnalystRouteImport } from './routes/_authentica
 import { Route as AuthenticatedTmsIndexRouteImport } from './routes/_authenticated/tms.index'
 import { Route as AuthenticatedFinancialIntelligenceIndexRouteImport } from './routes/_authenticated/financial-intelligence.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedTmsViagensRouteImport } from './routes/_authenticated/tms.viagens'
 import { Route as AuthenticatedTmsTrackingRouteImport } from './routes/_authenticated/tms.tracking'
 import { Route as AuthenticatedTmsTabelaFreteRouteImport } from './routes/_authenticated/tms.tabela-frete'
 import { Route as AuthenticatedTmsSolicitacoesRouteImport } from './routes/_authenticated/tms.solicitacoes'
@@ -54,6 +55,7 @@ import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminPerfisRouteImport } from './routes/_authenticated/admin.perfis'
 import { Route as AuthenticatedTmsSolicitacoesIndexRouteImport } from './routes/_authenticated/tms.solicitacoes.index'
 import { Route as AuthenticatedTmsLmIndexRouteImport } from './routes/_authenticated/tms.lm.index'
+import { Route as AuthenticatedTmsViagensCodigoRouteImport } from './routes/_authenticated/tms.viagens.$codigo'
 import { Route as AuthenticatedTmsSolicitacoesNovaRouteImport } from './routes/_authenticated/tms.solicitacoes.nova'
 import { Route as AuthenticatedTmsMinutasNumeroRouteImport } from './routes/_authenticated/tms.minutas.$numero'
 import { Route as AuthenticatedTmsLmTrackingRouteImport } from './routes/_authenticated/tms.lm.tracking'
@@ -212,6 +214,11 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/admin/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedTmsViagensRoute = AuthenticatedTmsViagensRouteImport.update({
+  id: '/tms/viagens',
+  path: '/tms/viagens',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedTmsTrackingRoute =
   AuthenticatedTmsTrackingRouteImport.update({
     id: '/tms/tracking',
@@ -313,6 +320,12 @@ const AuthenticatedTmsLmIndexRoute = AuthenticatedTmsLmIndexRouteImport.update({
   path: '/tms/lm/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedTmsViagensCodigoRoute =
+  AuthenticatedTmsViagensCodigoRouteImport.update({
+    id: '/$codigo',
+    path: '/$codigo',
+    getParentRoute: () => AuthenticatedTmsViagensRoute,
+  } as any)
 const AuthenticatedTmsSolicitacoesNovaRoute =
   AuthenticatedTmsSolicitacoesNovaRouteImport.update({
     id: '/nova',
@@ -437,6 +450,7 @@ export interface FileRoutesByFullPath {
   '/tms/solicitacoes': typeof AuthenticatedTmsSolicitacoesRouteWithChildren
   '/tms/tabela-frete': typeof AuthenticatedTmsTabelaFreteRoute
   '/tms/tracking': typeof AuthenticatedTmsTrackingRoute
+  '/tms/viagens': typeof AuthenticatedTmsViagensRouteWithChildren
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/financial-intelligence/': typeof AuthenticatedFinancialIntelligenceIndexRoute
   '/tms/': typeof AuthenticatedTmsIndexRoute
@@ -452,6 +466,7 @@ export interface FileRoutesByFullPath {
   '/tms/lm/tracking': typeof AuthenticatedTmsLmTrackingRoute
   '/tms/minutas/$numero': typeof AuthenticatedTmsMinutasNumeroRoute
   '/tms/solicitacoes/nova': typeof AuthenticatedTmsSolicitacoesNovaRoute
+  '/tms/viagens/$codigo': typeof AuthenticatedTmsViagensCodigoRoute
   '/tms/lm/': typeof AuthenticatedTmsLmIndexRoute
   '/tms/solicitacoes/': typeof AuthenticatedTmsSolicitacoesIndexRoute
   '/tms/lm/motorista/$rotaId': typeof AuthenticatedTmsLmMotoristaRotaIdRoute
@@ -495,6 +510,7 @@ export interface FileRoutesByTo {
   '/tms/recebimento': typeof AuthenticatedTmsRecebimentoRoute
   '/tms/tabela-frete': typeof AuthenticatedTmsTabelaFreteRoute
   '/tms/tracking': typeof AuthenticatedTmsTrackingRoute
+  '/tms/viagens': typeof AuthenticatedTmsViagensRouteWithChildren
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/financial-intelligence': typeof AuthenticatedFinancialIntelligenceIndexRoute
   '/tms': typeof AuthenticatedTmsIndexRoute
@@ -510,6 +526,7 @@ export interface FileRoutesByTo {
   '/tms/lm/tracking': typeof AuthenticatedTmsLmTrackingRoute
   '/tms/minutas/$numero': typeof AuthenticatedTmsMinutasNumeroRoute
   '/tms/solicitacoes/nova': typeof AuthenticatedTmsSolicitacoesNovaRoute
+  '/tms/viagens/$codigo': typeof AuthenticatedTmsViagensCodigoRoute
   '/tms/lm': typeof AuthenticatedTmsLmIndexRoute
   '/tms/solicitacoes': typeof AuthenticatedTmsSolicitacoesIndexRoute
   '/tms/lm/motorista/$rotaId': typeof AuthenticatedTmsLmMotoristaRotaIdRoute
@@ -557,6 +574,7 @@ export interface FileRoutesById {
   '/_authenticated/tms/solicitacoes': typeof AuthenticatedTmsSolicitacoesRouteWithChildren
   '/_authenticated/tms/tabela-frete': typeof AuthenticatedTmsTabelaFreteRoute
   '/_authenticated/tms/tracking': typeof AuthenticatedTmsTrackingRoute
+  '/_authenticated/tms/viagens': typeof AuthenticatedTmsViagensRouteWithChildren
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/financial-intelligence/': typeof AuthenticatedFinancialIntelligenceIndexRoute
   '/_authenticated/tms/': typeof AuthenticatedTmsIndexRoute
@@ -572,6 +590,7 @@ export interface FileRoutesById {
   '/_authenticated/tms/lm/tracking': typeof AuthenticatedTmsLmTrackingRoute
   '/_authenticated/tms/minutas/$numero': typeof AuthenticatedTmsMinutasNumeroRoute
   '/_authenticated/tms/solicitacoes/nova': typeof AuthenticatedTmsSolicitacoesNovaRoute
+  '/_authenticated/tms/viagens/$codigo': typeof AuthenticatedTmsViagensCodigoRoute
   '/_authenticated/tms/lm/': typeof AuthenticatedTmsLmIndexRoute
   '/_authenticated/tms/solicitacoes/': typeof AuthenticatedTmsSolicitacoesIndexRoute
   '/_authenticated/tms/lm/motorista/$rotaId': typeof AuthenticatedTmsLmMotoristaRotaIdRoute
@@ -619,6 +638,7 @@ export interface FileRouteTypes {
     | '/tms/solicitacoes'
     | '/tms/tabela-frete'
     | '/tms/tracking'
+    | '/tms/viagens'
     | '/admin/'
     | '/financial-intelligence/'
     | '/tms/'
@@ -634,6 +654,7 @@ export interface FileRouteTypes {
     | '/tms/lm/tracking'
     | '/tms/minutas/$numero'
     | '/tms/solicitacoes/nova'
+    | '/tms/viagens/$codigo'
     | '/tms/lm/'
     | '/tms/solicitacoes/'
     | '/tms/lm/motorista/$rotaId'
@@ -677,6 +698,7 @@ export interface FileRouteTypes {
     | '/tms/recebimento'
     | '/tms/tabela-frete'
     | '/tms/tracking'
+    | '/tms/viagens'
     | '/admin'
     | '/financial-intelligence'
     | '/tms'
@@ -692,6 +714,7 @@ export interface FileRouteTypes {
     | '/tms/lm/tracking'
     | '/tms/minutas/$numero'
     | '/tms/solicitacoes/nova'
+    | '/tms/viagens/$codigo'
     | '/tms/lm'
     | '/tms/solicitacoes'
     | '/tms/lm/motorista/$rotaId'
@@ -738,6 +761,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tms/solicitacoes'
     | '/_authenticated/tms/tabela-frete'
     | '/_authenticated/tms/tracking'
+    | '/_authenticated/tms/viagens'
     | '/_authenticated/admin/'
     | '/_authenticated/financial-intelligence/'
     | '/_authenticated/tms/'
@@ -753,6 +777,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tms/lm/tracking'
     | '/_authenticated/tms/minutas/$numero'
     | '/_authenticated/tms/solicitacoes/nova'
+    | '/_authenticated/tms/viagens/$codigo'
     | '/_authenticated/tms/lm/'
     | '/_authenticated/tms/solicitacoes/'
     | '/_authenticated/tms/lm/motorista/$rotaId'
@@ -963,6 +988,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/tms/viagens': {
+      id: '/_authenticated/tms/viagens'
+      path: '/tms/viagens'
+      fullPath: '/tms/viagens'
+      preLoaderRoute: typeof AuthenticatedTmsViagensRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/tms/tracking': {
       id: '/_authenticated/tms/tracking'
       path: '/tms/tracking'
@@ -1081,6 +1113,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/tms/lm/'
       preLoaderRoute: typeof AuthenticatedTmsLmIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tms/viagens/$codigo': {
+      id: '/_authenticated/tms/viagens/$codigo'
+      path: '/$codigo'
+      fullPath: '/tms/viagens/$codigo'
+      preLoaderRoute: typeof AuthenticatedTmsViagensCodigoRouteImport
+      parentRoute: typeof AuthenticatedTmsViagensRoute
     }
     '/_authenticated/tms/solicitacoes/nova': {
       id: '/_authenticated/tms/solicitacoes/nova'
@@ -1225,6 +1264,20 @@ const AuthenticatedTmsSolicitacoesRouteWithChildren =
     AuthenticatedTmsSolicitacoesRouteChildren,
   )
 
+interface AuthenticatedTmsViagensRouteChildren {
+  AuthenticatedTmsViagensCodigoRoute: typeof AuthenticatedTmsViagensCodigoRoute
+}
+
+const AuthenticatedTmsViagensRouteChildren: AuthenticatedTmsViagensRouteChildren =
+  {
+    AuthenticatedTmsViagensCodigoRoute: AuthenticatedTmsViagensCodigoRoute,
+  }
+
+const AuthenticatedTmsViagensRouteWithChildren =
+  AuthenticatedTmsViagensRoute._addFileChildren(
+    AuthenticatedTmsViagensRouteChildren,
+  )
+
 interface AuthenticatedTmsLmRotasRouteChildren {
   AuthenticatedTmsLmRotasNumeroRoute: typeof AuthenticatedTmsLmRotasNumeroRoute
 }
@@ -1274,6 +1327,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedTmsSolicitacoesRoute: typeof AuthenticatedTmsSolicitacoesRouteWithChildren
   AuthenticatedTmsTabelaFreteRoute: typeof AuthenticatedTmsTabelaFreteRoute
   AuthenticatedTmsTrackingRoute: typeof AuthenticatedTmsTrackingRoute
+  AuthenticatedTmsViagensRoute: typeof AuthenticatedTmsViagensRouteWithChildren
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedTmsIndexRoute: typeof AuthenticatedTmsIndexRoute
   AuthenticatedTmsEtiquetasMinutaRoute: typeof AuthenticatedTmsEtiquetasMinutaRoute
@@ -1328,6 +1382,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedTmsSolicitacoesRouteWithChildren,
   AuthenticatedTmsTabelaFreteRoute: AuthenticatedTmsTabelaFreteRoute,
   AuthenticatedTmsTrackingRoute: AuthenticatedTmsTrackingRoute,
+  AuthenticatedTmsViagensRoute: AuthenticatedTmsViagensRouteWithChildren,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   AuthenticatedTmsIndexRoute: AuthenticatedTmsIndexRoute,
   AuthenticatedTmsEtiquetasMinutaRoute: AuthenticatedTmsEtiquetasMinutaRoute,

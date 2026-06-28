@@ -5,7 +5,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { QrSvg } from "@/components/tms/qr-label";
 import { Timeline } from "@/components/tms/timeline";
 import { STATUS_VOL_LABEL } from "@/lib/tms";
-import { Printer, Tag } from "lucide-react";
+import { Printer, Tag, Ban } from "lucide-react";
+import { CancelarMinutaDialog } from "@/components/tms/cancelar-minuta-dialog";
+import { MOTIVOS_CANCELAMENTO } from "@/lib/tms-minutas.functions";
 
 export const Route = createFileRoute("/_authenticated/tms/minutas/$numero")({
   head: () => ({ meta: [{ title: "PXLog — Minuta" }] }),
@@ -17,6 +19,7 @@ function MinutaPage() {
   const [minuta, setMinuta] = useState<any | null>(null);
   const [volumes, setVolumes] = useState<any[]>([]);
   const [eventos, setEventos] = useState<any[]>([]);
+  const [cancelOpen, setCancelOpen] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -42,6 +45,8 @@ function MinutaPage() {
   if (!minuta) return <TmsShell title="Carregando…"><div className="text-sm text-muted-foreground">Buscando minuta #{numero}…</div></TmsShell>;
 
   const st = STATUS_VOL_LABEL[minuta.status];
+  const cancelada = !!minuta.cancelada_em;
+  const motivoLabel = MOTIVOS_CANCELAMENTO.find((m) => m.value === minuta.cancelamento_motivo)?.label ?? minuta.cancelamento_motivo;
 
   return (
     <TmsShell
@@ -49,17 +54,31 @@ function MinutaPage() {
       subtitle={`${minuta.origem} → ${minuta.destino}`}
       headerActions={
         <div className="flex items-center gap-1">
-          <Link to="/tms/etiquetas/$minuta" params={{ minuta: String(minuta.numero) }}
-            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs ring-1 ring-border bg-surface/60 hover:bg-surface">
-            <Tag className="size-3.5" /> Etiquetas
-          </Link>
-          <Link to="/tms/etiquetas/$minuta" params={{ minuta: String(minuta.numero) }} search={{ print: 1 } as any}
-            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs bg-brand text-brand-foreground">
-            <Printer className="size-3.5" /> Imprimir
-          </Link>
+          {!cancelada && (
+            <>
+              <Link to="/tms/etiquetas/$minuta" params={{ minuta: String(minuta.numero) }}
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs ring-1 ring-border bg-surface/60 hover:bg-surface">
+                <Tag className="size-3.5" /> Etiquetas
+              </Link>
+              <Link to="/tms/etiquetas/$minuta" params={{ minuta: String(minuta.numero) }} search={{ print: 1 } as any}
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs bg-brand text-brand-foreground">
+                <Printer className="size-3.5" /> Imprimir
+              </Link>
+              <button onClick={() => setCancelOpen(true)}
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs ring-1 ring-rose-500/40 text-rose-300 hover:bg-rose-500/10">
+                <Ban className="size-3.5" /> Cancelar
+              </button>
+            </>
+          )}
         </div>
       }
     >
+      {cancelada && (
+        <div className="rounded-xl ring-1 ring-rose-500/40 bg-rose-500/10 p-3 text-xs text-rose-200 flex items-center gap-2">
+          <Ban className="size-4" />
+          <span><b>MINUTA CANCELADA</b> · {motivoLabel ?? "—"} · {new Date(minuta.cancelada_em).toLocaleString("pt-BR")}</span>
+        </div>
+      )}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2 space-y-4">
           <div className="rounded-xl ring-1 ring-border bg-surface/60 p-4 flex items-start justify-between gap-4">
@@ -122,6 +141,9 @@ function MinutaPage() {
           <Timeline eventos={eventos} />
         </aside>
       </div>
+      <CancelarMinutaDialog open={cancelOpen} onOpenChange={setCancelOpen}
+        minutaId={minuta.id} numero={minuta.numero}
+        onCancelled={() => { setCancelOpen(false); window.location.reload(); }} />
     </TmsShell>
   );
 }

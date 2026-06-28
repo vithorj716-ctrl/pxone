@@ -13,10 +13,11 @@ type NavItem = { to: string; label: string; icon: typeof Truck; exact?: boolean;
 const TMS_NAV: NavItem[] = [
   { to: "/tms", label: "Dashboard", icon: Truck, exact: true, group: "Transferências" },
   { to: "/tms/solicitacoes", label: "Solicitações", icon: FileText, group: "Transferências" },
-  { to: "/tms/conferencia", label: "Conferência", icon: ScanLine, group: "Transferências" },
-  { to: "/tms/embarque", label: "Embarque", icon: Truck, group: "Transferências" },
+  
+  { to: "/tms/embarque", label: "Embarque", icon: ScanLine, group: "Transferências" },
   { to: "/tms/recebimento", label: "Recebimento", icon: Package, group: "Transferências" },
   { to: "/tms/entregas", label: "Entregas", icon: Package, group: "Transferências" },
+  { to: "/tms/viagens", label: "Viagens", icon: Truck, group: "Transferências" },
   { to: "/tms/tracking", label: "Tracking", icon: Search, group: "Transferências" },
   { to: "/tms/ocorrencias", label: "Ocorrências", icon: AlertTriangle, group: "Transferências" },
   { to: "/tms/tabela-frete", label: "Tabela de Fretes", icon: Tag, group: "Transferências" },
