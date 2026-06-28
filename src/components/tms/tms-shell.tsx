@@ -13,7 +13,7 @@ type NavItem = { to: string; label: string; icon: typeof Truck; exact?: boolean;
 const TMS_NAV: NavItem[] = [
   { to: "/tms", label: "Dashboard", icon: Truck, exact: true, group: "Transferências" },
   { to: "/tms/solicitacoes", label: "Solicitações", icon: FileText, group: "Transferências" },
-  { to: "/tms/minutas", label: "Minutas", icon: FileText, group: "Transferências" },
+  
   { to: "/tms/embarque", label: "Embarque", icon: ScanLine, group: "Transferências" },
   { to: "/tms/recebimento", label: "Recebimento", icon: Package, group: "Transferências" },
   { to: "/tms/entregas", label: "Entregas", icon: Package, group: "Transferências" },

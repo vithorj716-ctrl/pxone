@@ -5,7 +5,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { QrSvg } from "@/components/tms/qr-label";
 import { Timeline } from "@/components/tms/timeline";
 import { STATUS_VOL_LABEL } from "@/lib/tms";
-import { Printer, Tag } from "lucide-react";
+import { Printer, Tag, Ban } from "lucide-react";
+import { CancelarMinutaDialog } from "@/components/tms/cancelar-minuta-dialog";
+import { MOTIVOS_CANCELAMENTO } from "@/lib/tms-minutas.functions";
 
 export const Route = createFileRoute("/_authenticated/tms/minutas/$numero")({
   head: () => ({ meta: [{ title: "PXLog — Minuta" }] }),
