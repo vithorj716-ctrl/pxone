@@ -281,7 +281,7 @@ function NovaSolicitacaoPage() {
             )}
           </SectionCard>
 
-          {/* 2. PAGADOR */}
+          {/* 2. PAGADOR + CONTA CORRENTE */}
           {contratante && (
             <SectionCard title="Pagador do Frete" icon={<User className="size-4" />}>
               <Select value={pagador} onValueChange={setPagador}>
@@ -290,13 +290,28 @@ function NovaSolicitacaoPage() {
                   {PAGADOR_OPTS.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
                 </SelectContent>
               </Select>
-              <div className="mt-3 rounded-md border border-border bg-surface/40 p-3 text-xs text-muted-foreground">
-                <div className="flex items-center gap-2"><AlertTriangle className="size-3.5 text-amber-400" />
-                  Controle de conta corrente e bloqueio por inadimplência será integrado na próxima fase.
-                </div>
-              </div>
+              <ContaCorrenteCard
+                saldo={saldo}
+                bloqueado={bloqueadoAtivo}
+                vencido={temVencido}
+                excede={excedeLimite}
+                autorizado={autorizadoBloqueio}
+                liberadoVigente={liberadoVigente}
+                onAutorizar={() => setAutorizadoBloqueio(true)}
+                onLiberar={async (ate: string) => {
+                  if (!contratante) return;
+                  try {
+                    await fnLiberar({ data: { cliente_id: contratante.id, ate, motivo: "Liberação manual via Nova Solicitação" } });
+                    const cc = await fnCredito({ data: { cliente_id: contratante.id } });
+                    setCredito(cc.credito); setSaldo(cc.saldo);
+                    toast.success("Liberação registrada");
+                  } catch (e: any) { toast.error(e?.message || "Falha"); }
+                }}
+              />
             </SectionCard>
           )}
+
+
 
           {/* 3. REMETENTE */}
           {contratante && (
