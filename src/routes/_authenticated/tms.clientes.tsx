@@ -103,6 +103,16 @@ function TmsClientesPage() {
                   {r.contato_nome || "—"}
                   {r.telefone && <div className="text-muted-foreground">{r.telefone}</div>}
                 </td>
+                <td className="px-3 py-2 text-right">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => { setEditing(r); setOpen(true); }}
+                    title="Editar cliente"
+                  >
+                    <Pencil className="size-4" />
+                  </Button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -111,8 +121,9 @@ function TmsClientesPage() {
 
       <NovoClienteDialog
         open={open}
-        onOpenChange={setOpen}
+        onOpenChange={(v) => { setOpen(v); if (!v) setEditing(null); }}
         sistema="pxlog"
+        initialCliente={editing}
         onSaved={() => reload()}
       />
     </TmsShell>
