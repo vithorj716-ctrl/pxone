@@ -113,6 +113,31 @@ export const upsertCliente = createServerFn({ method: "POST" })
       } catch { /* non-blocking */ }
     }
 
+    async function syncTmsCliente(reg: any) {
+      try {
+        const payload = {
+          registry_id: reg.id,
+          nome: reg.nome_fantasia || reg.razao_social || reg.cnpj,
+          cnpj: reg.cnpj ?? null,
+          contato: reg.contato_nome ?? null,
+          telefone: reg.telefone ?? null,
+          email: reg.email ?? null,
+          endereco: [reg.logradouro, reg.numero, reg.complemento, reg.bairro].filter(Boolean).join(", ") || null,
+          cidade: reg.cidade ?? null,
+          uf: reg.uf ?? null,
+          observacoes: reg.observacoes ?? null,
+          ativo: reg.ativo !== false,
+        };
+        const { data: existing } = await (supabase as any)
+          .from("tms_clientes").select("id").eq("registry_id", reg.id).maybeSingle();
+        if (existing?.id) {
+          await (supabase as any).from("tms_clientes").update(payload).eq("id", existing.id);
+        } else {
+          await (supabase as any).from("tms_clientes").insert(payload);
+        }
+      } catch { /* non-blocking */ }
+    }
+
     if (data.id) {
       const { id, ...rest } = data;
       const { data: before } = await (supabase as any)
@@ -131,6 +156,7 @@ export const upsertCliente = createServerFn({ method: "POST" })
         }
       }
       if (Object.keys(diff).length) await audit("update", id, diff);
+      await syncTmsCliente(row);
       return row;
     }
 
@@ -144,6 +170,7 @@ export const upsertCliente = createServerFn({ method: "POST" })
       throw new Error(error.message);
     }
     await audit("create", row.id, { cnpj: row.cnpj, razao_social: row.razao_social });
+    await syncTmsCliente(row);
     return row;
   });
 
