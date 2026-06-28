@@ -27,6 +27,12 @@ export const askTmsAnalyst = createServerFn({ method: "POST" })
       cliente_id: undefined,
     }));
 
+    const viagensDto = (viagens ?? []).map((v: any) => ({
+      ...v,
+      divergencia: Math.max(0, Number(v.qtd_volumes_prev || 0) - Number(v.qtd_volumes_emb || 0)),
+      pct_conferencia: v.qtd_volumes_prev > 0 ? Math.round((v.qtd_volumes_emb / v.qtd_volumes_prev) * 100) : null,
+    }));
+
     const ctx = {
       total_minutas: minutasDto.length,
       por_status: contar(minutasDto, "status"),
@@ -35,6 +41,29 @@ export const askTmsAnalyst = createServerFn({ method: "POST" })
       por_cliente: agregar(minutasDto, "cliente", (m) => Number(m.valor_frete || 0)),
       faturamento_total: minutasDto.reduce((a, b) => a + Number(b.valor_frete || 0), 0),
       eventos_recentes: (eventos ?? []).slice(0, 50).map((e: any) => ({ tipo: e.tipo, em: e.created_at })),
+      // Operacional
+      viagens: viagensDto,
+      viagens_por_status: contar(viagensDto, "status"),
+      viagens_incompletas: viagensDto.filter((v: any) => v.status === "finalizada" && v.divergencia > 0).length,
+      top_divergencia: [...viagensDto].sort((a, b) => b.divergencia - a.divergencia).slice(0, 10).map((v: any) => ({ viagem: v.codigo, divergencia: v.divergencia })),
+      pct_conferencia_medio: (() => {
+        const arr = viagensDto.map((v: any) => v.pct_conferencia).filter((x: any) => x !== null);
+        return arr.length ? Math.round(arr.reduce((a: number, b: number) => a + b, 0) / arr.length) : null;
+      })(),
+      erros_por_operador: contar((vEventos ?? []).filter((e: any) => e.tipo === "bip_erro"), "operador_id"),
+      cancelamentos_por_motivo: contar(cancel ?? [], "motivo"),
+      cancelamentos_por_cliente: (() => {
+        const minutaCli = new Map(minutasDto.map((m: any) => [m.numero, m.cliente]));
+        void minutaCli;
+        const cliPorCancel: Record<string, number> = {};
+        for (const c of cancel ?? []) {
+          const m = (minutas ?? []).find((mm: any) => mm.id === (c as any).minuta_id) as any;
+          const cli = m ? clientesMap.get(m.cliente_id) ?? "—" : "—";
+          cliPorCancel[String(cli)] = (cliPorCancel[String(cli)] ?? 0) + 1;
+        }
+        return cliPorCancel;
+      })(),
+      volumes_esquecidos_no_hub: (vEventos ?? []).filter((e: any) => e.tipo === "volume_pendente").length,
     };
 
     const sys = [
