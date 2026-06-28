@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { NumericInput } from "@/components/ui/numeric-input";
 import { CATEGORIAS_CLIENTE } from "@/lib/px-registry.functions";
 
 export type ClienteFormState = {
@@ -164,7 +165,12 @@ export function ClienteForm({
           <F label="E-mail" span={2}><Input type="email" value={value.email} onChange={(e) => set("email", e.target.value)} readOnly={readOnly} /></F>
           <F label="Condição de pagamento" span={2}><Input value={value.condicao_pagamento} onChange={(e) => set("condicao_pagamento", e.target.value)} placeholder="Ex.: 28 DDL" readOnly={readOnly} /></F>
           <F label="Limite de crédito (R$)" span={2}>
-            <Input type="number" step="0.01" value={value.limite_credito} onChange={(e) => set("limite_credito", e.target.value)} readOnly={readOnly} />
+            <NumericInput
+              variant="currency"
+              value={value.limite_credito ? Number(value.limite_credito) : null}
+              onValueChange={(n) => set("limite_credito", n != null ? String(n) : "")}
+              readOnly={readOnly}
+            />
           </F>
           <F label="Observações" span={4}>
             <Textarea value={value.observacoes} onChange={(e) => set("observacoes", e.target.value)} readOnly={readOnly} rows={2} />
