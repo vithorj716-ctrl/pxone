@@ -18,6 +18,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { listClientes } from "@/lib/px-registry.functions";
 import { TIPOS_ENDERECO } from "@/lib/px-enderecos.functions";
 import { loadClienteCompleto } from "@/lib/px-nova-solicitacao.functions";
+import { getCreditoCliente, liberarBloqueio, type SaldoCliente } from "@/lib/px-credito.functions";
 import { NovoClienteDialog } from "@/components/registry/novo-cliente-dialog";
 
 export const Route = createFileRoute("/_authenticated/tms/solicitacoes/nova")({
