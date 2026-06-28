@@ -1,77 +1,127 @@
-## Last Mile (Entregas Finais) — novo módulo do PXLog TMS
+## Refatoração Operacional do PXLog TMS
 
-Módulo independente dentro do PXLog TMS, totalmente integrado ao PX Core (Clientes, Minutas, Tracking, Financeiro, Central de Custos, IA, Dashboard). Sem duplicar cadastros: reaproveita `tms_clientes`, `tms_minutas`, `tms_volumes`, `tms_eventos`, `custos`.
+Transformar o TMS de um conjunto de CRUDs em um fluxo operacional real centrado em **Viagens**, com embarque inteligente, cancelamento de minuta, painel ao vivo e IA operacional.
 
-### 1. Modelo de dados (migration)
+---
 
-Tabelas novas em `public.*` (com GRANTs + RLS scopada a `authenticated` via `has_system_access('pxlog-tms')`):
+### 1. Nova entidade: Viagens (banco)
 
-- `tms_lm_motoristas` — nome, cpf, cnh, telefone, ativo
-- `tms_lm_veiculos` — placa, modelo, capacidade_kg, capacidade_m3, ativo
-- `tms_lm_rotas` — numero (auto), data, motorista_id, veiculo_id, cidade, status (`planejada|separando|carregando|em_rota|finalizada|atrasada|ocorrencia`), hora_saida, hora_prevista, hora_finalizada, valor_rota, observacoes
-- `tms_lm_entregas` — rota_id, minuta_id (FK opcional para `tms_minutas`), destinatario, telefone, endereco, cidade, cep, lat, lng, qtd_volumes, peso, cubagem, valor_mercadoria, prioridade (`baixa|media|alta|urgente`), janela_inicio, janela_fim, observacoes, status (`aguardando_separacao|separado|carregado|saiu_entrega|tentativa_1|tentativa_2|entregue|recusado|ausente|endereco_incorreto|avaria|devolucao`), ordem, tempo_estimado_min, distancia_km, concluida_em
-- `tms_lm_volumes` — entrega_id, codigo (reaproveita códigos PXLOG quando vier de minuta), status, separado_em, carregado_em
-- `tms_lm_eventos` — entrega_id, tipo, payload (jsonb), criado_por, created_at — espelhado em `tms_eventos` quando vinculado a minuta
-- `tms_lm_ocorrencias` — entrega_id, tipo, descricao, foto_url, created_at
-- `tms_lm_comprovantes` — entrega_id, recebedor_nome, recebedor_doc, foto_mercadoria, foto_fachada, assinatura_base64, observacoes, lat, lng, created_at
+Migration única criando:
 
-Trigger: ao status entrega → `entregue`, inserir evento em `tms_eventos` e (se rota faturada) gerar `custos` (receita Last Mile) — espelhando padrão TMS atual.
+- `tms_viagens` — código (`GOI-00021`), origem, destino, motorista_id, veiculo_id, placa, rota, status (`planejada|em_embarque|em_transito|finalizada|cancelada`), data_prevista, iniciada_em, finalizada_em, operador_id, totais previstos/embarcados (volumes, peso, cubagem), tempo_operacao_min, observacoes.
+- `tms_viagem_minutas` — vínculo viagem↔minuta (define o "previsto").
+- `tms_viagem_eventos` — auditoria de embarque/divergência/finalização.
+- `tms_cancelamentos` — minuta_id, motivo (enum), motivo_texto, usuario_id, cancelado_em. Reaproveitada também para volumes deixados no HUB.
+- Colunas novas em `tms_minutas`: `cancelada_em`, `cancelamento_motivo`, `cancelada_por`.
+- Colunas em `tms_volumes`: `viagem_id`, `embarcado_em`, `embarcado_por`, `bloqueado`, `bloqueio_motivo`.
+- RLS + GRANTs em todas as novas tabelas (authenticated + service_role).
 
-### 2. Registro do submódulo
+Cancelamento **nunca** apaga registros — apenas muda status e grava auditoria. Embarque/faturamento bloqueados via checagem de status.
 
-- `src/components/tms/tms-shell.tsx` — adicionar item "Last Mile" no menu TMS (grupo separado abaixo de Transferências).
-- Rotas sob `src/routes/_authenticated/tms.lm.*` reutilizando `TmsShell` com `subtitle="Last Mile"` e cor de destaque verde-limão para diferenciar.
+---
 
-### 3. Rotas (file-based)
+### 2. Eliminar módulo Conferência
 
-```
-tms.lm.index.tsx              → /tms/lm           Dashboard operacional
-tms.lm.rotas.tsx              → /tms/lm/rotas     Grid de cards (tela principal)
-tms.lm.rotas.$numero.tsx      → detalhe + cards de entrega + mapa
-tms.lm.entregas.tsx           → busca/filtros globais de entregas
-tms.lm.separacao.tsx          → scan rápido (bipa etiqueta → identifica)
-tms.lm.carregamento.tsx       → scan por veículo + romaneio PDF
-tms.lm.tracking.tsx           → timeline por minuta/etiqueta
-tms.lm.ocorrencias.tsx        → registro rápido com tipos pré-definidos
-tms.lm.comprovantes.tsx       → galeria + busca + PDF
-tms.lm.relatorios.tsx         → dashboard executivo + drilldown
-tms.lm.configuracoes.tsx      → motoristas, veículos, janelas, tipos
-tms.lm.motorista.$rotaId.tsx  → interface mobile do motorista (próxima entrega, botões grandes)
-```
+- Remover rota `/tms/conferencia` do menu (`tms-shell.tsx`).
+- Manter `ScanOperationPage` reutilizável (usado por recebimento/entrega/coleta).
+- Embarque vira tela própria que **também conta como conferência**: ao bipar, grava eventos `conferido` + `embarcado` na mesma transação.
 
-### 4. UX-chave (não-tabela)
+---
 
-- **`RotaCard`** (`src/components/tms/lm/rota-card.tsx`): card grande, cor por status (mapa de cores especificado), barra de progresso, badge de atrasos, 5 botões rápidos (Abrir/Mapa/Comprovantes/Ocorrências/Finalizar).
-- **`EntregaCard`** (`src/components/tms/lm/entrega-card.tsx`): card por entrega com QR, prioridade colorida, janela de atendimento, ETA.
-- **`ScanSeparacao` / `ScanCarregamento`**: reaproveita `ScanInput` existente; resolve volume por código PXLOG e mostra contexto (cliente/destino/rota) sem digitação.
-- **`PodCapture`**: form de comprovante com upload de fotos (Lovable Cloud Storage bucket `pod-lastmile`), canvas de assinatura, geolocalização opcional.
-- **`MotoristaView`**: tela única com próxima entrega, mapa embutido (link `https://www.google.com/maps/dir/?api=1&destination=lat,lng`), botões grandes: Cheguei / Iniciar / Concluir / Ocorrência / Foto / Assinatura.
-- **Dashboard**: 14 cards de KPI + placeholder de mapa (link externo, sem libs nativas pesadas no Worker). Drilldown via Link tipado.
+### 3. Nova tela `/tms/embarque` (fluxo guiado)
 
-### 5. IA Last Mile
+**Etapa 1 — Setup da viagem** (formulário inicial):
+- Select Viagem existente (planejada) **ou** "Nova viagem".
+- Select Motorista, Veículo (auto-preenche placa), Rota, Origem, Destino, Horário previsto.
+- Multi-select de Minutas disponíveis no HUB atual → calcula automaticamente: qtd volumes prevista, peso previsto, cubagem prevista, clientes envolvidos.
+- Botão "Iniciar Embarque" → cria/atualiza viagem com status `em_embarque`, vincula minutas, marca `iniciada_em`.
 
-`src/lib/lm-ai.functions.ts` — `askLastMileAnalyst` server fn (mesmo padrão de `askTmsAnalyst`):
-- agrega `tms_lm_rotas`, `tms_lm_entregas`, `tms_lm_ocorrencias`, OTIF, tempo médio
-- system prompt: especialista em última milha; responde atrasos, produtividade, otimização de rota, risco de não conclusão
-- usa `callPxAI` com `modulo: "tms-lm"`, modo `analitico`
+**Etapa 2 — Bipagem (tela operacional cheia)**:
 
-### 6. Storage
+Layout: scanner + lista de leituras à esquerda (2/3), **Painel da Viagem** à direita (1/3, sticky).
 
-Criar bucket privado `pod-lastmile` via tool `supabase--storage_create_bucket`, com RLS em `storage.objects` restrita a `authenticated` + path `entrega_{id}/*`. Comprovantes em PDF gerados client-side (jsPDF já no padrão do projeto) ou server fn que monta HTML imprimível.
+**Validações em cada bip** (server fn `bipVolumeEmbarque`):
+1. Volume existe?
+2. Pertence a alguma minuta da viagem?
+3. Está no HUB atual (`hub_atual === origem`)?
+4. Status não é `cancelado|bloqueado|entregue|embarcado`?
+5. Minuta não cancelada?
+6. Não foi bipado nessa viagem ainda (duplicado)?
 
-### 7. Integrações automáticas
+Falha → toast vermelho + som longo + card vermelho na lista + razão clara. Sucesso → som curto + card verde + atualiza painel.
 
-- **Tracking**: cada evento Last Mile insere em `tms_lm_eventos` e, quando vinculado a minuta, em `tms_eventos` (timeline já existente continua funcionando).
-- **Financeiro / Central de Custos**: ao concluir rota com flag faturável, gerar linha em `custos` (`centro_custo: "Receita Last Mile"`).
-- **Dashboard global TMS**: estender `src/routes/_authenticated/tms.index.tsx` com bloco Last Mile (sem remover nada).
-- **Clientes / Minutas / Etiquetas**: relacionamento via FK; nenhuma duplicação.
+**Painel lateral ao vivo**:
+- Viagem, motorista, veículo+placa, rota, origem→destino.
+- Clientes (chips), Minutas (chips).
+- Volumes previstos / embarcados / restantes (barra de progresso %).
+- Peso previsto / embarcado, cubagem.
+- Tempo decorrido (cronômetro vivo desde `iniciada_em`).
+- Tabs: Pendentes · Divergentes · Duplicados · Bloqueados · Cancelados.
 
-### 8. Fora de escopo (futuro)
+**Finalizar Embarque**:
+- Se restantes > 0 → AlertDialog "Existem N volumes não embarcados. Finalizar mesmo assim?"
+- Confirmação → cada volume pendente vira ocorrência (`tms_lm_ocorrencias` ou novo `tms_ocorrencias`) com motivo "ficou_no_hub", tracking atualizado, viagem `finalizada`, calcula `tempo_operacao_min`, gera **Resumo Operacional** persistido em `tms_viagem_eventos` tipo `resumo`.
 
-- Roteirização automática real (apenas estrutura para ordem manual + ETA por entrega)
-- Tracking público para destinatário (link compartilhável) — fica para próxima iteração
-- Push notifications nativas
+**Áudio**: dois `<audio>` (beep curto OK / beep longo erro) via WebAudio inline (sem assets externos).
 
-### Resumo técnico
+---
 
-8 tabelas novas + 1 bucket + 12 rotas + 6 componentes específicos + 1 server fn de IA + edição mínima de `tms-shell.tsx` e `tms.index.tsx`. Zero remoção. Zero alteração no PXOne ERP. Reutiliza `ScanInput`, `QrLabel`, `Timeline`, `TmsShell`, `callPxAI` e o módulo de custos existente.
+### 4. Cancelamento de Minuta
+
+- Botão "Cancelar Minuta" em `/tms/minutas/$numero` (header, ao lado de Imprimir).
+- Dialog com select de motivo (enum acima) + textarea opcional + confirmação dupla.
+- Server fn `cancelarMinuta`: muda status para `cancelada`, marca todos os volumes como `cancelado`, grava `tms_cancelamentos`, emite evento.
+- UI da minuta passa a mostrar banner vermelho "MINUTA CANCELADA — motivo · usuário · data". Botões Imprimir/Embarcar/Faturar ficam desabilitados.
+- Lista de minutas: badge "Cancelada" + filtro.
+
+---
+
+### 5. Resumo Operacional (pós-viagem)
+
+Rota `/tms/viagens/$codigo` exibe:
+- Cabeçalho da viagem + status.
+- KPIs: previstos, embarcados, faltantes, % conferência, peso previsto/embarcado, tempo, operador.
+- Lista de volumes pendentes (com motivos).
+- Timeline de eventos.
+- Botão exportar/imprimir.
+
+Lista `/tms/viagens` com filtros (status, motorista, data, divergências).
+
+---
+
+### 6. IA Operacional
+
+Estender `src/lib/tms-ai.functions.ts` com novo contexto agregado:
+- Divergência por viagem (`embarcados/previstos`).
+- Erros por operador (bips com falha em `tms_viagem_eventos`).
+- Cancelamentos por cliente e motivo (`tms_cancelamentos` + join com minuta→cliente).
+- Volumes esquecidos no HUB (`status != entregue` e parados > X dias).
+- Viagens incompletas, taxa média de conferência correta, top motivos de cancelamento.
+
+Atalhos prontos no `/tms/ai-analyst` (perguntas sugeridas).
+
+---
+
+### 7. Menu/Shell
+
+`tms-shell.tsx`:
+- Remover "Conferência".
+- Renomear/ordenar: Solicitações · Minutas · **Embarque** · Recebimento · Entrega · **Viagens** · Tracking · Ocorrências · Tabela de Frete · Clientes · Financeiro · IA.
+
+---
+
+### Detalhes técnicos
+
+- Server fns novos (em `src/lib/tms-viagens.functions.ts` e `src/lib/tms-minutas.functions.ts`):
+  `criarViagem`, `iniciarEmbarque`, `bipVolumeEmbarque`, `finalizarEmbarque`, `cancelarMinuta`, `getViagemPainel`, `listVolumesPendentes`.
+- Todos com `requireSupabaseAuth`; mutações invalidam queries de viagem/minuta.
+- Componentes novos: `EmbarqueSetup`, `EmbarqueScanner`, `PainelViagem`, `CancelarMinutaDialog`, `ResumoViagem`.
+- Áudio: utilitário `playBeep(type)` usando `AudioContext` (sem arquivos).
+- Rotas novas: `/tms/embarque` (substitui a atual), `/tms/viagens`, `/tms/viagens/$codigo`.
+- Rota `/tms/conferencia` permanece no código (reutilizada por recebimento/embarque scan genérico antigo é removido do menu).
+
+### Fora de escopo desta entrega
+
+- Last Mile (já tem fluxo próprio).
+- Refatoração de impressão de etiqueta (já feita).
+- Alterações em pricing/financeiro além do bloqueio por minuta cancelada.
