@@ -963,6 +963,140 @@ export type Database = {
         }
         Relationships: []
       }
+      px_registry_clientes: {
+        Row: {
+          api_payload: Json | null
+          bairro: string | null
+          categorias: string[]
+          cep: string | null
+          cidade: string | null
+          cnae_descricao: string | null
+          cnae_principal: string | null
+          cnpj: string
+          complemento: string | null
+          condicao_pagamento: string | null
+          contato_cargo: string | null
+          contato_nome: string | null
+          created_at: string
+          created_by: string | null
+          data_abertura: string | null
+          email: string | null
+          id: string
+          limite_credito: number | null
+          logradouro: string | null
+          natureza_juridica: string | null
+          nome_fantasia: string | null
+          numero: string | null
+          observacoes: string | null
+          razao_social: string | null
+          situacao_cadastral: string | null
+          tabela_frete_id: string | null
+          telefone: string | null
+          uf: string | null
+          updated_at: string
+          updated_by: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          api_payload?: Json | null
+          bairro?: string | null
+          categorias?: string[]
+          cep?: string | null
+          cidade?: string | null
+          cnae_descricao?: string | null
+          cnae_principal?: string | null
+          cnpj: string
+          complemento?: string | null
+          condicao_pagamento?: string | null
+          contato_cargo?: string | null
+          contato_nome?: string | null
+          created_at?: string
+          created_by?: string | null
+          data_abertura?: string | null
+          email?: string | null
+          id?: string
+          limite_credito?: number | null
+          logradouro?: string | null
+          natureza_juridica?: string | null
+          nome_fantasia?: string | null
+          numero?: string | null
+          observacoes?: string | null
+          razao_social?: string | null
+          situacao_cadastral?: string | null
+          tabela_frete_id?: string | null
+          telefone?: string | null
+          uf?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          api_payload?: Json | null
+          bairro?: string | null
+          categorias?: string[]
+          cep?: string | null
+          cidade?: string | null
+          cnae_descricao?: string | null
+          cnae_principal?: string | null
+          cnpj?: string
+          complemento?: string | null
+          condicao_pagamento?: string | null
+          contato_cargo?: string | null
+          contato_nome?: string | null
+          created_at?: string
+          created_by?: string | null
+          data_abertura?: string | null
+          email?: string | null
+          id?: string
+          limite_credito?: number | null
+          logradouro?: string | null
+          natureza_juridica?: string | null
+          nome_fantasia?: string | null
+          numero?: string | null
+          observacoes?: string | null
+          razao_social?: string | null
+          situacao_cadastral?: string | null
+          tabela_frete_id?: string | null
+          telefone?: string | null
+          uf?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
+      px_registry_vinculos: {
+        Row: {
+          cliente_id: string
+          id: string
+          sistema_key: string
+          vinculado_em: string
+          vinculado_por: string | null
+        }
+        Insert: {
+          cliente_id: string
+          id?: string
+          sistema_key: string
+          vinculado_em?: string
+          vinculado_por?: string | null
+        }
+        Update: {
+          cliente_id?: string
+          id?: string
+          sistema_key?: string
+          vinculado_em?: string
+          vinculado_por?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "px_registry_vinculos_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "px_registry_clientes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       px_shared_resources: {
         Row: {
           created_at: string
@@ -1272,6 +1406,7 @@ export type Database = {
           id: string
           nome: string
           observacoes: string | null
+          registry_id: string | null
           telefone: string | null
           uf: string | null
           updated_at: string
@@ -1288,6 +1423,7 @@ export type Database = {
           id?: string
           nome: string
           observacoes?: string | null
+          registry_id?: string | null
           telefone?: string | null
           uf?: string | null
           updated_at?: string
@@ -1304,6 +1440,7 @@ export type Database = {
           id?: string
           nome?: string
           observacoes?: string | null
+          registry_id?: string | null
           telefone?: string | null
           uf?: string | null
           updated_at?: string
@@ -1314,6 +1451,13 @@ export type Database = {
             columns: ["empresa_id"]
             isOneToOne: false
             referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tms_clientes_registry_id_fkey"
+            columns: ["registry_id"]
+            isOneToOne: false
+            referencedRelation: "px_registry_clientes"
             referencedColumns: ["id"]
           },
         ]
