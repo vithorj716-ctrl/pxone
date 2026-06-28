@@ -154,7 +154,7 @@ function NovaSolicitacaoPage() {
     return {
       cubagem, peso_cubado, peso_taxado, valor_frete,
       prazo: regra?.prazo_dias ?? contratante?.prazo_padrao_dias ?? 1,
-      tabela_nome: regra?.nome ?? null,
+      tabela_nome: regra ? `${regra.tipo_cobranca}` : null,
     };
   }, [merc, regras, tmsClienteId, origem, destino, contratante]);
 
