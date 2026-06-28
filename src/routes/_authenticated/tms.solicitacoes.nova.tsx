@@ -70,6 +70,8 @@ function NovaSolicitacaoPage() {
   const { empresa } = useEmpresaAtiva();
   const fnList = useServerFn(listClientes);
   const fnLoad = useServerFn(loadClienteCompleto);
+  const fnCredito = useServerFn(getCreditoCliente);
+  const fnLiberar = useServerFn(liberarBloqueio);
 
   const [clientes, setClientes] = useState<{ id: string; razao_social: string; nome_fantasia?: string; cnpj?: string }[]>([]);
   const [regras, setRegras] = useState<RegraFrete[]>([]);
