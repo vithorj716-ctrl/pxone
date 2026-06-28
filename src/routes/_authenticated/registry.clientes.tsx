@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, Search, Users, Pencil } from "lucide-react";
 import { NovoClienteDialog } from "@/components/registry/novo-cliente-dialog";
+import { ClienteStatusDot } from "@/components/registry/cliente-status";
 import { CATEGORIAS_CLIENTE, listClientes } from "@/lib/px-registry.functions";
 import { formatCnpj } from "@/lib/cnpj";
 
@@ -85,10 +86,15 @@ function RegistryClientesPage() {
             ) : rows.map((r) => (
               <tr key={r.id} className="border-t border-border hover:bg-white/5">
                 <td className="px-3 py-2">
-                  <div className="font-medium">{r.razao_social || r.nome_fantasia || "—"}</div>
-                  {r.nome_fantasia && r.nome_fantasia !== r.razao_social && (
-                    <div className="text-xs text-muted-foreground">{r.nome_fantasia}</div>
-                  )}
+                  <div className="flex items-center gap-2">
+                    <ClienteStatusDot cliente={r} />
+                    <div>
+                      <div className={`font-medium ${r.ativo === false ? "text-muted-foreground line-through" : ""}`}>{r.razao_social || r.nome_fantasia || "—"}</div>
+                      {r.nome_fantasia && r.nome_fantasia !== r.razao_social && (
+                        <div className="text-xs text-muted-foreground">{r.nome_fantasia}</div>
+                      )}
+                    </div>
+                  </div>
                 </td>
                 <td className="px-3 py-2 font-mono text-xs">{r.cnpj ? formatCnpj(r.cnpj) : "—"}</td>
                 <td className="px-3 py-2">{[r.cidade, r.uf].filter(Boolean).join("/") || "—"}</td>
