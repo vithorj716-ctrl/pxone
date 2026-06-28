@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { TmsShell } from "@/components/tms/tms-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Search, Users } from "lucide-react";
+import { Plus, Search, Users, Pencil } from "lucide-react";
 import { NovoClienteDialog } from "@/components/registry/novo-cliente-dialog";
 import { CATEGORIAS_CLIENTE, listClientes } from "@/lib/px-registry.functions";
 import { formatCnpj } from "@/lib/cnpj";
