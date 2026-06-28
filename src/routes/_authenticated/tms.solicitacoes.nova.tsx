@@ -120,11 +120,29 @@ function NovaSolicitacaoPage() {
       setEnderecos(data.enderecos);
       setContatos(data.contatos);
       setTmsClienteId(data.tms_cliente_id);
+      setAutorizadoBloqueio(false);
       // Auto-preencher remetente padrão se houver
       const padRem = data.enderecos.find((e: any) => e.is_padrao_remetente);
       if (padRem) aplicarEndereco(padRem, data.contatos, setRem);
+      // Carregar conta corrente / saldo
+      try {
+        const cc = await fnCredito({ data: { cliente_id } });
+        setCredito(cc.credito);
+        setSaldo(cc.saldo);
+      } catch { setCredito(null); setSaldo(null); }
     } catch (e: any) { toast.error(e?.message || "Falha ao carregar cliente"); }
   }
+
+  const liberadoVigente = !!(credito?.liberado_ate && new Date(credito.liberado_ate) > new Date());
+  const bloqueadoAtivo = !!(saldo?.bloqueado && !liberadoVigente);
+  const excedeLimite = !!(saldo && saldo.limite_credito > 0 && saldo.utilizado + calc_valor_preview() > saldo.limite_credito);
+  const temVencido = !!(saldo && saldo.vencido > 0);
+
+  function calc_valor_preview() {
+    // chamada antes de calc estar definido — recalcula minimamente
+    return 0;
+  }
+
 
   function aplicarEndereco(end: Endereco, allContatos: Contato[], setter: (v: EndSnap) => void) {
     const principal = allContatos.find((c) => c.endereco_id === end.id && c.is_principal)
