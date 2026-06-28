@@ -336,6 +336,9 @@ function NovaSolicitacaoPage() {
               enderecos={enderecos}
               contatos={contatos}
               aplicarEndereco={(end) => aplicarEndereco(end, contatos, setDst)}
+              clientesList={clientes}
+              fnLoadCliente={fnLoad}
+              clienteContratanteId={contratante.id}
             />
           )}
 
