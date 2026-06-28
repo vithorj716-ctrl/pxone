@@ -612,7 +612,7 @@ function EnderecoCard({
                       <CommandItem
                         key={e.id}
                         value={`${e.apelido ?? ""} ${e.cidade ?? ""} ${e.uf ?? ""} ${e.bairro ?? ""}`}
-                        onSelect={() => { aplicarEndereco(e); setOpen(false); }}
+                        onSelect={() => { aplicarEffetivo(e); setOpen(false); }}
                       >
                         <div className="flex flex-col gap-0.5">
                           <div className="flex items-center gap-1.5">
