@@ -404,8 +404,11 @@ function NovaSolicitacaoPage() {
           <Row label="Peso taxado" value={`${calc.peso_taxado.toFixed(2)} kg`} mono />
           <Row label="Prazo" value={`${calc.prazo} dia(s)`} />
           <div className="border-t border-border pt-2" />
-          <Row label="Limite crédito" value={contratante?.limite_credito ? Number(contratante.limite_credito).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : "—"} />
-          <Row label="Situação financeira" value={<span className="inline-flex items-center gap-1"><span className="size-2 rounded-full bg-emerald-400" />OK</span>} />
+          <Row label="Limite crédito" value={saldo ? brl(saldo.limite_credito) : "—"} />
+          <Row label="Utilizado" value={saldo ? brl(saldo.utilizado) : "—"} />
+          <Row label="Disponível" value={saldo ? brl(saldo.disponivel) : "—"} />
+          {saldo && saldo.vencido > 0 && <Row label="Vencido" value={<span className="text-red-300">{brl(saldo.vencido)}</span>} />}
+          <Row label="Situação" value={<StatusFinanceiroBadge status={statusFin} />} />
           <div className="border-t border-border pt-2">
             <Row label="Valor do frete" value={calc.valor_frete.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })} highlight />
           </div>
