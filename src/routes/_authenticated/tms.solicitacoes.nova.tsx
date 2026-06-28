@@ -525,6 +525,7 @@ function ClienteCombobox({ clientes, value, onChange }: {
 
 function EnderecoCard({
   titulo, papel, snap, setSnap, enderecos, contatos, aplicarEndereco,
+  clientesList, fnLoadCliente, clienteContratanteId,
 }: {
   titulo: string;
   papel: "remetente" | "destinatario";
@@ -533,12 +534,57 @@ function EnderecoCard({
   enderecos: Endereco[];
   contatos: Contato[];
   aplicarEndereco: (end: Endereco) => void;
+  clientesList?: { id: string; razao_social: string; nome_fantasia?: string; cnpj?: string }[];
+  fnLoadCliente?: (opts: { data: { cliente_id: string } }) => Promise<any>;
+  clienteContratanteId?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [editando, setEditando] = useState(false);
+  const [outro, setOutro] = useState<{ cliente: any; enderecos: Endereco[]; contatos: Contato[] } | null>(null);
+  const [loadingOutro, setLoadingOutro] = useState(false);
+
+  const efetivosEnderecos = outro?.enderecos ?? enderecos;
+  const efetivosContatos = outro?.contatos ?? contatos;
   const sugeridos = papel === "remetente"
-    ? [...enderecos].sort((a, b) => Number(!!b.is_padrao_remetente) - Number(!!a.is_padrao_remetente))
-    : [...enderecos].sort((a, b) => Number(!!b.is_padrao_destinatario) - Number(!!a.is_padrao_destinatario));
+    ? [...efetivosEnderecos].sort((a, b) => Number(!!b.is_padrao_remetente) - Number(!!a.is_padrao_remetente))
+    : [...efetivosEnderecos].sort((a, b) => Number(!!b.is_padrao_destinatario) - Number(!!a.is_padrao_destinatario));
+
+  async function selecionarOutroCliente(id: string) {
+    if (!fnLoadCliente) return;
+    setLoadingOutro(true);
+    try {
+      const data = await fnLoadCliente({ data: { cliente_id: id } });
+      setOutro({ cliente: data.cliente, enderecos: data.enderecos ?? [], contatos: data.contatos ?? [] });
+      // limpa o endereço atual para forçar nova seleção
+      setSnap(emptyEnd());
+    } catch (e: any) {
+      toast.error(e?.message || "Falha ao carregar cliente");
+    } finally { setLoadingOutro(false); }
+  }
+
+  function aplicarEffetivo(end: Endereco) {
+    if (outro) {
+      const principal = outro.contatos.find(c => c.endereco_id === end.id && c.is_principal)
+        ?? outro.contatos.find(c => c.endereco_id === end.id);
+      setSnap({
+        endereco_id: end.id,
+        contato_id: principal?.id ?? null,
+        nome: end.apelido || outro.cliente?.nome_fantasia || outro.cliente?.razao_social || "",
+        telefone: principal?.telefone ?? "",
+        contato: principal?.nome ?? "",
+        cep: end.cep ?? "", logradouro: end.logradouro ?? "",
+        numero: end.numero ?? "", complemento: end.complemento ?? "",
+        bairro: end.bairro ?? "", cidade: end.cidade ?? "", uf: end.uf ?? "",
+        ponto_referencia: end.ponto_referencia ?? "",
+        observacoes: end.observacoes ?? "",
+        janela_recebimento: end.janela_recebimento ?? "",
+        restricoes: end.restricoes ?? [],
+      });
+    } else {
+      aplicarEndereco(end);
+    }
+  }
+
 
   const contatosDoEndereco = contatos.filter(c => c.endereco_id === snap.endereco_id);
   const podeEditar = !!snap.endereco_id || editando;
