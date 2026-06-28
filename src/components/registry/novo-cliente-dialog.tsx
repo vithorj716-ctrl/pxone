@@ -26,6 +26,8 @@ import {
   type ClienteFormState,
 } from "./cliente-form";
 import { HistoricoTab } from "./historico-tab";
+import { EnderecosTab } from "./enderecos-tab";
+
 
 type Mode = "search" | "edit";
 
@@ -139,8 +141,11 @@ export function NovoClienteDialog({
         observacoes: form.observacoes || null,
         condicao_pagamento: form.condicao_pagamento || null,
         limite_credito: form.limite_credito ? Number(form.limite_credito) : null,
+        prazo_padrao_dias: form.prazo_padrao_dias ? Number(form.prazo_padrao_dias) : null,
+        observacoes_comerciais: form.observacoes_comerciais || null,
         categorias: form.categorias,
       };
+
       const saved = await fnUpsert({ data: payload });
       await fnLink({ data: { cliente_id: saved.id, sistema_key: sistema } });
       toast.success(form.id ? "Cliente atualizado" : "Cliente cadastrado");
@@ -221,8 +226,10 @@ export function NovoClienteDialog({
           <Tabs value={tab} onValueChange={setTab} className="w-full">
             <TabsList>
               <TabsTrigger value="dados">Dados</TabsTrigger>
+              <TabsTrigger value="enderecos" disabled={!form.id}>Endereços & Contatos</TabsTrigger>
               <TabsTrigger value="historico" disabled={!form.id}>Histórico</TabsTrigger>
             </TabsList>
+
 
             <TabsContent value="dados" className="space-y-4">
               {existing && !form.id && (
@@ -260,9 +267,14 @@ export function NovoClienteDialog({
               <ClienteForm value={form} onChange={setForm} readOnly={readOnly} />
             </TabsContent>
 
+            <TabsContent value="enderecos">
+              {form.id && <EnderecosTab clienteId={form.id} />}
+            </TabsContent>
+
             <TabsContent value="historico">
               {form.id && <HistoricoTab entityType="px_registry_clientes" entityId={form.id} />}
             </TabsContent>
+
           </Tabs>
         )}
 

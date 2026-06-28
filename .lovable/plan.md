@@ -1,56 +1,85 @@
-Esta é uma refatoração estrutural grande. Proponho dividir em **3 fases entregáveis**, cada uma funcional por si. Confirme a fase 1 e seguimos.
+# Refatoração da Tela "Nova Solicitação"
+
+Escopo enorme com dependências que ainda não existem no banco. Proponho dividir em 3 fases entregáveis, cada uma funcional por si.
+
+## Dependências que faltam hoje
+
+- **Endereços do cliente** — não existe tabela. Hoje `px_registry_clientes` guarda apenas 1 endereço.
+- **Contatos do cliente/endereço** — não existe tabela. Hoje só `contato_nome/telefone/email` no cliente.
+- **Conta Corrente / limite / bloqueios** — Fase 2 do plano anterior, ainda não implementada.
+- **Tabela de frete vinculada ao cliente** — `tms_tabela_frete` existe, mas sem vínculo padrão por cliente.
+- **Condição de pagamento / prazo padrão** — não existem campos.
+
+Sem isso, "preenchimento automático" vira só placeholder.
 
 ---
 
-## FASE 1 — Fundação (entrego nesta rodada)
+## FASE A — Cadastros de suporte (fundação, esta rodada)
 
-### 1.1 Campos numéricos padronizados (global)
-- Criar `src/components/ui/numeric-input.tsx` com variantes: `currency` (BRL), `weight` (kg), `volume` (m³), `percent`, `integer`, `decimal`.
-- CSS global em `src/styles.css` removendo setas: `input[type=number]::-webkit-{inner,outer}-spinner-button { -webkit-appearance: none; margin: 0; } input[type=number] { -moz-appearance: textfield; }`
-- Comportamentos: `inputMode="decimal"`, seleciona tudo no foco, aceita colar, formatação on-blur, validação em tempo real.
-- Substituir os `type="number"` mais sensíveis (frete, peso, cubagem, limite_credito, valor_mercadoria) — os demais herdam o CSS global automaticamente.
+Migrations no PX Core:
 
-### 1.2 CRUD padrão + Histórico (PX Core)
-- Migration: tabela `px_audit_log` (entity_type, entity_id, action `create|update|inactivate|reactivate|duplicate`, diff jsonb, user_id, created_at).
-- Adicionar colunas `ativo boolean default true`, `inativado_em`, `inativado_por` em `px_registry_clientes`.
-- Helper `src/lib/px-audit.ts` + server fn `logAudit` chamado nos upserts.
-- Componente `<HistoricoTab entityType entityId />` reutilizável.
+- `px_registry_enderecos` — múltiplos endereços por cliente: `tipo` (matriz/filial/cd/hospital/farmacia/outro), `apelido`, CEP, logradouro, número, complemento, bairro, cidade, UF, ponto_referencia, observacoes, janela_recebimento, restricoes (text[]), is_padrao_remetente, is_padrao_destinatario.
+- `px_registry_contatos` — múltiplos contatos por endereço: `setor` (recebimento/compras/expedicao/financeiro/outro), nome, telefone, whatsapp, email, is_principal.
+- Campos novos em `px_registry_clientes`: `tabela_frete_id`, `condicao_pagamento`, `prazo_padrao_dias`, `observacoes_comerciais`.
 
-### 1.3 Ações padrão no cadastro de clientes
-- Botões: Visualizar, Editar, Duplicar, Inativar/Reativar.
-- Aba "Histórico" no `NovoClienteDialog` (já estruturado em tabs).
-- Indicador visual de status (verde/amarelo/vermelho/cinza) na listagem.
+UI:
+- Aba **"Endereços"** no `NovoClienteDialog` — listar/criar/editar/remover endereços com seus contatos aninhados.
+- Aba **"Comercial"** — tabela de frete padrão, condição de pagamento, prazo, observações comerciais.
+- Migração suave do endereço atual do cliente para a nova tabela (cria 1 endereço "Matriz" automaticamente).
+
+## FASE B — Refatoração da tela Nova Solicitação (próxima rodada)
+
+`src/routes/_authenticated/tms.solicitacoes.nova.tsx` reescrita:
+
+```text
+┌─────────────────────────────────────────┬──────────────────┐
+│ 1. Cliente Contratante [combobox]       │  RESUMO          │
+│    └ carrega: tabela, condição, prazo,  │  Cliente: ...    │
+│      obs comerciais, status financeiro  │  Pagador: ...    │
+├─────────────────────────────────────────┤  Tabela: ...     │
+│ 2. Pagador do Frete [select]            │  Peso: ...       │
+│    Remetente | Destinatário | Terceiro  │  Cubagem: ...    │
+│    | Contratante | Outro cliente        │  Peso Taxado:... │
+│    └ Card Conta Corrente (Fase 3)       │  Frete: ...      │
+├─────────────────────────────────────────┤  Prazo: ...      │
+│ 3. REMETENTE [Card de Endereço]         │  Limite: ...     │
+│    [Trocar Endereço] [+ Novo]           │  Situação: ●     │
+│    └ Contato: [select de contatos]      │                  │
+├─────────────────────────────────────────┤                  │
+│ 4. DESTINATÁRIO [Card de Endereço]      │                  │
+│    + janela recebimento + restrições    │                  │
+├─────────────────────────────────────────┤                  │
+│ 5. MERCADORIA                           │                  │
+│    descrição, vols, peso, cubagem,      │                  │
+│    valor NF, nº NF, CT-e, tipo          │                  │
+└─────────────────────────────────────────┘
+```
+
+Componentes novos:
+- `<EnderecoSelector cliente_id role="remetente|destinatario">` — combobox com nome/cidade/UF/tipo + botão "Cadastrar novo".
+- `<EnderecoCard>` — exibe endereço selecionado, com "Editar (só nesta minuta)" e "Trocar endereço".
+- `<ContatoSelector endereco_id>` — picker de contatos por setor.
+- `<PagadorSelector>` + `<ResumoLateral>` (sticky).
+
+Regra crítica: editar dados de endereço na minuta NÃO altera o cadastro — vira snapshot na própria minuta (campos já existem em `tms_minutas`).
+
+## FASE C — Conta Corrente + Bloqueio integrado (Fase 2/3 do plano anterior)
+
+- Tabelas `px_cliente_credito`, `px_cliente_lancamentos`, view `px_cliente_saldo`.
+- Card de status financeiro no `PagadorSelector` (Limite / Utilizado / Disponível / Vencido).
+- Guard de bloqueio: card vermelho "CLIENTE BLOQUEADO" antes de salvar, com ações **Trocar pagador / Solicitar liberação / Continuar (autorizado)**.
+- Semáforo no resumo lateral.
 
 ---
 
-## FASE 2 — Conta Corrente do cliente (próxima rodada)
+## Detalhes técnicos
 
-- Migrations:
-  - `px_cliente_credito` (cliente_id, limite, situacao `normal|bloqueado_manual|inativo`, bloqueado_por, motivo_bloqueio)
-  - `px_cliente_lancamentos` (cliente_id, data, tipo `debito|credito`, documento, descricao, valor, origem `tms|pxone|manual`, sistema_key, ref_id, user_id, situacao `aberto|pago|vencido|cancelado`, vencimento)
-  - `px_cliente_liberacoes` (auditoria de exceções: cliente_id, embarque_id, user_id, motivo)
-  - View `px_cliente_saldo` calculando: utilizado, disponível, vencido, em aberto, maior atraso, último pagamento.
-- Server fns: `getContaCorrente`, `listLancamentos`, `setLimiteCredito`, `bloquearCliente`, `desbloquearCliente`, `lancarDebito`, `lancarCredito`, `checkEmbarqueAllowed`, `liberarEmbarqueManual`.
-- Aba "Conta Corrente" no dialog do cliente: KPIs + extrato com filtros.
+- Tudo em PX Core (`px_registry_*`) → reusável por PXLog/PXMed/PXFarma.
+- RLS: `authenticated` + `service_role` em todas; `anon` nunca.
+- `syncTmsCliente` continua espelhando para `tms_clientes` (FK das minutas).
+- `tms_minutas` ganha `remetente_endereco_id` e `destinatario_endereco_id` (opcionais, para auditoria do endereço-origem). Os campos textuais atuais continuam sendo o snapshot.
+- Combobox usando `cmdk` (já no projeto via shadcn `Command`).
 
 ---
 
-## FASE 3 — Integração operacional + IA + Dashboard
-
-- Hook no faturamento TMS (`tms.financeiro.tsx`) → gera débito automático ao faturar minuta; pagamento gera crédito e libera limite.
-- Guard no embarque (`tms.embarque.tsx`): antes de embarcar, chama `checkEmbarqueAllowed` → se bloqueado, abre dialog "EMBARQUE BLOQUEADO" com motivo, limite, utilizado, saldo, e ações (Cancelar / Solicitar liberação / Abrir CC). Liberação só com role autorizada (registra auditoria).
-- Indicador financeiro (semáforo) onde cliente aparece (listagens, minutas, embarque).
-- Rota `/financeiro/dashboard` com KPIs (bloqueados, utilizado, vencido, top devedores, maior atraso, recebido no mês).
-- Estender `tms-ai.functions.ts` com contexto de crédito para responder as perguntas do item 13.
-
----
-
-## Detalhes técnicos relevantes
-- Tudo em `px_*` no PX Core → reutilizado por PXLog/PXOne/PXMed/PXFarma via `sistema_key`.
-- RLS: todas as tabelas com `authenticated` + `service_role`; liberações exigem `has_role('admin'|'gerente'|'financeiro')`.
-- Lançamentos imutáveis (estorno via lançamento contrário) para preservar trilha de auditoria.
-- View materializada não — usar view normal para refletir saldo em tempo real.
-
----
-
-**Posso começar pela Fase 1 agora?** Responda "sim" ou diga o que ajustar. Fases 2 e 3 viram nas próximas rodadas para manter cada entrega revisável.
+**Posso começar pela Fase A agora?** Responda "sim" ou diga o que ajustar. Fases B e C nas próximas rodadas para manter cada entrega revisável e testável.
