@@ -22,6 +22,7 @@ function TmsClientesPage() {
   const [search, setSearch] = useState("");
   const [categoria, setCategoria] = useState<string>("");
   const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<any | null>(null);
   const fn = useServerFn(listClientes);
 
   async function reload() {
