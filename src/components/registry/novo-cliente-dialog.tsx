@@ -56,13 +56,6 @@ export function NovoClienteDialog({
       setCnpj(initialCliente.cnpj ?? "");
     }
   }, [open, initialCliente]);
-  const [mode, setMode] = useState<Mode>("search");
-  const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState<ClienteFormState>(emptyCliente());
-  const [existing, setExisting] = useState<any | null>(null);
-  const [readOnly, setReadOnly] = useState(false);
-  const [confirmInapta, setConfirmInapta] = useState(false);
 
   const fnLookup = useServerFn(lookupCnpj);
   const fnFind = useServerFn(findClienteByCnpj);
