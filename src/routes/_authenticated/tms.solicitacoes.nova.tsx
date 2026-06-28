@@ -336,6 +336,9 @@ function NovaSolicitacaoPage() {
               enderecos={enderecos}
               contatos={contatos}
               aplicarEndereco={(end) => aplicarEndereco(end, contatos, setDst)}
+              clientesList={clientes}
+              fnLoadCliente={fnLoad}
+              clienteContratanteId={contratante.id}
             />
           )}
 
@@ -522,6 +525,7 @@ function ClienteCombobox({ clientes, value, onChange }: {
 
 function EnderecoCard({
   titulo, papel, snap, setSnap, enderecos, contatos, aplicarEndereco,
+  clientesList, fnLoadCliente, clienteContratanteId,
 }: {
   titulo: string;
   papel: "remetente" | "destinatario";
@@ -530,14 +534,59 @@ function EnderecoCard({
   enderecos: Endereco[];
   contatos: Contato[];
   aplicarEndereco: (end: Endereco) => void;
+  clientesList?: { id: string; razao_social: string; nome_fantasia?: string; cnpj?: string }[];
+  fnLoadCliente?: (opts: { data: { cliente_id: string } }) => Promise<any>;
+  clienteContratanteId?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [editando, setEditando] = useState(false);
-  const sugeridos = papel === "remetente"
-    ? [...enderecos].sort((a, b) => Number(!!b.is_padrao_remetente) - Number(!!a.is_padrao_remetente))
-    : [...enderecos].sort((a, b) => Number(!!b.is_padrao_destinatario) - Number(!!a.is_padrao_destinatario));
+  const [outro, setOutro] = useState<{ cliente: any; enderecos: Endereco[]; contatos: Contato[] } | null>(null);
+  const [loadingOutro, setLoadingOutro] = useState(false);
 
-  const contatosDoEndereco = contatos.filter(c => c.endereco_id === snap.endereco_id);
+  const efetivosEnderecos = outro?.enderecos ?? enderecos;
+  const efetivosContatos = outro?.contatos ?? contatos;
+  const sugeridos = papel === "remetente"
+    ? [...efetivosEnderecos].sort((a, b) => Number(!!b.is_padrao_remetente) - Number(!!a.is_padrao_remetente))
+    : [...efetivosEnderecos].sort((a, b) => Number(!!b.is_padrao_destinatario) - Number(!!a.is_padrao_destinatario));
+
+  async function selecionarOutroCliente(id: string) {
+    if (!fnLoadCliente) return;
+    setLoadingOutro(true);
+    try {
+      const data = await fnLoadCliente({ data: { cliente_id: id } });
+      setOutro({ cliente: data.cliente, enderecos: data.enderecos ?? [], contatos: data.contatos ?? [] });
+      // limpa o endereço atual para forçar nova seleção
+      setSnap(emptyEnd());
+    } catch (e: any) {
+      toast.error(e?.message || "Falha ao carregar cliente");
+    } finally { setLoadingOutro(false); }
+  }
+
+  function aplicarEffetivo(end: Endereco) {
+    if (outro) {
+      const principal = outro.contatos.find(c => c.endereco_id === end.id && c.is_principal)
+        ?? outro.contatos.find(c => c.endereco_id === end.id);
+      setSnap({
+        endereco_id: end.id,
+        contato_id: principal?.id ?? null,
+        nome: end.apelido || outro.cliente?.nome_fantasia || outro.cliente?.razao_social || "",
+        telefone: principal?.telefone ?? "",
+        contato: principal?.nome ?? "",
+        cep: end.cep ?? "", logradouro: end.logradouro ?? "",
+        numero: end.numero ?? "", complemento: end.complemento ?? "",
+        bairro: end.bairro ?? "", cidade: end.cidade ?? "", uf: end.uf ?? "",
+        ponto_referencia: end.ponto_referencia ?? "",
+        observacoes: end.observacoes ?? "",
+        janela_recebimento: end.janela_recebimento ?? "",
+        restricoes: end.restricoes ?? [],
+      });
+    } else {
+      aplicarEndereco(end);
+    }
+  }
+
+
+  const contatosDoEndereco = efetivosContatos.filter(c => c.endereco_id === snap.endereco_id);
   const podeEditar = !!snap.endereco_id || editando;
   const vazio = !snap.endereco_id && !snap.cidade;
 
@@ -563,7 +612,7 @@ function EnderecoCard({
                       <CommandItem
                         key={e.id}
                         value={`${e.apelido ?? ""} ${e.cidade ?? ""} ${e.uf ?? ""} ${e.bairro ?? ""}`}
-                        onSelect={() => { aplicarEndereco(e); setOpen(false); }}
+                        onSelect={() => { aplicarEffetivo(e); setOpen(false); }}
                       >
                         <div className="flex flex-col gap-0.5">
                           <div className="flex items-center gap-1.5">
@@ -598,6 +647,32 @@ function EnderecoCard({
         </div>
       }
     >
+      {papel === "destinatario" && clientesList && fnLoadCliente && (
+        <div className="mb-3 rounded-md border border-border bg-surface/30 p-2.5 space-y-1.5">
+          <div className="flex items-center justify-between gap-2">
+            <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">
+              Cliente destinatário {outro ? "(outro cliente)" : "(usando cadastros do contratante)"}
+            </Label>
+            {outro && (
+              <Button type="button" variant="ghost" size="sm" className="h-6 text-[11px]"
+                onClick={() => { setOutro(null); setSnap(emptyEnd()); }}>
+                <X className="size-3 mr-1" /> Voltar ao contratante
+              </Button>
+            )}
+          </div>
+          <ClienteCombobox
+            clientes={clientesList}
+            value={outro?.cliente?.id ?? null}
+            onChange={(id) => { if (id) selecionarOutroCliente(id); }}
+          />
+          {loadingOutro && <div className="text-[11px] text-muted-foreground">Carregando endereços…</div>}
+          {outro && (
+            <div className="text-[11px] text-emerald-300">
+              {outro.cliente?.nome_fantasia || outro.cliente?.razao_social} — {outro.enderecos.length} endereço(s) cadastrado(s)
+            </div>
+          )}
+        </div>
+      )}
       {vazio ? (
         <div className="text-center text-xs text-muted-foreground py-6 border border-dashed border-border rounded-md">
           Selecione um endereço cadastrado ou clique em "Editar nesta minuta" para preencher manualmente.
