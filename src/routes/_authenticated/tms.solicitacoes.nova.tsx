@@ -647,6 +647,32 @@ function EnderecoCard({
         </div>
       }
     >
+      {papel === "destinatario" && clientesList && fnLoadCliente && (
+        <div className="mb-3 rounded-md border border-border bg-surface/30 p-2.5 space-y-1.5">
+          <div className="flex items-center justify-between gap-2">
+            <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">
+              Cliente destinatário {outro ? "(outro cliente)" : "(usando cadastros do contratante)"}
+            </Label>
+            {outro && (
+              <Button type="button" variant="ghost" size="sm" className="h-6 text-[11px]"
+                onClick={() => { setOutro(null); setSnap(emptyEnd()); }}>
+                <X className="size-3 mr-1" /> Voltar ao contratante
+              </Button>
+            )}
+          </div>
+          <ClienteCombobox
+            clientes={clientesList}
+            value={outro?.cliente?.id ?? null}
+            onChange={(id) => { if (id) selecionarOutroCliente(id); }}
+          />
+          {loadingOutro && <div className="text-[11px] text-muted-foreground">Carregando endereços…</div>}
+          {outro && (
+            <div className="text-[11px] text-emerald-300">
+              {outro.cliente?.nome_fantasia || outro.cliente?.razao_social} — {outro.enderecos.length} endereço(s) cadastrado(s)
+            </div>
+          )}
+        </div>
+      )}
       {vazio ? (
         <div className="text-center text-xs text-muted-foreground py-6 border border-dashed border-border rounded-md">
           Selecione um endereço cadastrado ou clique em "Editar nesta minuta" para preencher manualmente.
