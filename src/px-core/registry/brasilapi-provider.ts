@@ -15,6 +15,7 @@ export const brasilApiProvider: CnpjProvider = {
       headers: { Accept: "application/json" },
     });
     if (res.status === 404) throw new Error("CNPJ não encontrado na Receita Federal");
+    if (res.status === 429) throw new Error("RATE_LIMIT");
     if (!res.ok) throw new Error(`Falha ao consultar CNPJ (status ${res.status})`);
     const j = (await res.json()) as Record<string, any>;
 

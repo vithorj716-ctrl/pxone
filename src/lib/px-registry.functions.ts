@@ -26,7 +26,25 @@ export const lookupCnpj = createServerFn({ method: "POST" })
   })
   .handler(async ({ data }) => {
     const { brasilApiProvider } = await import("@/px-core/registry/brasilapi-provider");
-    return brasilApiProvider.lookup(data.cnpj);
+    const { receitaWsProvider } = await import("@/px-core/registry/receitaws-provider");
+    const providers = [brasilApiProvider, receitaWsProvider];
+    let lastErr: any = null;
+    for (const p of providers) {
+      try {
+        return await p.lookup(data.cnpj);
+      } catch (e: any) {
+        lastErr = e;
+        const msg = String(e?.message || "");
+        // Try next provider on rate-limit or transient failures; stop on "not found"
+        if (msg === "RATE_LIMIT" || msg.startsWith("Falha ao consultar")) continue;
+        throw e;
+      }
+    }
+    throw new Error(
+      lastErr?.message === "RATE_LIMIT"
+        ? "Todos os provedores de consulta estão temporariamente limitados. Tente novamente em alguns segundos."
+        : lastErr?.message || "Falha na consulta de CNPJ",
+    );
   });
 
 export const findClienteByCnpj = createServerFn({ method: "POST" })
