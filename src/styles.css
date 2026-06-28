@@ -110,6 +110,11 @@
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { scrollbar-width: none; }
 
+  /* Global: remove native number spinners for fast keyboard entry */
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+
   /* Custom thin scrollbar */
   .thin-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
   .thin-scroll::-webkit-scrollbar-track { background: transparent; }

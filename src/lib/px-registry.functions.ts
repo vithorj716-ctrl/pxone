@@ -103,8 +103,20 @@ export const upsertCliente = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const now = new Date().toISOString();
 
+    async function audit(action: string, entity_id: string, diff: any) {
+      try {
+        const label = (context.claims as any)?.email ?? null;
+        await (supabase as any).from("px_audit_log").insert({
+          entity_type: "px_registry_clientes",
+          entity_id, action, diff, user_id: userId, user_label: label,
+        });
+      } catch { /* non-blocking */ }
+    }
+
     if (data.id) {
       const { id, ...rest } = data;
+      const { data: before } = await (supabase as any)
+        .from("px_registry_clientes").select("*").eq("id", id).maybeSingle();
       const { data: row, error } = await (supabase as any)
         .from("px_registry_clientes")
         .update({ ...rest, updated_by: userId, updated_at: now })
@@ -112,6 +124,13 @@ export const upsertCliente = createServerFn({ method: "POST" })
         .select("*")
         .single();
       if (error) throw new Error(error.message);
+      const diff: Record<string, any> = {};
+      if (before) for (const k of Object.keys(rest)) {
+        if (JSON.stringify(before[k] ?? null) !== JSON.stringify((rest as any)[k] ?? null)) {
+          diff[k] = { from: before[k] ?? null, to: (rest as any)[k] ?? null };
+        }
+      }
+      if (Object.keys(diff).length) await audit("update", id, diff);
       return row;
     }
 
@@ -124,6 +143,59 @@ export const upsertCliente = createServerFn({ method: "POST" })
       if (error.code === "23505") throw new Error("Este CNPJ já está cadastrado na plataforma.");
       throw new Error(error.message);
     }
+    await audit("create", row.id, { cnpj: row.cnpj, razao_social: row.razao_social });
+    return row;
+  });
+
+export const setClienteAtivo = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { id: string; ativo: boolean; motivo?: string | null }) => {
+    if (!d?.id) throw new Error("id obrigatório");
+    return d;
+  })
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const patch: any = data.ativo
+      ? { ativo: true, inativado_em: null, inativado_por: null, motivo_inativacao: null, updated_by: userId, updated_at: new Date().toISOString() }
+      : { ativo: false, inativado_em: new Date().toISOString(), inativado_por: userId, motivo_inativacao: data.motivo ?? null, updated_by: userId, updated_at: new Date().toISOString() };
+    const { error } = await (supabase as any).from("px_registry_clientes").update(patch).eq("id", data.id);
+    if (error) throw new Error(error.message);
+    const label = (context.claims as any)?.email ?? null;
+    await (supabase as any).from("px_audit_log").insert({
+      entity_type: "px_registry_clientes",
+      entity_id: data.id,
+      action: data.ativo ? "reactivate" : "inactivate",
+      diff: data.motivo ? { motivo: data.motivo } : null,
+      user_id: userId, user_label: label,
+    });
+    return { ok: true };
+  });
+
+export const duplicateCliente = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { id: string; novo_cnpj: string }) => {
+    const cnpj = onlyDigits(d?.novo_cnpj || "");
+    if (!isValidCnpj(cnpj)) throw new Error("Novo CNPJ inválido");
+    if (!d?.id) throw new Error("id obrigatório");
+    return { id: d.id, novo_cnpj: cnpj };
+  })
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: src, error: se } = await (supabase as any).from("px_registry_clientes").select("*").eq("id", data.id).single();
+    if (se) throw new Error(se.message);
+    const { id, created_at, updated_at, created_by, updated_by, ...copy } = src;
+    const { data: row, error } = await (supabase as any).from("px_registry_clientes")
+      .insert({ ...copy, cnpj: data.novo_cnpj, razao_social: `${src.razao_social ?? ""} (cópia)`, created_by: userId, updated_by: userId })
+      .select("*").single();
+    if (error) {
+      if (error.code === "23505") throw new Error("Já existe cliente com esse CNPJ.");
+      throw new Error(error.message);
+    }
+    const label = (context.claims as any)?.email ?? null;
+    await (supabase as any).from("px_audit_log").insert({
+      entity_type: "px_registry_clientes", entity_id: row.id, action: "duplicate",
+      diff: { origem_id: data.id }, user_id: userId, user_label: label,
+    });
     return row;
   });
 
