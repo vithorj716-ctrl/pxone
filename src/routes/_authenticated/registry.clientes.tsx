@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { TmsShell } from "@/components/tms/tms-shell";
+import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, Search, Users } from "lucide-react";
@@ -9,14 +9,14 @@ import { NovoClienteDialog } from "@/components/registry/novo-cliente-dialog";
 import { CATEGORIAS_CLIENTE, listClientes } from "@/lib/px-registry.functions";
 import { formatCnpj } from "@/lib/cnpj";
 
-export const Route = createFileRoute("/_authenticated/tms/clientes")({
-  head: () => ({ meta: [{ title: "PXLog — Clientes" }] }),
-  component: TmsClientesPage,
+export const Route = createFileRoute("/_authenticated/registry/clientes")({
+  head: () => ({ meta: [{ title: "PX Registry — Clientes" }] }),
+  component: RegistryClientesPage,
   errorComponent: ({ error }) => <div role="alert" className="p-6 text-sm text-destructive">{error.message}</div>,
   notFoundComponent: () => <div className="p-6 text-sm">Não encontrado.</div>,
 });
 
-function TmsClientesPage() {
+function RegistryClientesPage() {
   const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -27,15 +27,17 @@ function TmsClientesPage() {
   async function reload() {
     setLoading(true);
     try {
-      const data = await fn({ data: { search: search || undefined, categoria: categoria || undefined, sistema: "pxlog" } });
+      const data = await fn({ data: { search: search || undefined, categoria: categoria || undefined } });
       setRows(data as any[]);
-    } finally { setLoading(false); }
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => { void reload(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
 
   return (
-    <TmsShell title="Clientes" subtitle="Cadastro único — PX Registry">
+    <AppShell title="PX Registry" subtitle="Cadastro único de clientes da plataforma">
       <div className="flex flex-wrap items-center gap-2 mb-4">
         <div className="relative flex-1 min-w-[240px]">
           <Search className="absolute left-2.5 top-2.5 size-4 text-muted-foreground" />
@@ -49,7 +51,7 @@ function TmsClientesPage() {
         </div>
         <select
           value={categoria}
-          onChange={(e) => setCategoria(e.target.value)}
+          onChange={(e) => { setCategoria(e.target.value); }}
           className="h-9 rounded-md border border-input bg-transparent px-3 text-sm"
         >
           <option value="">Todas categorias</option>
@@ -67,7 +69,7 @@ function TmsClientesPage() {
               <th className="text-left px-3 py-2">CNPJ</th>
               <th className="text-left px-3 py-2">Cidade/UF</th>
               <th className="text-left px-3 py-2">Categorias</th>
-              <th className="text-left px-3 py-2">Contato</th>
+              <th className="text-left px-3 py-2">Situação</th>
             </tr>
           </thead>
           <tbody>
@@ -76,7 +78,7 @@ function TmsClientesPage() {
             ) : rows.length === 0 ? (
               <tr><td colSpan={5} className="px-3 py-10 text-center text-muted-foreground">
                 <Users className="size-6 mx-auto mb-2 opacity-50" />
-                Nenhum cliente vinculado ao PXLog. Clique em <strong>Novo cliente</strong>.
+                Nenhum cliente. Clique em <strong>Novo cliente</strong>.
               </td></tr>
             ) : rows.map((r) => (
               <tr key={r.id} className="border-t border-border hover:bg-white/5">
@@ -97,10 +99,7 @@ function TmsClientesPage() {
                     ))}
                   </div>
                 </td>
-                <td className="px-3 py-2 text-xs">
-                  {r.contato_nome || "—"}
-                  {r.telefone && <div className="text-muted-foreground">{r.telefone}</div>}
-                </td>
+                <td className="px-3 py-2 text-xs">{r.situacao_cadastral ?? "—"}</td>
               </tr>
             ))}
           </tbody>
@@ -110,9 +109,9 @@ function TmsClientesPage() {
       <NovoClienteDialog
         open={open}
         onOpenChange={setOpen}
-        sistema="pxlog"
+        sistema="pxone"
         onSaved={() => reload()}
       />
-    </TmsShell>
+    </AppShell>
   );
 }
