@@ -586,7 +586,7 @@ function EnderecoCard({
   }
 
 
-  const contatosDoEndereco = contatos.filter(c => c.endereco_id === snap.endereco_id);
+  const contatosDoEndereco = efetivosContatos.filter(c => c.endereco_id === snap.endereco_id);
   const podeEditar = !!snap.endereco_id || editando;
   const vazio = !snap.endereco_id && !snap.cidade;
 
