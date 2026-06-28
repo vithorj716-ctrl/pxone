@@ -88,8 +88,11 @@ type UpsertInput = {
   observacoes?: string | null;
   condicao_pagamento?: string | null;
   limite_credito?: number | null;
+  prazo_padrao_dias?: number | null;
+  observacoes_comerciais?: string | null;
   categorias?: string[];
 };
+
 
 
 export const upsertCliente = createServerFn({ method: "POST" })
