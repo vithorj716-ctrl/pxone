@@ -795,6 +795,39 @@ export type Database = {
         }
         Relationships: []
       }
+      px_audit_log: {
+        Row: {
+          action: string
+          created_at: string
+          diff: Json | null
+          entity_id: string
+          entity_type: string
+          id: string
+          user_id: string | null
+          user_label: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          diff?: Json | null
+          entity_id: string
+          entity_type: string
+          id?: string
+          user_id?: string | null
+          user_label?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          diff?: Json | null
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          user_id?: string | null
+          user_label?: string | null
+        }
+        Relationships: []
+      }
       px_empresa_modulos: {
         Row: {
           ativo: boolean
@@ -966,6 +999,7 @@ export type Database = {
       px_registry_clientes: {
         Row: {
           api_payload: Json | null
+          ativo: boolean
           bairro: string | null
           categorias: string[]
           cep: string | null
@@ -982,8 +1016,11 @@ export type Database = {
           data_abertura: string | null
           email: string | null
           id: string
+          inativado_em: string | null
+          inativado_por: string | null
           limite_credito: number | null
           logradouro: string | null
+          motivo_inativacao: string | null
           natureza_juridica: string | null
           nome_fantasia: string | null
           numero: string | null
@@ -999,6 +1036,7 @@ export type Database = {
         }
         Insert: {
           api_payload?: Json | null
+          ativo?: boolean
           bairro?: string | null
           categorias?: string[]
           cep?: string | null
@@ -1015,8 +1053,11 @@ export type Database = {
           data_abertura?: string | null
           email?: string | null
           id?: string
+          inativado_em?: string | null
+          inativado_por?: string | null
           limite_credito?: number | null
           logradouro?: string | null
+          motivo_inativacao?: string | null
           natureza_juridica?: string | null
           nome_fantasia?: string | null
           numero?: string | null
@@ -1032,6 +1073,7 @@ export type Database = {
         }
         Update: {
           api_payload?: Json | null
+          ativo?: boolean
           bairro?: string | null
           categorias?: string[]
           cep?: string | null
@@ -1048,8 +1090,11 @@ export type Database = {
           data_abertura?: string | null
           email?: string | null
           id?: string
+          inativado_em?: string | null
+          inativado_por?: string | null
           limite_credito?: number | null
           logradouro?: string | null
+          motivo_inativacao?: string | null
           natureza_juridica?: string | null
           nome_fantasia?: string | null
           numero?: string | null
