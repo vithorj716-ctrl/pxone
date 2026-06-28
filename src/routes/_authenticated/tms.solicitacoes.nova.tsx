@@ -18,6 +18,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { listClientes } from "@/lib/px-registry.functions";
 import { TIPOS_ENDERECO } from "@/lib/px-enderecos.functions";
 import { loadClienteCompleto } from "@/lib/px-nova-solicitacao.functions";
+import { getCreditoCliente, liberarBloqueio, type SaldoCliente } from "@/lib/px-credito.functions";
 import { NovoClienteDialog } from "@/components/registry/novo-cliente-dialog";
 
 export const Route = createFileRoute("/_authenticated/tms/solicitacoes/nova")({
@@ -69,6 +70,8 @@ function NovaSolicitacaoPage() {
   const { empresa } = useEmpresaAtiva();
   const fnList = useServerFn(listClientes);
   const fnLoad = useServerFn(loadClienteCompleto);
+  const fnCredito = useServerFn(getCreditoCliente);
+  const fnLiberar = useServerFn(liberarBloqueio);
 
   const [clientes, setClientes] = useState<{ id: string; razao_social: string; nome_fantasia?: string; cnpj?: string }[]>([]);
   const [regras, setRegras] = useState<RegraFrete[]>([]);
@@ -80,6 +83,9 @@ function NovaSolicitacaoPage() {
   const [enderecos, setEnderecos] = useState<Endereco[]>([]);
   const [contatos, setContatos] = useState<Contato[]>([]);
   const [tmsClienteId, setTmsClienteId] = useState<string | null>(null);
+  const [saldo, setSaldo] = useState<SaldoCliente | null>(null);
+  const [credito, setCredito] = useState<any>(null);
+  const [autorizadoBloqueio, setAutorizadoBloqueio] = useState(false);
 
   const [pagador, setPagador] = useState<string>("contratante");
 
@@ -114,11 +120,24 @@ function NovaSolicitacaoPage() {
       setEnderecos(data.enderecos);
       setContatos(data.contatos);
       setTmsClienteId(data.tms_cliente_id);
+      setAutorizadoBloqueio(false);
       // Auto-preencher remetente padrão se houver
       const padRem = data.enderecos.find((e: any) => e.is_padrao_remetente);
       if (padRem) aplicarEndereco(padRem, data.contatos, setRem);
+      // Carregar conta corrente / saldo
+      try {
+        const cc = await fnCredito({ data: { cliente_id } });
+        setCredito(cc.credito);
+        setSaldo(cc.saldo);
+      } catch { setCredito(null); setSaldo(null); }
     } catch (e: any) { toast.error(e?.message || "Falha ao carregar cliente"); }
   }
+
+  const liberadoVigente = !!(credito?.liberado_ate && new Date(credito.liberado_ate) > new Date());
+  const bloqueadoAtivo = !!(saldo?.bloqueado && !liberadoVigente);
+  const temVencido = !!(saldo && saldo.vencido > 0);
+
+
 
   function aplicarEndereco(end: Endereco, allContatos: Contato[], setter: (v: EndSnap) => void) {
     const principal = allContatos.find((c) => c.endereco_id === end.id && c.is_principal)
@@ -158,10 +177,23 @@ function NovaSolicitacaoPage() {
     };
   }, [merc, regras, tmsClienteId, origem, destino, contratante]);
 
+  const excedeLimite = !!(saldo && saldo.limite_credito > 0 && (saldo.utilizado + calc.valor_frete) > saldo.limite_credito);
+  const statusFin: "ok" | "alerta" | "vencido" | "bloqueado" = bloqueadoAtivo
+    ? "bloqueado"
+    : temVencido
+      ? "vencido"
+      : excedeLimite
+        ? "alerta"
+        : "ok";
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!contratante) { toast.error("Selecione o cliente contratante"); return; }
     if (!rem.cidade || !dst.cidade) { toast.error("Selecione remetente e destinatário"); return; }
+    if ((bloqueadoAtivo || excedeLimite || temVencido) && !autorizadoBloqueio) {
+      toast.error("Cliente bloqueado — autorize na seção financeira para continuar");
+      return;
+    }
     setSaving(true);
     try {
       const { data, error } = await supabase
@@ -249,7 +281,7 @@ function NovaSolicitacaoPage() {
             )}
           </SectionCard>
 
-          {/* 2. PAGADOR */}
+          {/* 2. PAGADOR + CONTA CORRENTE */}
           {contratante && (
             <SectionCard title="Pagador do Frete" icon={<User className="size-4" />}>
               <Select value={pagador} onValueChange={setPagador}>
@@ -258,13 +290,28 @@ function NovaSolicitacaoPage() {
                   {PAGADOR_OPTS.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
                 </SelectContent>
               </Select>
-              <div className="mt-3 rounded-md border border-border bg-surface/40 p-3 text-xs text-muted-foreground">
-                <div className="flex items-center gap-2"><AlertTriangle className="size-3.5 text-amber-400" />
-                  Controle de conta corrente e bloqueio por inadimplência será integrado na próxima fase.
-                </div>
-              </div>
+              <ContaCorrenteCard
+                saldo={saldo}
+                bloqueado={bloqueadoAtivo}
+                vencido={temVencido}
+                excede={excedeLimite}
+                autorizado={autorizadoBloqueio}
+                liberadoVigente={liberadoVigente}
+                onAutorizar={() => setAutorizadoBloqueio(true)}
+                onLiberar={async (ate: string) => {
+                  if (!contratante) return;
+                  try {
+                    await fnLiberar({ data: { cliente_id: contratante.id, ate, motivo: "Liberação manual via Nova Solicitação" } });
+                    const cc = await fnCredito({ data: { cliente_id: contratante.id } });
+                    setCredito(cc.credito); setSaldo(cc.saldo);
+                    toast.success("Liberação registrada");
+                  } catch (e: any) { toast.error(e?.message || "Falha"); }
+                }}
+              />
             </SectionCard>
           )}
+
+
 
           {/* 3. REMETENTE */}
           {contratante && (
@@ -357,8 +404,11 @@ function NovaSolicitacaoPage() {
           <Row label="Peso taxado" value={`${calc.peso_taxado.toFixed(2)} kg`} mono />
           <Row label="Prazo" value={`${calc.prazo} dia(s)`} />
           <div className="border-t border-border pt-2" />
-          <Row label="Limite crédito" value={contratante?.limite_credito ? Number(contratante.limite_credito).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : "—"} />
-          <Row label="Situação financeira" value={<span className="inline-flex items-center gap-1"><span className="size-2 rounded-full bg-emerald-400" />OK</span>} />
+          <Row label="Limite crédito" value={saldo ? brl(saldo.limite_credito) : "—"} />
+          <Row label="Utilizado" value={saldo ? brl(saldo.utilizado) : "—"} />
+          <Row label="Disponível" value={saldo ? brl(saldo.disponivel) : "—"} />
+          {saldo && saldo.vencido > 0 && <Row label="Vencido" value={<span className="text-red-300">{brl(saldo.vencido)}</span>} />}
+          <Row label="Situação" value={<StatusFinanceiroBadge status={statusFin} />} />
           <div className="border-t border-border pt-2">
             <Row label="Valor do frete" value={calc.valor_frete.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })} highlight />
           </div>
@@ -625,3 +675,102 @@ function EnderecoCard({
     </SectionCard>
   );
 }
+
+function brl(n: number) {
+  return Number(n || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+
+function StatusFinanceiroBadge({ status }: { status: "ok" | "alerta" | "vencido" | "bloqueado" }) {
+  const meta = {
+    ok:        { label: "OK",         dot: "bg-emerald-400", cls: "text-emerald-300" },
+    alerta:    { label: "Próx limite",dot: "bg-amber-400",   cls: "text-amber-300"   },
+    vencido:   { label: "Em atraso",  dot: "bg-orange-400",  cls: "text-orange-300"  },
+    bloqueado: { label: "Bloqueado",  dot: "bg-red-500",     cls: "text-red-300"     },
+  }[status];
+  return (
+    <span className={`inline-flex items-center gap-1.5 ${meta.cls}`}>
+      <span className={`size-2 rounded-full ${meta.dot}`} />{meta.label}
+    </span>
+  );
+}
+
+function ContaCorrenteCard({
+  saldo, bloqueado, vencido, excede, autorizado, liberadoVigente, onAutorizar, onLiberar,
+}: {
+  saldo: SaldoCliente | null;
+  bloqueado: boolean;
+  vencido: boolean;
+  excede: boolean;
+  autorizado: boolean;
+  liberadoVigente: boolean;
+  onAutorizar: () => void;
+  onLiberar: (ate: string) => void;
+}) {
+  const [liberarAte, setLiberarAte] = useState<string>(() => {
+    const d = new Date(); d.setDate(d.getDate() + 7);
+    return d.toISOString().slice(0, 10);
+  });
+
+  if (!saldo) {
+    return (
+      <div className="mt-3 rounded-md border border-border bg-surface/40 p-3 text-xs text-muted-foreground">
+        Sem conta corrente cadastrada para este cliente.
+      </div>
+    );
+  }
+
+  const tone = bloqueado
+    ? "border-red-500/40 bg-red-500/5"
+    : vencido || excede
+      ? "border-amber-500/40 bg-amber-500/5"
+      : "border-emerald-500/30 bg-emerald-500/5";
+
+  return (
+    <div className={`mt-3 rounded-md border ${tone} p-3 space-y-2`}>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+        <MetaPill label="Limite" value={brl(saldo.limite_credito)} />
+        <MetaPill label="Utilizado" value={brl(saldo.utilizado)} />
+        <MetaPill label="Disponível" value={brl(saldo.disponivel)} />
+        <MetaPill label="Vencido" value={brl(saldo.vencido)} />
+      </div>
+
+      {liberadoVigente && (
+        <div className="text-[11px] text-emerald-300 flex items-center gap-1.5">
+          <Check className="size-3.5" /> Liberação ativa até {new Date(saldo.liberado_ate!).toLocaleDateString("pt-BR")}
+        </div>
+      )}
+
+      {(bloqueado || excede || vencido) && !autorizado && (
+        <div className="border-t border-current/20 pt-2 space-y-2">
+          <div className="flex items-start gap-2 text-xs">
+            <AlertTriangle className="size-4 text-red-400 shrink-0 mt-0.5" />
+            <div>
+              <div className="font-semibold text-red-300">
+                {bloqueado ? "CLIENTE BLOQUEADO" : excede ? "EXCEDE LIMITE DE CRÉDITO" : "POSSUI TÍTULOS EM ATRASO"}
+              </div>
+              {saldo.motivo_bloqueio && <div className="text-muted-foreground">{saldo.motivo_bloqueio}</div>}
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2 items-center">
+            <Button type="button" size="sm" variant="outline" onClick={onAutorizar}>
+              Continuar (autorizado)
+            </Button>
+            <div className="flex items-center gap-1">
+              <Input type="date" value={liberarAte} onChange={(e) => setLiberarAte(e.target.value)} className="h-8 w-36" />
+              <Button type="button" size="sm" variant="secondary" onClick={() => onLiberar(liberarAte)}>
+                Liberar até
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {autorizado && (
+        <div className="text-[11px] text-amber-300 flex items-center gap-1.5">
+          <Check className="size-3.5" /> Emissão autorizada manualmente para esta minuta
+        </div>
+      )}
+    </div>
+  );
+}
+

@@ -828,6 +828,141 @@ export type Database = {
         }
         Relationships: []
       }
+      px_cliente_credito: {
+        Row: {
+          bloqueado: boolean
+          cliente_id: string
+          created_at: string
+          dia_fechamento: number | null
+          dia_vencimento: number | null
+          id: string
+          liberado_ate: string | null
+          liberado_por: string | null
+          limite_credito: number
+          motivo_bloqueio: string | null
+          observacoes: string | null
+          prazo_dias: number
+          updated_at: string
+        }
+        Insert: {
+          bloqueado?: boolean
+          cliente_id: string
+          created_at?: string
+          dia_fechamento?: number | null
+          dia_vencimento?: number | null
+          id?: string
+          liberado_ate?: string | null
+          liberado_por?: string | null
+          limite_credito?: number
+          motivo_bloqueio?: string | null
+          observacoes?: string | null
+          prazo_dias?: number
+          updated_at?: string
+        }
+        Update: {
+          bloqueado?: boolean
+          cliente_id?: string
+          created_at?: string
+          dia_fechamento?: number | null
+          dia_vencimento?: number | null
+          id?: string
+          liberado_ate?: string | null
+          liberado_por?: string | null
+          limite_credito?: number
+          motivo_bloqueio?: string | null
+          observacoes?: string | null
+          prazo_dias?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "px_cliente_credito_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: true
+            referencedRelation: "px_cliente_saldo"
+            referencedColumns: ["cliente_id"]
+          },
+          {
+            foreignKeyName: "px_cliente_credito_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: true
+            referencedRelation: "px_registry_clientes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      px_cliente_lancamentos: {
+        Row: {
+          cliente_id: string
+          created_at: string
+          created_by: string | null
+          descricao: string
+          emissao: string
+          id: string
+          observacoes: string | null
+          origem: string
+          pago_em: string | null
+          referencia_id: string | null
+          referencia_tipo: string | null
+          status: string
+          tipo: string
+          updated_at: string
+          valor: number
+          vencimento: string | null
+        }
+        Insert: {
+          cliente_id: string
+          created_at?: string
+          created_by?: string | null
+          descricao: string
+          emissao?: string
+          id?: string
+          observacoes?: string | null
+          origem: string
+          pago_em?: string | null
+          referencia_id?: string | null
+          referencia_tipo?: string | null
+          status?: string
+          tipo: string
+          updated_at?: string
+          valor: number
+          vencimento?: string | null
+        }
+        Update: {
+          cliente_id?: string
+          created_at?: string
+          created_by?: string | null
+          descricao?: string
+          emissao?: string
+          id?: string
+          observacoes?: string | null
+          origem?: string
+          pago_em?: string | null
+          referencia_id?: string | null
+          referencia_tipo?: string | null
+          status?: string
+          tipo?: string
+          updated_at?: string
+          valor?: number
+          vencimento?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "px_cliente_lancamentos_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "px_cliente_saldo"
+            referencedColumns: ["cliente_id"]
+          },
+          {
+            foreignKeyName: "px_cliente_lancamentos_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "px_registry_clientes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       px_empresa_modulos: {
         Row: {
           ativo: boolean
@@ -1173,6 +1308,13 @@ export type Database = {
             foreignKeyName: "px_registry_contatos_cliente_id_fkey"
             columns: ["cliente_id"]
             isOneToOne: false
+            referencedRelation: "px_cliente_saldo"
+            referencedColumns: ["cliente_id"]
+          },
+          {
+            foreignKeyName: "px_registry_contatos_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
             referencedRelation: "px_registry_clientes"
             referencedColumns: ["id"]
           },
@@ -1263,6 +1405,13 @@ export type Database = {
             foreignKeyName: "px_registry_enderecos_cliente_id_fkey"
             columns: ["cliente_id"]
             isOneToOne: false
+            referencedRelation: "px_cliente_saldo"
+            referencedColumns: ["cliente_id"]
+          },
+          {
+            foreignKeyName: "px_registry_enderecos_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
             referencedRelation: "px_registry_clientes"
             referencedColumns: ["id"]
           },
@@ -1291,6 +1440,13 @@ export type Database = {
           vinculado_por?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "px_registry_vinculos_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "px_cliente_saldo"
+            referencedColumns: ["cliente_id"]
+          },
           {
             foreignKeyName: "px_registry_vinculos_cliente_id_fkey"
             columns: ["cliente_id"]
@@ -1655,6 +1811,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "empresas"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tms_clientes_registry_id_fkey"
+            columns: ["registry_id"]
+            isOneToOne: false
+            referencedRelation: "px_cliente_saldo"
+            referencedColumns: ["cliente_id"]
           },
           {
             foreignKeyName: "tms_clientes_registry_id_fkey"
@@ -2681,7 +2844,19 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      px_cliente_saldo: {
+        Row: {
+          bloqueado: boolean | null
+          cliente_id: string | null
+          disponivel: number | null
+          liberado_ate: string | null
+          limite_credito: number | null
+          motivo_bloqueio: string | null
+          utilizado: number | null
+          vencido: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       has_role: {
