@@ -254,6 +254,56 @@ function buildSpec(origin: string) {
       "/tabelas-frete": {
         get: { tags: ["Tabelas de frete"], summary: "Lista tabelas de frete", security: [{ bearerAuth: ["tabela-frete:read"] }], responses: { 200: { description: "OK" } } },
       },
+      "/financeiro/lancamentos": {
+        post: {
+          tags: ["Financeiro"],
+          summary: "Publica faturamento operacional (idempotente)",
+          description: "Usado pelo PXLog para registrar faturamento gerado por operações concluídas. Idempotente via header Idempotency-Key ou external_id.",
+          security: [{ bearerAuth: ["financeiro:write"] }],
+          requestBody: {
+            required: true,
+            content: { "application/json": { schema: {
+              type: "object",
+              required: ["external_id", "cliente_id", "valor"],
+              properties: {
+                external_id: { type: "string" },
+                cliente_id: { type: "string", format: "uuid" },
+                valor: { type: "number" },
+                descricao: { type: "string" },
+                emissao: { type: "string", format: "date" },
+                vencimento: { type: "string", format: "date" },
+                origem_tipo: { type: "string", example: "operacao" },
+                origem_id: { type: "string" },
+                metadata: { type: "object" },
+              },
+            } } },
+          },
+          responses: { 201: { description: "Lançamento criado" }, 409: { description: "Idempotency-Key reutilizada com body diferente" } },
+        },
+      },
+      "/financeiro/consolidado": {
+        get: {
+          tags: ["Financeiro"],
+          summary: "Consolidação financeira agregada",
+          security: [{ bearerAuth: ["financeiro:read"] }],
+          parameters: [
+            { in: "query", name: "de", schema: { type: "string", format: "date" } },
+            { in: "query", name: "ate", schema: { type: "string", format: "date" } },
+            { in: "query", name: "cliente_id", schema: { type: "string", format: "uuid" } },
+            { in: "query", name: "origem", schema: { type: "string" } },
+          ],
+          responses: { 200: { description: "OK" } },
+        },
+      },
+      "/dashboard/executivo": {
+        get: {
+          tags: ["Dashboard"],
+          summary: "Dashboard executivo consolidado",
+          description: "Agrega financeiro do PXOne + pipeline do PXComercial + KPIs operacionais do PXLog (com fallback resiliente quando indisponíveis).",
+          security: [{ bearerAuth: ["dashboard:read"] }],
+          responses: { 200: { description: "OK" } },
+        },
+      },
     },
     "x-pxapi": { scopes: SCOPES },
   };
