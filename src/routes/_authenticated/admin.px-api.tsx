@@ -440,6 +440,16 @@ function ApiDocsTab() {
           <li><code>GET /api/public/v1/clientes</code> — lista paginada (escopo <code>clientes:read</code>).</li>
           <li><code>GET /api/public/v1/clientes/:id</code> — detalhe (com <code>?include=enderecos,contatos</code>).</li>
           <li><code>GET /api/public/v1/clientes/:id/conta-corrente</code> — saldo, limite, vencidos (escopo <code>financeiro:read</code>).</li>
+          <li><code>GET /api/public/v1/clientes/:id/enderecos</code> — endereços do cliente (escopo <code>clientes:read</code>).</li>
+          <li><code>GET /api/public/v1/clientes/:id/contatos</code> — contatos do cliente (escopo <code>clientes:read</code>).</li>
+          <li><code>GET /api/public/v1/clientes/:id/lancamentos</code> — lançamentos da conta corrente, paginado (escopo <code>clientes:read</code>).</li>
+          <li><code>GET /api/public/v1/empresas</code> — lista de empresas do grupo (escopo <code>empresas:read</code>).</li>
+          <li><code>GET /api/public/v1/empresas/:id</code> — detalhe (com <code>?include=filiais,modulos</code>).</li>
+          <li><code>GET /api/public/v1/filiais</code> — lista de filiais (escopo <code>empresas:read</code>).</li>
+          <li><code>GET /api/public/v1/perfis</code> — perfis e permissões (escopo <code>perfis:read</code>, <code>?include=permissoes</code>).</li>
+          <li><code>GET /api/public/v1/usuarios</code> — lista de usuários (escopo <code>usuarios:read</code>).</li>
+          <li><code>GET /api/public/v1/usuarios/:id</code> — detalhe (com <code>?include=perfis,sistemas</code>).</li>
+          <li><code>GET /api/public/v1/tabelas-frete</code> — tabelas de frete cadastradas (escopo <code>tabela-frete:read</code>).</li>
         </ul>
       </div>
       <p className="text-xs text-muted-foreground">
