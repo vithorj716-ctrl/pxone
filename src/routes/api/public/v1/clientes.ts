@@ -24,6 +24,43 @@ const CLIENTE_INSERT_FIELDS = [
   "limite_credito", "prazo_padrao_dias", "condicao_pagamento", "tabela_frete_id",
 ] as const;
 
+async function linkClienteAoPxLog(ctx: { supabase: any }, clienteId: string) {
+  await ctx.supabase
+    .from("px_registry_vinculos")
+    .upsert(
+      { cliente_id: clienteId, sistema_key: "pxlog" },
+      { onConflict: "cliente_id,sistema_key", ignoreDuplicates: true },
+    );
+}
+
+async function syncTmsCliente(ctx: { supabase: any }, cliente: any) {
+  const payload = {
+    registry_id: cliente.id,
+    nome: cliente.nome_fantasia || cliente.razao_social || cliente.cnpj,
+    cnpj: cliente.cnpj ?? null,
+    contato: cliente.contato_nome ?? null,
+    telefone: cliente.telefone ?? null,
+    email: cliente.email ?? null,
+    endereco: [cliente.logradouro, cliente.numero, cliente.complemento, cliente.bairro].filter(Boolean).join(", ") || null,
+    cidade: cliente.cidade ?? null,
+    uf: cliente.uf ?? null,
+    observacoes: cliente.observacoes ?? null,
+    ativo: cliente.ativo !== false,
+  };
+
+  const { data: existing } = await ctx.supabase
+    .from("tms_clientes")
+    .select("id")
+    .eq("registry_id", cliente.id)
+    .maybeSingle();
+
+  if (existing?.id) {
+    await ctx.supabase.from("tms_clientes").update(payload).eq("id", existing.id);
+  } else {
+    await ctx.supabase.from("tms_clientes").insert(payload);
+  }
+}
+
 export const Route = createFileRoute("/api/public/v1/clientes")({
   server: {
     handlers: {
@@ -98,10 +135,12 @@ export const Route = createFileRoute("/api/public/v1/clientes")({
           // CNPJ único — se existir e estiver ativo, devolve o registro existente (idempotência natural).
           const { data: existing } = await (ctx.supabase as any)
             .from("px_registry_clientes")
-            .select(SAFE_COLUMNS)
+            .select(`${SAFE_COLUMNS}, contato_nome, whatsapp, logradouro, numero, complemento, bairro, observacoes`)
             .eq("cnpj", cnpj)
             .maybeSingle();
           if (existing) {
+            await linkClienteAoPxLog(ctx, existing.id);
+            await syncTmsCliente(ctx, existing);
             const body409 = {
               status: "ok", message: "Cliente já existente para esse CNPJ.",
               data: existing, timestamp: new Date().toISOString(), requestId: ctx.requestId,
@@ -126,13 +165,16 @@ export const Route = createFileRoute("/api/public/v1/clientes")({
           const { data, error } = await (ctx.supabase as any)
             .from("px_registry_clientes")
             .insert(insert)
-            .select(SAFE_COLUMNS)
+            .select(`${SAFE_COLUMNS}, contato_nome, whatsapp, logradouro, numero, complemento, bairro, observacoes`)
             .single();
           if (error) {
             return pxErr("INTERNAL", "Falha ao criar cliente.", {
               requestId: ctx.requestId, details: error.message,
             });
           }
+
+          await linkClienteAoPxLog(ctx, data.id);
+          await syncTmsCliente(ctx, data);
 
           const okBody = {
             status: "ok", message: "Cliente criado.", data,
