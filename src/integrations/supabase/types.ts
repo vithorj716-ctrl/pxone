@@ -849,6 +849,53 @@ export type Database = {
         }
         Relationships: []
       }
+      px_api_idempotency: {
+        Row: {
+          api_client_id: string
+          created_at: string
+          endpoint: string
+          expires_at: string
+          id: string
+          idempotency_key: string
+          method: string
+          request_hash: string
+          response_body: Json
+          response_status: number
+        }
+        Insert: {
+          api_client_id: string
+          created_at?: string
+          endpoint: string
+          expires_at?: string
+          id?: string
+          idempotency_key: string
+          method: string
+          request_hash: string
+          response_body: Json
+          response_status: number
+        }
+        Update: {
+          api_client_id?: string
+          created_at?: string
+          endpoint?: string
+          expires_at?: string
+          id?: string
+          idempotency_key?: string
+          method?: string
+          request_hash?: string
+          response_body?: Json
+          response_status?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "px_api_idempotency_api_client_id_fkey"
+            columns: ["api_client_id"]
+            isOneToOne: false
+            referencedRelation: "px_api_clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       px_api_logs: {
         Row: {
           api_client_id: string | null
