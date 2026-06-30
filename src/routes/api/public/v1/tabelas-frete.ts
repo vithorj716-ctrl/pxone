@@ -3,7 +3,7 @@
 //
 // Query params: page, pageSize, cliente_id, ativo=true|false, search,
 //   origem=<uf|cidade>, destino=<uf|cidade>
-// Requer escopo: tabelas-frete:read
+// Requer escopo: tabela-frete:read
 
 import { createFileRoute } from "@tanstack/react-router";
 import { withPxApi } from "@/px-api/middleware";
@@ -14,7 +14,7 @@ export const Route = createFileRoute("/api/public/v1/tabelas-frete")({
   server: {
     handlers: {
       GET: async ({ request }) =>
-        withPxApi(request, { scopes: ["tabelas-frete:read"] }, async (ctx) => {
+        withPxApi(request, { scopes: ["tabela-frete:read"] }, async (ctx) => {
           const url = new URL(request.url);
           const { page, pageSize, from, to } = parsePagination(url, { defaultSize: 50, maxSize: 200 });
           const clienteId = url.searchParams.get("cliente_id")?.trim() || "";
