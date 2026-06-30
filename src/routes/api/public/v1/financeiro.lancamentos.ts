@@ -72,6 +72,7 @@ export const Route = createFileRoute("/api/public/v1/financeiro/lancamentos")({
           }).select("id").maybeSingle();
 
           // Cria lançamento (a receber → crédito)
+          const refId = body?.origem_id && /^[0-9a-f-]{36}$/i.test(String(body.origem_id)) ? String(body.origem_id) : null;
           const ins = await (ctx.supabase as any).from("px_cliente_lancamentos").insert({
             cliente_id,
             tipo: "credito",
@@ -81,8 +82,9 @@ export const Route = createFileRoute("/api/public/v1/financeiro/lancamentos")({
             emissao: body?.emissao ?? new Date().toISOString().slice(0, 10),
             vencimento: body?.vencimento ?? null,
             origem: sistema_origem,
-            origem_id: body?.origem_id ?? external_id,
-            metadata: body?.metadata ?? {},
+            referencia_id: refId,
+            referencia_tipo: body?.origem_tipo ?? "operacao",
+            observacoes: body?.metadata ? JSON.stringify(body.metadata) : null,
           }).select("*").maybeSingle();
 
           if (ins.error) {
