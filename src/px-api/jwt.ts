@@ -25,9 +25,17 @@ function b64urlDecode(s: string): Uint8Array {
   return out;
 }
 
-function utf8(s: string): ArrayBuffer {
-  // Cast para satisfazer o tipo BufferSource estrito da Web Crypto.
-  return new TextEncoder().encode(s).buffer as ArrayBuffer;
+function utf8(s: string): Uint8Array {
+  return new TextEncoder().encode(s);
+}
+
+// Web Crypto exige BufferSource com ArrayBuffer (não SharedArrayBuffer).
+// O TextEncoder pode devolver Uint8Array<ArrayBufferLike>, então copiamos.
+function buf(s: string | Uint8Array): ArrayBuffer {
+  const u = typeof s === "string" ? utf8(s) : s;
+  const out = new ArrayBuffer(u.byteLength);
+  new Uint8Array(out).set(u);
+  return out;
 }
 
 async function hmacKey(secret: string): Promise<CryptoKey> {
