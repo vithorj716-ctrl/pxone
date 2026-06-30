@@ -40,6 +40,7 @@ function AdminHome() {
   const cards = [
     { to: "/admin/usuarios", label: "Usuários", desc: "Criar, editar e atribuir sistemas.", icon: Users },
     { to: "/admin/perfis", label: "Perfis & Permissões", desc: "Gerenciar perfis e permissões por sistema.", icon: Shield },
+    { to: "/admin/px-api", label: "PX API", desc: "Sistemas consumidores, tokens e logs da PX API.", icon: KeyRound },
   ];
 
   return (
