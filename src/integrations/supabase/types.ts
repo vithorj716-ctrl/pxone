@@ -1291,6 +1291,81 @@ export type Database = {
           },
         ]
       }
+      px_integration_inbox: {
+        Row: {
+          created_at: string
+          erro: string | null
+          evento: string
+          external_id: string | null
+          id: string
+          payload: Json
+          processed_at: string | null
+          sistema_origem: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          erro?: string | null
+          evento: string
+          external_id?: string | null
+          id?: string
+          payload?: Json
+          processed_at?: string | null
+          sistema_origem: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          erro?: string | null
+          evento?: string
+          external_id?: string | null
+          id?: string
+          payload?: Json
+          processed_at?: string | null
+          sistema_origem?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      px_integration_links: {
+        Row: {
+          created_at: string
+          id: string
+          id_destino: string
+          id_origem: string
+          metadata: Json
+          sistema_destino: string
+          sistema_origem: string
+          tipo_destino: string
+          tipo_origem: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          id_destino: string
+          id_origem: string
+          metadata?: Json
+          sistema_destino: string
+          sistema_origem: string
+          tipo_destino: string
+          tipo_origem: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          id_destino?: string
+          id_origem?: string
+          metadata?: Json
+          sistema_destino?: string
+          sistema_origem?: string
+          tipo_destino?: string
+          tipo_origem?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       px_perfil_permissoes: {
         Row: {
           acao: string
