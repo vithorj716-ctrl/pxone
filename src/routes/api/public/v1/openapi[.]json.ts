@@ -14,6 +14,8 @@ const SCOPES = {
   "usuarios:read": "Ler usuários da plataforma",
   "perfis:read": "Ler perfis e permissões",
   "tabela-frete:read": "Ler tabelas de frete",
+  "financeiro:write": "Publicar lançamentos financeiros (faturamento operacional)",
+  "dashboard:read": "Ler dashboard executivo consolidado",
 };
 
 function buildSpec(origin: string) {
