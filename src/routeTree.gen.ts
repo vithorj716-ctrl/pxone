@@ -56,6 +56,8 @@ import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminPerfisRouteImport } from './routes/_authenticated/admin.perfis'
 import { Route as AuthenticatedTmsSolicitacoesIndexRouteImport } from './routes/_authenticated/tms.solicitacoes.index'
 import { Route as AuthenticatedTmsLmIndexRouteImport } from './routes/_authenticated/tms.lm.index'
+import { Route as ApiPublicV1HealthRouteImport } from './routes/api/public/v1/health'
+import { Route as ApiPublicV1ClientesRouteImport } from './routes/api/public/v1/clientes'
 import { Route as AuthenticatedTmsViagensCodigoRouteImport } from './routes/_authenticated/tms.viagens.$codigo'
 import { Route as AuthenticatedTmsSolicitacoesNovaRouteImport } from './routes/_authenticated/tms.solicitacoes.nova'
 import { Route as AuthenticatedTmsMinutasNumeroRouteImport } from './routes/_authenticated/tms.minutas.$numero'
@@ -69,8 +71,12 @@ import { Route as AuthenticatedTmsLmConfiguracoesRouteImport } from './routes/_a
 import { Route as AuthenticatedTmsLmComprovantesRouteImport } from './routes/_authenticated/tms.lm.comprovantes'
 import { Route as AuthenticatedTmsLmCarregamentoRouteImport } from './routes/_authenticated/tms.lm.carregamento'
 import { Route as AuthenticatedTmsEtiquetasMinutaRouteImport } from './routes/_authenticated/tms.etiquetas.$minuta'
+import { Route as ApiPublicV1ClientesIdRouteImport } from './routes/api/public/v1/clientes.$id'
+import { Route as ApiPublicV1AuthTokenRouteImport } from './routes/api/public/v1/auth/token'
+import { Route as ApiPublicV1AuthRefreshRouteImport } from './routes/api/public/v1/auth/refresh'
 import { Route as AuthenticatedTmsLmRotasNumeroRouteImport } from './routes/_authenticated/tms.lm.rotas.$numero'
 import { Route as AuthenticatedTmsLmMotoristaRotaIdRouteImport } from './routes/_authenticated/tms.lm.motorista.$rotaId'
+import { Route as ApiPublicV1ClientesIdContaCorrenteRouteImport } from './routes/api/public/v1/clientes.$id.conta-corrente'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -327,6 +333,16 @@ const AuthenticatedTmsLmIndexRoute = AuthenticatedTmsLmIndexRouteImport.update({
   path: '/tms/lm/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicV1HealthRoute = ApiPublicV1HealthRouteImport.update({
+  id: '/api/public/v1/health',
+  path: '/api/public/v1/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicV1ClientesRoute = ApiPublicV1ClientesRouteImport.update({
+  id: '/api/public/v1/clientes',
+  path: '/api/public/v1/clientes',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedTmsViagensCodigoRoute =
   AuthenticatedTmsViagensCodigoRouteImport.update({
     id: '/$codigo',
@@ -404,6 +420,21 @@ const AuthenticatedTmsEtiquetasMinutaRoute =
     path: '/tms/etiquetas/$minuta',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicV1ClientesIdRoute = ApiPublicV1ClientesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiPublicV1ClientesRoute,
+} as any)
+const ApiPublicV1AuthTokenRoute = ApiPublicV1AuthTokenRouteImport.update({
+  id: '/api/public/v1/auth/token',
+  path: '/api/public/v1/auth/token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicV1AuthRefreshRoute = ApiPublicV1AuthRefreshRouteImport.update({
+  id: '/api/public/v1/auth/refresh',
+  path: '/api/public/v1/auth/refresh',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedTmsLmRotasNumeroRoute =
   AuthenticatedTmsLmRotasNumeroRouteImport.update({
     id: '/$numero',
@@ -415,6 +446,12 @@ const AuthenticatedTmsLmMotoristaRotaIdRoute =
     id: '/tms/lm/motorista/$rotaId',
     path: '/tms/lm/motorista/$rotaId',
     getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const ApiPublicV1ClientesIdContaCorrenteRoute =
+  ApiPublicV1ClientesIdContaCorrenteRouteImport.update({
+    id: '/conta-corrente',
+    path: '/conta-corrente',
+    getParentRoute: () => ApiPublicV1ClientesIdRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -475,10 +512,16 @@ export interface FileRoutesByFullPath {
   '/tms/minutas/$numero': typeof AuthenticatedTmsMinutasNumeroRoute
   '/tms/solicitacoes/nova': typeof AuthenticatedTmsSolicitacoesNovaRoute
   '/tms/viagens/$codigo': typeof AuthenticatedTmsViagensCodigoRoute
+  '/api/public/v1/clientes': typeof ApiPublicV1ClientesRouteWithChildren
+  '/api/public/v1/health': typeof ApiPublicV1HealthRoute
   '/tms/lm/': typeof AuthenticatedTmsLmIndexRoute
   '/tms/solicitacoes/': typeof AuthenticatedTmsSolicitacoesIndexRoute
   '/tms/lm/motorista/$rotaId': typeof AuthenticatedTmsLmMotoristaRotaIdRoute
   '/tms/lm/rotas/$numero': typeof AuthenticatedTmsLmRotasNumeroRoute
+  '/api/public/v1/auth/refresh': typeof ApiPublicV1AuthRefreshRoute
+  '/api/public/v1/auth/token': typeof ApiPublicV1AuthTokenRoute
+  '/api/public/v1/clientes/$id': typeof ApiPublicV1ClientesIdRouteWithChildren
+  '/api/public/v1/clientes/$id/conta-corrente': typeof ApiPublicV1ClientesIdContaCorrenteRoute
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
@@ -536,10 +579,16 @@ export interface FileRoutesByTo {
   '/tms/minutas/$numero': typeof AuthenticatedTmsMinutasNumeroRoute
   '/tms/solicitacoes/nova': typeof AuthenticatedTmsSolicitacoesNovaRoute
   '/tms/viagens/$codigo': typeof AuthenticatedTmsViagensCodigoRoute
+  '/api/public/v1/clientes': typeof ApiPublicV1ClientesRouteWithChildren
+  '/api/public/v1/health': typeof ApiPublicV1HealthRoute
   '/tms/lm': typeof AuthenticatedTmsLmIndexRoute
   '/tms/solicitacoes': typeof AuthenticatedTmsSolicitacoesIndexRoute
   '/tms/lm/motorista/$rotaId': typeof AuthenticatedTmsLmMotoristaRotaIdRoute
   '/tms/lm/rotas/$numero': typeof AuthenticatedTmsLmRotasNumeroRoute
+  '/api/public/v1/auth/refresh': typeof ApiPublicV1AuthRefreshRoute
+  '/api/public/v1/auth/token': typeof ApiPublicV1AuthTokenRoute
+  '/api/public/v1/clientes/$id': typeof ApiPublicV1ClientesIdRouteWithChildren
+  '/api/public/v1/clientes/$id/conta-corrente': typeof ApiPublicV1ClientesIdContaCorrenteRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -601,10 +650,16 @@ export interface FileRoutesById {
   '/_authenticated/tms/minutas/$numero': typeof AuthenticatedTmsMinutasNumeroRoute
   '/_authenticated/tms/solicitacoes/nova': typeof AuthenticatedTmsSolicitacoesNovaRoute
   '/_authenticated/tms/viagens/$codigo': typeof AuthenticatedTmsViagensCodigoRoute
+  '/api/public/v1/clientes': typeof ApiPublicV1ClientesRouteWithChildren
+  '/api/public/v1/health': typeof ApiPublicV1HealthRoute
   '/_authenticated/tms/lm/': typeof AuthenticatedTmsLmIndexRoute
   '/_authenticated/tms/solicitacoes/': typeof AuthenticatedTmsSolicitacoesIndexRoute
   '/_authenticated/tms/lm/motorista/$rotaId': typeof AuthenticatedTmsLmMotoristaRotaIdRoute
   '/_authenticated/tms/lm/rotas/$numero': typeof AuthenticatedTmsLmRotasNumeroRoute
+  '/api/public/v1/auth/refresh': typeof ApiPublicV1AuthRefreshRoute
+  '/api/public/v1/auth/token': typeof ApiPublicV1AuthTokenRoute
+  '/api/public/v1/clientes/$id': typeof ApiPublicV1ClientesIdRouteWithChildren
+  '/api/public/v1/clientes/$id/conta-corrente': typeof ApiPublicV1ClientesIdContaCorrenteRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -666,10 +721,16 @@ export interface FileRouteTypes {
     | '/tms/minutas/$numero'
     | '/tms/solicitacoes/nova'
     | '/tms/viagens/$codigo'
+    | '/api/public/v1/clientes'
+    | '/api/public/v1/health'
     | '/tms/lm/'
     | '/tms/solicitacoes/'
     | '/tms/lm/motorista/$rotaId'
     | '/tms/lm/rotas/$numero'
+    | '/api/public/v1/auth/refresh'
+    | '/api/public/v1/auth/token'
+    | '/api/public/v1/clientes/$id'
+    | '/api/public/v1/clientes/$id/conta-corrente'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/auth'
@@ -727,10 +788,16 @@ export interface FileRouteTypes {
     | '/tms/minutas/$numero'
     | '/tms/solicitacoes/nova'
     | '/tms/viagens/$codigo'
+    | '/api/public/v1/clientes'
+    | '/api/public/v1/health'
     | '/tms/lm'
     | '/tms/solicitacoes'
     | '/tms/lm/motorista/$rotaId'
     | '/tms/lm/rotas/$numero'
+    | '/api/public/v1/auth/refresh'
+    | '/api/public/v1/auth/token'
+    | '/api/public/v1/clientes/$id'
+    | '/api/public/v1/clientes/$id/conta-corrente'
   id:
     | '__root__'
     | '/_authenticated'
@@ -791,16 +858,26 @@ export interface FileRouteTypes {
     | '/_authenticated/tms/minutas/$numero'
     | '/_authenticated/tms/solicitacoes/nova'
     | '/_authenticated/tms/viagens/$codigo'
+    | '/api/public/v1/clientes'
+    | '/api/public/v1/health'
     | '/_authenticated/tms/lm/'
     | '/_authenticated/tms/solicitacoes/'
     | '/_authenticated/tms/lm/motorista/$rotaId'
     | '/_authenticated/tms/lm/rotas/$numero'
+    | '/api/public/v1/auth/refresh'
+    | '/api/public/v1/auth/token'
+    | '/api/public/v1/clientes/$id'
+    | '/api/public/v1/clientes/$id/conta-corrente'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   LoginRoute: typeof LoginRoute
+  ApiPublicV1ClientesRoute: typeof ApiPublicV1ClientesRouteWithChildren
+  ApiPublicV1HealthRoute: typeof ApiPublicV1HealthRoute
+  ApiPublicV1AuthRefreshRoute: typeof ApiPublicV1AuthRefreshRoute
+  ApiPublicV1AuthTokenRoute: typeof ApiPublicV1AuthTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1134,6 +1211,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTmsLmIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/v1/health': {
+      id: '/api/public/v1/health'
+      path: '/api/public/v1/health'
+      fullPath: '/api/public/v1/health'
+      preLoaderRoute: typeof ApiPublicV1HealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/v1/clientes': {
+      id: '/api/public/v1/clientes'
+      path: '/api/public/v1/clientes'
+      fullPath: '/api/public/v1/clientes'
+      preLoaderRoute: typeof ApiPublicV1ClientesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/tms/viagens/$codigo': {
       id: '/_authenticated/tms/viagens/$codigo'
       path: '/$codigo'
@@ -1225,6 +1316,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTmsEtiquetasMinutaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/v1/clientes/$id': {
+      id: '/api/public/v1/clientes/$id'
+      path: '/$id'
+      fullPath: '/api/public/v1/clientes/$id'
+      preLoaderRoute: typeof ApiPublicV1ClientesIdRouteImport
+      parentRoute: typeof ApiPublicV1ClientesRoute
+    }
+    '/api/public/v1/auth/token': {
+      id: '/api/public/v1/auth/token'
+      path: '/api/public/v1/auth/token'
+      fullPath: '/api/public/v1/auth/token'
+      preLoaderRoute: typeof ApiPublicV1AuthTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/v1/auth/refresh': {
+      id: '/api/public/v1/auth/refresh'
+      path: '/api/public/v1/auth/refresh'
+      fullPath: '/api/public/v1/auth/refresh'
+      preLoaderRoute: typeof ApiPublicV1AuthRefreshRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/tms/lm/rotas/$numero': {
       id: '/_authenticated/tms/lm/rotas/$numero'
       path: '/$numero'
@@ -1238,6 +1350,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/tms/lm/motorista/$rotaId'
       preLoaderRoute: typeof AuthenticatedTmsLmMotoristaRotaIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/public/v1/clientes/$id/conta-corrente': {
+      id: '/api/public/v1/clientes/$id/conta-corrente'
+      path: '/conta-corrente'
+      fullPath: '/api/public/v1/clientes/$id/conta-corrente'
+      preLoaderRoute: typeof ApiPublicV1ClientesIdContaCorrenteRouteImport
+      parentRoute: typeof ApiPublicV1ClientesIdRoute
     }
   }
 }
@@ -1426,10 +1545,39 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface ApiPublicV1ClientesIdRouteChildren {
+  ApiPublicV1ClientesIdContaCorrenteRoute: typeof ApiPublicV1ClientesIdContaCorrenteRoute
+}
+
+const ApiPublicV1ClientesIdRouteChildren: ApiPublicV1ClientesIdRouteChildren = {
+  ApiPublicV1ClientesIdContaCorrenteRoute:
+    ApiPublicV1ClientesIdContaCorrenteRoute,
+}
+
+const ApiPublicV1ClientesIdRouteWithChildren =
+  ApiPublicV1ClientesIdRoute._addFileChildren(
+    ApiPublicV1ClientesIdRouteChildren,
+  )
+
+interface ApiPublicV1ClientesRouteChildren {
+  ApiPublicV1ClientesIdRoute: typeof ApiPublicV1ClientesIdRouteWithChildren
+}
+
+const ApiPublicV1ClientesRouteChildren: ApiPublicV1ClientesRouteChildren = {
+  ApiPublicV1ClientesIdRoute: ApiPublicV1ClientesIdRouteWithChildren,
+}
+
+const ApiPublicV1ClientesRouteWithChildren =
+  ApiPublicV1ClientesRoute._addFileChildren(ApiPublicV1ClientesRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   LoginRoute: LoginRoute,
+  ApiPublicV1ClientesRoute: ApiPublicV1ClientesRouteWithChildren,
+  ApiPublicV1HealthRoute: ApiPublicV1HealthRoute,
+  ApiPublicV1AuthRefreshRoute: ApiPublicV1AuthRefreshRoute,
+  ApiPublicV1AuthTokenRoute: ApiPublicV1AuthTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
