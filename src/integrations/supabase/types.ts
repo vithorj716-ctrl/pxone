@@ -795,6 +795,178 @@ export type Database = {
         }
         Relationships: []
       }
+      px_api_clients: {
+        Row: {
+          allowed_origins: string[]
+          api_key_hash: string
+          api_key_prefix: string
+          ativo: boolean
+          created_at: string
+          criado_por: string | null
+          descricao: string | null
+          escopos: string[]
+          id: string
+          nome: string
+          observacoes: string | null
+          rate_limit_rpm: number
+          secret_hash: string
+          sistema_key: string
+          updated_at: string
+        }
+        Insert: {
+          allowed_origins?: string[]
+          api_key_hash: string
+          api_key_prefix: string
+          ativo?: boolean
+          created_at?: string
+          criado_por?: string | null
+          descricao?: string | null
+          escopos?: string[]
+          id?: string
+          nome: string
+          observacoes?: string | null
+          rate_limit_rpm?: number
+          secret_hash: string
+          sistema_key: string
+          updated_at?: string
+        }
+        Update: {
+          allowed_origins?: string[]
+          api_key_hash?: string
+          api_key_prefix?: string
+          ativo?: boolean
+          created_at?: string
+          criado_por?: string | null
+          descricao?: string | null
+          escopos?: string[]
+          id?: string
+          nome?: string
+          observacoes?: string | null
+          rate_limit_rpm?: number
+          secret_hash?: string
+          sistema_key?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      px_api_logs: {
+        Row: {
+          api_client_id: string | null
+          created_at: string
+          endpoint: string
+          erro_codigo: string | null
+          erro_mensagem: string | null
+          id: string
+          ip: string | null
+          latencia_ms: number | null
+          metodo: string
+          request_id: string | null
+          sistema_key: string | null
+          status: number
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          api_client_id?: string | null
+          created_at?: string
+          endpoint: string
+          erro_codigo?: string | null
+          erro_mensagem?: string | null
+          id?: string
+          ip?: string | null
+          latencia_ms?: number | null
+          metodo: string
+          request_id?: string | null
+          sistema_key?: string | null
+          status: number
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          api_client_id?: string | null
+          created_at?: string
+          endpoint?: string
+          erro_codigo?: string | null
+          erro_mensagem?: string | null
+          id?: string
+          ip?: string | null
+          latencia_ms?: number | null
+          metodo?: string
+          request_id?: string | null
+          sistema_key?: string | null
+          status?: number
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "px_api_logs_api_client_id_fkey"
+            columns: ["api_client_id"]
+            isOneToOne: false
+            referencedRelation: "px_api_clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      px_api_tokens: {
+        Row: {
+          api_client_id: string
+          created_at: string
+          escopos: string[]
+          expires_at: string
+          id: string
+          ip: string | null
+          jti: string
+          refresh_expires_at: string | null
+          refresh_token_hash: string | null
+          revogado: boolean
+          revogado_em: string | null
+          revogado_por: string | null
+          updated_at: string
+          user_agent: string | null
+        }
+        Insert: {
+          api_client_id: string
+          created_at?: string
+          escopos?: string[]
+          expires_at: string
+          id?: string
+          ip?: string | null
+          jti: string
+          refresh_expires_at?: string | null
+          refresh_token_hash?: string | null
+          revogado?: boolean
+          revogado_em?: string | null
+          revogado_por?: string | null
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Update: {
+          api_client_id?: string
+          created_at?: string
+          escopos?: string[]
+          expires_at?: string
+          id?: string
+          ip?: string | null
+          jti?: string
+          refresh_expires_at?: string | null
+          refresh_token_hash?: string | null
+          revogado?: boolean
+          revogado_em?: string | null
+          revogado_por?: string | null
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "px_api_tokens_api_client_id_fkey"
+            columns: ["api_client_id"]
+            isOneToOne: false
+            referencedRelation: "px_api_clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       px_audit_log: {
         Row: {
           action: string

@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Users, Shield, ArrowLeft, Boxes } from "lucide-react";
+import { Users, Shield, ArrowLeft, Boxes, KeyRound } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
@@ -40,6 +40,7 @@ function AdminHome() {
   const cards = [
     { to: "/admin/usuarios", label: "Usuários", desc: "Criar, editar e atribuir sistemas.", icon: Users },
     { to: "/admin/perfis", label: "Perfis & Permissões", desc: "Gerenciar perfis e permissões por sistema.", icon: Shield },
+    { to: "/admin/px-api", label: "PX API", desc: "Sistemas consumidores, tokens e logs da PX API.", icon: KeyRound },
   ];
 
   return (
