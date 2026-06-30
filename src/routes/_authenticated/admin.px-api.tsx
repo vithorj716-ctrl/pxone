@@ -450,6 +450,15 @@ function ApiDocsTab() {
           <li><code>GET /api/public/v1/usuarios</code> — lista de usuários (escopo <code>usuarios:read</code>).</li>
           <li><code>GET /api/public/v1/usuarios/:id</code> — detalhe (com <code>?include=perfis,sistemas</code>).</li>
           <li><code>GET /api/public/v1/tabelas-frete</code> — tabelas de frete cadastradas (escopo <code>tabela-frete:read</code>).</li>
+          <li className="pt-1 font-semibold">Escrita (Fase 3)</li>
+          <li><code>POST /api/public/v1/clientes</code> — cria cliente (<code>clientes:write</code>, idempotente por CNPJ + <code>Idempotency-Key</code>).</li>
+          <li><code>PATCH /api/public/v1/clientes/:id</code> — atualização parcial (<code>clientes:write</code>).</li>
+          <li><code>POST /api/public/v1/clientes/:id/inativar</code> — inativa cliente com motivo (<code>clientes:write</code>).</li>
+          <li><code>POST /api/public/v1/clientes/:id/reativar</code> — reativa cliente (<code>clientes:write</code>).</li>
+          <li><code>POST /api/public/v1/clientes/:id/enderecos</code> — cria endereço (<code>enderecos:write</code>).</li>
+          <li><code>PATCH/DELETE /api/public/v1/clientes/:id/enderecos/:enderecoId</code> — atualiza/inativa endereço (<code>enderecos:write</code>).</li>
+          <li><code>POST /api/public/v1/clientes/:id/contatos</code> — cria contato (<code>contatos:write</code>).</li>
+          <li><code>PATCH/DELETE /api/public/v1/clientes/:id/contatos/:contatoId</code> — atualiza/remove contato (<code>contatos:write</code>).</li>
         </ul>
       </div>
       <p className="text-xs text-muted-foreground">
