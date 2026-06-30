@@ -41,7 +41,7 @@ function buf(s: string | Uint8Array): ArrayBuffer {
 async function hmacKey(secret: string): Promise<CryptoKey> {
   return crypto.subtle.importKey(
     "raw",
-    utf8(secret),
+    buf(secret),
     { name: "HMAC", hash: "SHA-256" },
     false,
     ["sign", "verify"],
@@ -71,7 +71,7 @@ export async function signPxApiJwt(claims: Omit<PxApiClaims, "iat" | "exp"> & {
   const p = b64urlEncode(utf8(JSON.stringify(payload)));
   const signingInput = `${h}.${p}`;
   const key = await hmacKey(getSecret());
-  const sig = new Uint8Array(await crypto.subtle.sign("HMAC", key, utf8(signingInput)));
+  const sig = new Uint8Array(await crypto.subtle.sign("HMAC", key, buf(signingInput)));
   return `${signingInput}.${b64urlEncode(sig)}`;
 }
 
@@ -80,7 +80,7 @@ export async function verifyPxApiJwt(token: string): Promise<PxApiClaims> {
   if (parts.length !== 3) throw new Error("Token inválido");
   const [h, p, s] = parts;
   const key = await hmacKey(getSecret());
-  const ok = await crypto.subtle.verify("HMAC", key, b64urlDecode(s), utf8(`${h}.${p}`));
+  const ok = await crypto.subtle.verify("HMAC", key, buf(b64urlDecode(s)), buf(`${h}.${p}`));
   if (!ok) throw new Error("Assinatura inválida");
   let payload: PxApiClaims;
   try {
@@ -96,7 +96,7 @@ export async function verifyPxApiJwt(token: string): Promise<PxApiClaims> {
 // Hash determinístico de api_key/secret/refresh_token usando SHA-256 (hex).
 // Suficiente porque o "segredo" original é gerado com alta entropia (>=32 bytes random).
 export async function sha256Hex(input: string): Promise<string> {
-  const digest = await crypto.subtle.digest("SHA-256", utf8(input));
+  const digest = await crypto.subtle.digest("SHA-256", buf(input));
   const bytes = new Uint8Array(digest);
   let hex = "";
   for (let i = 0; i < bytes.length; i++) hex += bytes[i].toString(16).padStart(2, "0");
