@@ -265,7 +265,7 @@ function cors() {
   };
 }
 
-export const Route = createFileRoute("/api/public/v1/openapi[.]json")({
+export const Route = createFileRoute("/api/public/v1/openapi/json")({
   server: {
     handlers: {
       OPTIONS: async () => new Response(null, { status: 204, headers: cors() }),

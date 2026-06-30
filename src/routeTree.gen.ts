@@ -77,7 +77,9 @@ import { Route as AuthenticatedTmsLmConfiguracoesRouteImport } from './routes/_a
 import { Route as AuthenticatedTmsLmComprovantesRouteImport } from './routes/_authenticated/tms.lm.comprovantes'
 import { Route as AuthenticatedTmsLmCarregamentoRouteImport } from './routes/_authenticated/tms.lm.carregamento'
 import { Route as AuthenticatedTmsEtiquetasMinutaRouteImport } from './routes/_authenticated/tms.etiquetas.$minuta'
+import { Route as AuthenticatedAdminPxApiDocsRouteImport } from './routes/_authenticated/admin.px-api.docs'
 import { Route as ApiPublicV1UsuariosIdRouteImport } from './routes/api/public/v1/usuarios.$id'
+import { Route as ApiPublicV1OpenapiJsonRouteImport } from './routes/api/public/v1/openapi.json'
 import { Route as ApiPublicV1EmpresasIdRouteImport } from './routes/api/public/v1/empresas.$id'
 import { Route as ApiPublicV1ClientesIdRouteImport } from './routes/api/public/v1/clientes.$id'
 import { Route as ApiPublicV1AuthTokenRouteImport } from './routes/api/public/v1/auth/token'
@@ -465,10 +467,21 @@ const AuthenticatedTmsEtiquetasMinutaRoute =
     path: '/tms/etiquetas/$minuta',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminPxApiDocsRoute =
+  AuthenticatedAdminPxApiDocsRouteImport.update({
+    id: '/docs',
+    path: '/docs',
+    getParentRoute: () => AuthenticatedAdminPxApiRoute,
+  } as any)
 const ApiPublicV1UsuariosIdRoute = ApiPublicV1UsuariosIdRouteImport.update({
   id: '/$id',
   path: '/$id',
   getParentRoute: () => ApiPublicV1UsuariosRoute,
+} as any)
+const ApiPublicV1OpenapiJsonRoute = ApiPublicV1OpenapiJsonRouteImport.update({
+  id: '/api/public/v1/openapi/json',
+  path: '/api/public/v1/openapi/json',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicV1EmpresasIdRoute = ApiPublicV1EmpresasIdRouteImport.update({
   id: '/$id',
@@ -577,7 +590,7 @@ export interface FileRoutesByFullPath {
   '/timeline': typeof AuthenticatedTimelineRoute
   '/valuation': typeof AuthenticatedValuationRoute
   '/admin/perfis': typeof AuthenticatedAdminPerfisRoute
-  '/admin/px-api': typeof AuthenticatedAdminPxApiRoute
+  '/admin/px-api': typeof AuthenticatedAdminPxApiRouteWithChildren
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/financial-intelligence/break-even': typeof AuthenticatedFinancialIntelligenceBreakEvenRoute
   '/financial-intelligence/dfc': typeof AuthenticatedFinancialIntelligenceDfcRoute
@@ -597,6 +610,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/financial-intelligence/': typeof AuthenticatedFinancialIntelligenceIndexRoute
   '/tms/': typeof AuthenticatedTmsIndexRoute
+  '/admin/px-api/docs': typeof AuthenticatedAdminPxApiDocsRoute
   '/tms/etiquetas/$minuta': typeof AuthenticatedTmsEtiquetasMinutaRoute
   '/tms/lm/carregamento': typeof AuthenticatedTmsLmCarregamentoRoute
   '/tms/lm/comprovantes': typeof AuthenticatedTmsLmComprovantesRoute
@@ -625,6 +639,7 @@ export interface FileRoutesByFullPath {
   '/api/public/v1/auth/token': typeof ApiPublicV1AuthTokenRoute
   '/api/public/v1/clientes/$id': typeof ApiPublicV1ClientesIdRouteWithChildren
   '/api/public/v1/empresas/$id': typeof ApiPublicV1EmpresasIdRoute
+  '/api/public/v1/openapi/json': typeof ApiPublicV1OpenapiJsonRoute
   '/api/public/v1/usuarios/$id': typeof ApiPublicV1UsuariosIdRoute
   '/api/public/v1/clientes/$id/conta-corrente': typeof ApiPublicV1ClientesIdContaCorrenteRoute
   '/api/public/v1/clientes/$id/contatos': typeof ApiPublicV1ClientesIdContatosRouteWithChildren
@@ -660,7 +675,7 @@ export interface FileRoutesByTo {
   '/valuation': typeof AuthenticatedValuationRoute
   '/': typeof AuthenticatedIndexRoute
   '/admin/perfis': typeof AuthenticatedAdminPerfisRoute
-  '/admin/px-api': typeof AuthenticatedAdminPxApiRoute
+  '/admin/px-api': typeof AuthenticatedAdminPxApiRouteWithChildren
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/financial-intelligence/break-even': typeof AuthenticatedFinancialIntelligenceBreakEvenRoute
   '/financial-intelligence/dfc': typeof AuthenticatedFinancialIntelligenceDfcRoute
@@ -679,6 +694,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/financial-intelligence': typeof AuthenticatedFinancialIntelligenceIndexRoute
   '/tms': typeof AuthenticatedTmsIndexRoute
+  '/admin/px-api/docs': typeof AuthenticatedAdminPxApiDocsRoute
   '/tms/etiquetas/$minuta': typeof AuthenticatedTmsEtiquetasMinutaRoute
   '/tms/lm/carregamento': typeof AuthenticatedTmsLmCarregamentoRoute
   '/tms/lm/comprovantes': typeof AuthenticatedTmsLmComprovantesRoute
@@ -707,6 +723,7 @@ export interface FileRoutesByTo {
   '/api/public/v1/auth/token': typeof ApiPublicV1AuthTokenRoute
   '/api/public/v1/clientes/$id': typeof ApiPublicV1ClientesIdRouteWithChildren
   '/api/public/v1/empresas/$id': typeof ApiPublicV1EmpresasIdRoute
+  '/api/public/v1/openapi/json': typeof ApiPublicV1OpenapiJsonRoute
   '/api/public/v1/usuarios/$id': typeof ApiPublicV1UsuariosIdRoute
   '/api/public/v1/clientes/$id/conta-corrente': typeof ApiPublicV1ClientesIdContaCorrenteRoute
   '/api/public/v1/clientes/$id/contatos': typeof ApiPublicV1ClientesIdContatosRouteWithChildren
@@ -745,7 +762,7 @@ export interface FileRoutesById {
   '/_authenticated/valuation': typeof AuthenticatedValuationRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/admin/perfis': typeof AuthenticatedAdminPerfisRoute
-  '/_authenticated/admin/px-api': typeof AuthenticatedAdminPxApiRoute
+  '/_authenticated/admin/px-api': typeof AuthenticatedAdminPxApiRouteWithChildren
   '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/_authenticated/financial-intelligence/break-even': typeof AuthenticatedFinancialIntelligenceBreakEvenRoute
   '/_authenticated/financial-intelligence/dfc': typeof AuthenticatedFinancialIntelligenceDfcRoute
@@ -765,6 +782,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/financial-intelligence/': typeof AuthenticatedFinancialIntelligenceIndexRoute
   '/_authenticated/tms/': typeof AuthenticatedTmsIndexRoute
+  '/_authenticated/admin/px-api/docs': typeof AuthenticatedAdminPxApiDocsRoute
   '/_authenticated/tms/etiquetas/$minuta': typeof AuthenticatedTmsEtiquetasMinutaRoute
   '/_authenticated/tms/lm/carregamento': typeof AuthenticatedTmsLmCarregamentoRoute
   '/_authenticated/tms/lm/comprovantes': typeof AuthenticatedTmsLmComprovantesRoute
@@ -793,6 +811,7 @@ export interface FileRoutesById {
   '/api/public/v1/auth/token': typeof ApiPublicV1AuthTokenRoute
   '/api/public/v1/clientes/$id': typeof ApiPublicV1ClientesIdRouteWithChildren
   '/api/public/v1/empresas/$id': typeof ApiPublicV1EmpresasIdRoute
+  '/api/public/v1/openapi/json': typeof ApiPublicV1OpenapiJsonRoute
   '/api/public/v1/usuarios/$id': typeof ApiPublicV1UsuariosIdRoute
   '/api/public/v1/clientes/$id/conta-corrente': typeof ApiPublicV1ClientesIdContaCorrenteRoute
   '/api/public/v1/clientes/$id/contatos': typeof ApiPublicV1ClientesIdContatosRouteWithChildren
@@ -851,6 +870,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/financial-intelligence/'
     | '/tms/'
+    | '/admin/px-api/docs'
     | '/tms/etiquetas/$minuta'
     | '/tms/lm/carregamento'
     | '/tms/lm/comprovantes'
@@ -879,6 +899,7 @@ export interface FileRouteTypes {
     | '/api/public/v1/auth/token'
     | '/api/public/v1/clientes/$id'
     | '/api/public/v1/empresas/$id'
+    | '/api/public/v1/openapi/json'
     | '/api/public/v1/usuarios/$id'
     | '/api/public/v1/clientes/$id/conta-corrente'
     | '/api/public/v1/clientes/$id/contatos'
@@ -933,6 +954,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/financial-intelligence'
     | '/tms'
+    | '/admin/px-api/docs'
     | '/tms/etiquetas/$minuta'
     | '/tms/lm/carregamento'
     | '/tms/lm/comprovantes'
@@ -961,6 +983,7 @@ export interface FileRouteTypes {
     | '/api/public/v1/auth/token'
     | '/api/public/v1/clientes/$id'
     | '/api/public/v1/empresas/$id'
+    | '/api/public/v1/openapi/json'
     | '/api/public/v1/usuarios/$id'
     | '/api/public/v1/clientes/$id/conta-corrente'
     | '/api/public/v1/clientes/$id/contatos'
@@ -1018,6 +1041,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/'
     | '/_authenticated/financial-intelligence/'
     | '/_authenticated/tms/'
+    | '/_authenticated/admin/px-api/docs'
     | '/_authenticated/tms/etiquetas/$minuta'
     | '/_authenticated/tms/lm/carregamento'
     | '/_authenticated/tms/lm/comprovantes'
@@ -1046,6 +1070,7 @@ export interface FileRouteTypes {
     | '/api/public/v1/auth/token'
     | '/api/public/v1/clientes/$id'
     | '/api/public/v1/empresas/$id'
+    | '/api/public/v1/openapi/json'
     | '/api/public/v1/usuarios/$id'
     | '/api/public/v1/clientes/$id/conta-corrente'
     | '/api/public/v1/clientes/$id/contatos'
@@ -1070,6 +1095,7 @@ export interface RootRouteChildren {
   ApiPublicV1UsuariosRoute: typeof ApiPublicV1UsuariosRouteWithChildren
   ApiPublicV1AuthRefreshRoute: typeof ApiPublicV1AuthRefreshRoute
   ApiPublicV1AuthTokenRoute: typeof ApiPublicV1AuthTokenRoute
+  ApiPublicV1OpenapiJsonRoute: typeof ApiPublicV1OpenapiJsonRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1550,12 +1576,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTmsEtiquetasMinutaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/px-api/docs': {
+      id: '/_authenticated/admin/px-api/docs'
+      path: '/docs'
+      fullPath: '/admin/px-api/docs'
+      preLoaderRoute: typeof AuthenticatedAdminPxApiDocsRouteImport
+      parentRoute: typeof AuthenticatedAdminPxApiRoute
+    }
     '/api/public/v1/usuarios/$id': {
       id: '/api/public/v1/usuarios/$id'
       path: '/$id'
       fullPath: '/api/public/v1/usuarios/$id'
       preLoaderRoute: typeof ApiPublicV1UsuariosIdRouteImport
       parentRoute: typeof ApiPublicV1UsuariosRoute
+    }
+    '/api/public/v1/openapi/json': {
+      id: '/api/public/v1/openapi/json'
+      path: '/api/public/v1/openapi/json'
+      fullPath: '/api/public/v1/openapi/json'
+      preLoaderRoute: typeof ApiPublicV1OpenapiJsonRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/public/v1/empresas/$id': {
       id: '/api/public/v1/empresas/$id'
@@ -1682,6 +1722,20 @@ const AuthenticatedFinancialIntelligenceRouteWithChildren =
     AuthenticatedFinancialIntelligenceRouteChildren,
   )
 
+interface AuthenticatedAdminPxApiRouteChildren {
+  AuthenticatedAdminPxApiDocsRoute: typeof AuthenticatedAdminPxApiDocsRoute
+}
+
+const AuthenticatedAdminPxApiRouteChildren: AuthenticatedAdminPxApiRouteChildren =
+  {
+    AuthenticatedAdminPxApiDocsRoute: AuthenticatedAdminPxApiDocsRoute,
+  }
+
+const AuthenticatedAdminPxApiRouteWithChildren =
+  AuthenticatedAdminPxApiRoute._addFileChildren(
+    AuthenticatedAdminPxApiRouteChildren,
+  )
+
 interface AuthenticatedTmsSolicitacoesRouteChildren {
   AuthenticatedTmsSolicitacoesNovaRoute: typeof AuthenticatedTmsSolicitacoesNovaRoute
   AuthenticatedTmsSolicitacoesIndexRoute: typeof AuthenticatedTmsSolicitacoesIndexRoute
@@ -1752,7 +1806,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedValuationRoute: typeof AuthenticatedValuationRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedAdminPerfisRoute: typeof AuthenticatedAdminPerfisRoute
-  AuthenticatedAdminPxApiRoute: typeof AuthenticatedAdminPxApiRoute
+  AuthenticatedAdminPxApiRoute: typeof AuthenticatedAdminPxApiRouteWithChildren
   AuthenticatedAdminUsuariosRoute: typeof AuthenticatedAdminUsuariosRoute
   AuthenticatedRegistryClientesRoute: typeof AuthenticatedRegistryClientesRoute
   AuthenticatedTmsClientesRoute: typeof AuthenticatedTmsClientesRoute
@@ -1808,7 +1862,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedValuationRoute: AuthenticatedValuationRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedAdminPerfisRoute: AuthenticatedAdminPerfisRoute,
-  AuthenticatedAdminPxApiRoute: AuthenticatedAdminPxApiRoute,
+  AuthenticatedAdminPxApiRoute: AuthenticatedAdminPxApiRouteWithChildren,
   AuthenticatedAdminUsuariosRoute: AuthenticatedAdminUsuariosRoute,
   AuthenticatedRegistryClientesRoute: AuthenticatedRegistryClientesRoute,
   AuthenticatedTmsClientesRoute: AuthenticatedTmsClientesRoute,
@@ -1946,6 +2000,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicV1UsuariosRoute: ApiPublicV1UsuariosRouteWithChildren,
   ApiPublicV1AuthRefreshRoute: ApiPublicV1AuthRefreshRoute,
   ApiPublicV1AuthTokenRoute: ApiPublicV1AuthTokenRoute,
+  ApiPublicV1OpenapiJsonRoute: ApiPublicV1OpenapiJsonRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
