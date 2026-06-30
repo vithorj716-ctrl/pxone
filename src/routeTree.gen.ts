@@ -80,7 +80,10 @@ import { Route as AuthenticatedTmsLmCarregamentoRouteImport } from './routes/_au
 import { Route as AuthenticatedTmsEtiquetasMinutaRouteImport } from './routes/_authenticated/tms.etiquetas.$minuta'
 import { Route as AuthenticatedAdminPxApiDocsRouteImport } from './routes/_authenticated/admin.px-api.docs'
 import { Route as ApiPublicV1UsuariosIdRouteImport } from './routes/api/public/v1/usuarios.$id'
+import { Route as ApiPublicV1FinanceiroLancamentosRouteImport } from './routes/api/public/v1/financeiro.lancamentos'
+import { Route as ApiPublicV1FinanceiroConsolidadoRouteImport } from './routes/api/public/v1/financeiro.consolidado'
 import { Route as ApiPublicV1EmpresasIdRouteImport } from './routes/api/public/v1/empresas.$id'
+import { Route as ApiPublicV1DashboardExecutivoRouteImport } from './routes/api/public/v1/dashboard.executivo'
 import { Route as ApiPublicV1ClientesIdRouteImport } from './routes/api/public/v1/clientes.$id'
 import { Route as ApiPublicV1AuthTokenRouteImport } from './routes/api/public/v1/auth/token'
 import { Route as ApiPublicV1AuthRefreshRouteImport } from './routes/api/public/v1/auth/refresh'
@@ -484,11 +487,29 @@ const ApiPublicV1UsuariosIdRoute = ApiPublicV1UsuariosIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => ApiPublicV1UsuariosRoute,
 } as any)
+const ApiPublicV1FinanceiroLancamentosRoute =
+  ApiPublicV1FinanceiroLancamentosRouteImport.update({
+    id: '/api/public/v1/financeiro/lancamentos',
+    path: '/api/public/v1/financeiro/lancamentos',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicV1FinanceiroConsolidadoRoute =
+  ApiPublicV1FinanceiroConsolidadoRouteImport.update({
+    id: '/api/public/v1/financeiro/consolidado',
+    path: '/api/public/v1/financeiro/consolidado',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicV1EmpresasIdRoute = ApiPublicV1EmpresasIdRouteImport.update({
   id: '/$id',
   path: '/$id',
   getParentRoute: () => ApiPublicV1EmpresasRoute,
 } as any)
+const ApiPublicV1DashboardExecutivoRoute =
+  ApiPublicV1DashboardExecutivoRouteImport.update({
+    id: '/api/public/v1/dashboard/executivo',
+    path: '/api/public/v1/dashboard/executivo',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicV1ClientesIdRoute = ApiPublicV1ClientesIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -640,7 +661,10 @@ export interface FileRoutesByFullPath {
   '/api/public/v1/auth/refresh': typeof ApiPublicV1AuthRefreshRoute
   '/api/public/v1/auth/token': typeof ApiPublicV1AuthTokenRoute
   '/api/public/v1/clientes/$id': typeof ApiPublicV1ClientesIdRouteWithChildren
+  '/api/public/v1/dashboard/executivo': typeof ApiPublicV1DashboardExecutivoRoute
   '/api/public/v1/empresas/$id': typeof ApiPublicV1EmpresasIdRoute
+  '/api/public/v1/financeiro/consolidado': typeof ApiPublicV1FinanceiroConsolidadoRoute
+  '/api/public/v1/financeiro/lancamentos': typeof ApiPublicV1FinanceiroLancamentosRoute
   '/api/public/v1/usuarios/$id': typeof ApiPublicV1UsuariosIdRoute
   '/api/public/v1/clientes/$id/conta-corrente': typeof ApiPublicV1ClientesIdContaCorrenteRoute
   '/api/public/v1/clientes/$id/contatos': typeof ApiPublicV1ClientesIdContatosRouteWithChildren
@@ -724,7 +748,10 @@ export interface FileRoutesByTo {
   '/api/public/v1/auth/refresh': typeof ApiPublicV1AuthRefreshRoute
   '/api/public/v1/auth/token': typeof ApiPublicV1AuthTokenRoute
   '/api/public/v1/clientes/$id': typeof ApiPublicV1ClientesIdRouteWithChildren
+  '/api/public/v1/dashboard/executivo': typeof ApiPublicV1DashboardExecutivoRoute
   '/api/public/v1/empresas/$id': typeof ApiPublicV1EmpresasIdRoute
+  '/api/public/v1/financeiro/consolidado': typeof ApiPublicV1FinanceiroConsolidadoRoute
+  '/api/public/v1/financeiro/lancamentos': typeof ApiPublicV1FinanceiroLancamentosRoute
   '/api/public/v1/usuarios/$id': typeof ApiPublicV1UsuariosIdRoute
   '/api/public/v1/clientes/$id/conta-corrente': typeof ApiPublicV1ClientesIdContaCorrenteRoute
   '/api/public/v1/clientes/$id/contatos': typeof ApiPublicV1ClientesIdContatosRouteWithChildren
@@ -812,7 +839,10 @@ export interface FileRoutesById {
   '/api/public/v1/auth/refresh': typeof ApiPublicV1AuthRefreshRoute
   '/api/public/v1/auth/token': typeof ApiPublicV1AuthTokenRoute
   '/api/public/v1/clientes/$id': typeof ApiPublicV1ClientesIdRouteWithChildren
+  '/api/public/v1/dashboard/executivo': typeof ApiPublicV1DashboardExecutivoRoute
   '/api/public/v1/empresas/$id': typeof ApiPublicV1EmpresasIdRoute
+  '/api/public/v1/financeiro/consolidado': typeof ApiPublicV1FinanceiroConsolidadoRoute
+  '/api/public/v1/financeiro/lancamentos': typeof ApiPublicV1FinanceiroLancamentosRoute
   '/api/public/v1/usuarios/$id': typeof ApiPublicV1UsuariosIdRoute
   '/api/public/v1/clientes/$id/conta-corrente': typeof ApiPublicV1ClientesIdContaCorrenteRoute
   '/api/public/v1/clientes/$id/contatos': typeof ApiPublicV1ClientesIdContatosRouteWithChildren
@@ -900,7 +930,10 @@ export interface FileRouteTypes {
     | '/api/public/v1/auth/refresh'
     | '/api/public/v1/auth/token'
     | '/api/public/v1/clientes/$id'
+    | '/api/public/v1/dashboard/executivo'
     | '/api/public/v1/empresas/$id'
+    | '/api/public/v1/financeiro/consolidado'
+    | '/api/public/v1/financeiro/lancamentos'
     | '/api/public/v1/usuarios/$id'
     | '/api/public/v1/clientes/$id/conta-corrente'
     | '/api/public/v1/clientes/$id/contatos'
@@ -984,7 +1017,10 @@ export interface FileRouteTypes {
     | '/api/public/v1/auth/refresh'
     | '/api/public/v1/auth/token'
     | '/api/public/v1/clientes/$id'
+    | '/api/public/v1/dashboard/executivo'
     | '/api/public/v1/empresas/$id'
+    | '/api/public/v1/financeiro/consolidado'
+    | '/api/public/v1/financeiro/lancamentos'
     | '/api/public/v1/usuarios/$id'
     | '/api/public/v1/clientes/$id/conta-corrente'
     | '/api/public/v1/clientes/$id/contatos'
@@ -1071,7 +1107,10 @@ export interface FileRouteTypes {
     | '/api/public/v1/auth/refresh'
     | '/api/public/v1/auth/token'
     | '/api/public/v1/clientes/$id'
+    | '/api/public/v1/dashboard/executivo'
     | '/api/public/v1/empresas/$id'
+    | '/api/public/v1/financeiro/consolidado'
+    | '/api/public/v1/financeiro/lancamentos'
     | '/api/public/v1/usuarios/$id'
     | '/api/public/v1/clientes/$id/conta-corrente'
     | '/api/public/v1/clientes/$id/contatos'
@@ -1097,6 +1136,9 @@ export interface RootRouteChildren {
   ApiPublicV1UsuariosRoute: typeof ApiPublicV1UsuariosRouteWithChildren
   ApiPublicV1AuthRefreshRoute: typeof ApiPublicV1AuthRefreshRoute
   ApiPublicV1AuthTokenRoute: typeof ApiPublicV1AuthTokenRoute
+  ApiPublicV1DashboardExecutivoRoute: typeof ApiPublicV1DashboardExecutivoRoute
+  ApiPublicV1FinanceiroConsolidadoRoute: typeof ApiPublicV1FinanceiroConsolidadoRoute
+  ApiPublicV1FinanceiroLancamentosRoute: typeof ApiPublicV1FinanceiroLancamentosRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1598,12 +1640,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicV1UsuariosIdRouteImport
       parentRoute: typeof ApiPublicV1UsuariosRoute
     }
+    '/api/public/v1/financeiro/lancamentos': {
+      id: '/api/public/v1/financeiro/lancamentos'
+      path: '/api/public/v1/financeiro/lancamentos'
+      fullPath: '/api/public/v1/financeiro/lancamentos'
+      preLoaderRoute: typeof ApiPublicV1FinanceiroLancamentosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/v1/financeiro/consolidado': {
+      id: '/api/public/v1/financeiro/consolidado'
+      path: '/api/public/v1/financeiro/consolidado'
+      fullPath: '/api/public/v1/financeiro/consolidado'
+      preLoaderRoute: typeof ApiPublicV1FinanceiroConsolidadoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/v1/empresas/$id': {
       id: '/api/public/v1/empresas/$id'
       path: '/$id'
       fullPath: '/api/public/v1/empresas/$id'
       preLoaderRoute: typeof ApiPublicV1EmpresasIdRouteImport
       parentRoute: typeof ApiPublicV1EmpresasRoute
+    }
+    '/api/public/v1/dashboard/executivo': {
+      id: '/api/public/v1/dashboard/executivo'
+      path: '/api/public/v1/dashboard/executivo'
+      fullPath: '/api/public/v1/dashboard/executivo'
+      preLoaderRoute: typeof ApiPublicV1DashboardExecutivoRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/public/v1/clientes/$id': {
       id: '/api/public/v1/clientes/$id'
@@ -2002,17 +2065,10 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicV1UsuariosRoute: ApiPublicV1UsuariosRouteWithChildren,
   ApiPublicV1AuthRefreshRoute: ApiPublicV1AuthRefreshRoute,
   ApiPublicV1AuthTokenRoute: ApiPublicV1AuthTokenRoute,
+  ApiPublicV1DashboardExecutivoRoute: ApiPublicV1DashboardExecutivoRoute,
+  ApiPublicV1FinanceiroConsolidadoRoute: ApiPublicV1FinanceiroConsolidadoRoute,
+  ApiPublicV1FinanceiroLancamentosRoute: ApiPublicV1FinanceiroLancamentosRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

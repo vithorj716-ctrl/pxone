@@ -23,6 +23,8 @@ const ESCOPOS_VALIDOS = [
   "perfis:read",
   "categorias:read",
   "tabela-frete:read",
+  "financeiro:write",
+  "dashboard:read",
   "admin:write",
 ];
 
