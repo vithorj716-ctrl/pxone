@@ -82,6 +82,12 @@ function PxApiAdmin() {
             </div>
           </div>
         </div>
+        <Link
+          to="/admin/px-api/docs"
+          className="text-xs px-3 py-1.5 rounded-md border border-border hover:bg-surface/60"
+        >
+          Swagger UI ↗
+        </Link>
       </header>
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
@@ -418,6 +424,15 @@ function ApiDocsTab() {
   -H "authorization: Bearer <access_token>"`;
   return (
     <div className="space-y-4 text-sm">
+      <div className="flex items-center justify-between rounded-md border border-border bg-surface/40 px-3 py-2">
+        <p className="text-xs text-muted-foreground">
+          Documentação interativa OpenAPI 3.1 — teste qualquer endpoint direto do navegador.
+        </p>
+        <div className="flex items-center gap-2">
+          <a href="/api/public/v1/openapi.json" target="_blank" rel="noreferrer" className="text-xs underline text-muted-foreground hover:text-foreground">openapi.json</a>
+          <Link to="/admin/px-api/docs" className="text-xs px-3 py-1 rounded-md bg-brand text-background hover:opacity-90">Abrir Swagger UI</Link>
+        </div>
+      </div>
       <p className="text-muted-foreground">
         A PX API é o ponto único de acesso aos dados centralizados do PXOne. Toda integração
         deve autenticar via <code>POST /api/public/v1/auth/token</code> e enviar o JWT

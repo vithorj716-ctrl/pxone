@@ -60,6 +60,7 @@ import { Route as AuthenticatedTmsLmIndexRouteImport } from './routes/_authentic
 import { Route as ApiPublicV1UsuariosRouteImport } from './routes/api/public/v1/usuarios'
 import { Route as ApiPublicV1TabelasFreteRouteImport } from './routes/api/public/v1/tabelas-frete'
 import { Route as ApiPublicV1PerfisRouteImport } from './routes/api/public/v1/perfis'
+import { Route as ApiPublicV1OpenapiDotjsonRouteImport } from './routes/api/public/v1/openapi[.]json'
 import { Route as ApiPublicV1HealthRouteImport } from './routes/api/public/v1/health'
 import { Route as ApiPublicV1FiliaisRouteImport } from './routes/api/public/v1/filiais'
 import { Route as ApiPublicV1EmpresasRouteImport } from './routes/api/public/v1/empresas'
@@ -77,6 +78,7 @@ import { Route as AuthenticatedTmsLmConfiguracoesRouteImport } from './routes/_a
 import { Route as AuthenticatedTmsLmComprovantesRouteImport } from './routes/_authenticated/tms.lm.comprovantes'
 import { Route as AuthenticatedTmsLmCarregamentoRouteImport } from './routes/_authenticated/tms.lm.carregamento'
 import { Route as AuthenticatedTmsEtiquetasMinutaRouteImport } from './routes/_authenticated/tms.etiquetas.$minuta'
+import { Route as AuthenticatedAdminPxApiDocsRouteImport } from './routes/_authenticated/admin.px-api.docs'
 import { Route as ApiPublicV1UsuariosIdRouteImport } from './routes/api/public/v1/usuarios.$id'
 import { Route as ApiPublicV1EmpresasIdRouteImport } from './routes/api/public/v1/empresas.$id'
 import { Route as ApiPublicV1ClientesIdRouteImport } from './routes/api/public/v1/clientes.$id'
@@ -368,6 +370,12 @@ const ApiPublicV1PerfisRoute = ApiPublicV1PerfisRouteImport.update({
   path: '/api/public/v1/perfis',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicV1OpenapiDotjsonRoute =
+  ApiPublicV1OpenapiDotjsonRouteImport.update({
+    id: '/api/public/v1/openapi.json',
+    path: '/api/public/v1/openapi.json',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicV1HealthRoute = ApiPublicV1HealthRouteImport.update({
   id: '/api/public/v1/health',
   path: '/api/public/v1/health',
@@ -464,6 +472,12 @@ const AuthenticatedTmsEtiquetasMinutaRoute =
     id: '/tms/etiquetas/$minuta',
     path: '/tms/etiquetas/$minuta',
     getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminPxApiDocsRoute =
+  AuthenticatedAdminPxApiDocsRouteImport.update({
+    id: '/docs',
+    path: '/docs',
+    getParentRoute: () => AuthenticatedAdminPxApiRoute,
   } as any)
 const ApiPublicV1UsuariosIdRoute = ApiPublicV1UsuariosIdRouteImport.update({
   id: '/$id',
@@ -577,7 +591,7 @@ export interface FileRoutesByFullPath {
   '/timeline': typeof AuthenticatedTimelineRoute
   '/valuation': typeof AuthenticatedValuationRoute
   '/admin/perfis': typeof AuthenticatedAdminPerfisRoute
-  '/admin/px-api': typeof AuthenticatedAdminPxApiRoute
+  '/admin/px-api': typeof AuthenticatedAdminPxApiRouteWithChildren
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/financial-intelligence/break-even': typeof AuthenticatedFinancialIntelligenceBreakEvenRoute
   '/financial-intelligence/dfc': typeof AuthenticatedFinancialIntelligenceDfcRoute
@@ -597,6 +611,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/financial-intelligence/': typeof AuthenticatedFinancialIntelligenceIndexRoute
   '/tms/': typeof AuthenticatedTmsIndexRoute
+  '/admin/px-api/docs': typeof AuthenticatedAdminPxApiDocsRoute
   '/tms/etiquetas/$minuta': typeof AuthenticatedTmsEtiquetasMinutaRoute
   '/tms/lm/carregamento': typeof AuthenticatedTmsLmCarregamentoRoute
   '/tms/lm/comprovantes': typeof AuthenticatedTmsLmComprovantesRoute
@@ -614,6 +629,7 @@ export interface FileRoutesByFullPath {
   '/api/public/v1/empresas': typeof ApiPublicV1EmpresasRouteWithChildren
   '/api/public/v1/filiais': typeof ApiPublicV1FiliaisRoute
   '/api/public/v1/health': typeof ApiPublicV1HealthRoute
+  '/api/public/v1/openapi.json': typeof ApiPublicV1OpenapiDotjsonRoute
   '/api/public/v1/perfis': typeof ApiPublicV1PerfisRoute
   '/api/public/v1/tabelas-frete': typeof ApiPublicV1TabelasFreteRoute
   '/api/public/v1/usuarios': typeof ApiPublicV1UsuariosRouteWithChildren
@@ -660,7 +676,7 @@ export interface FileRoutesByTo {
   '/valuation': typeof AuthenticatedValuationRoute
   '/': typeof AuthenticatedIndexRoute
   '/admin/perfis': typeof AuthenticatedAdminPerfisRoute
-  '/admin/px-api': typeof AuthenticatedAdminPxApiRoute
+  '/admin/px-api': typeof AuthenticatedAdminPxApiRouteWithChildren
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/financial-intelligence/break-even': typeof AuthenticatedFinancialIntelligenceBreakEvenRoute
   '/financial-intelligence/dfc': typeof AuthenticatedFinancialIntelligenceDfcRoute
@@ -679,6 +695,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/financial-intelligence': typeof AuthenticatedFinancialIntelligenceIndexRoute
   '/tms': typeof AuthenticatedTmsIndexRoute
+  '/admin/px-api/docs': typeof AuthenticatedAdminPxApiDocsRoute
   '/tms/etiquetas/$minuta': typeof AuthenticatedTmsEtiquetasMinutaRoute
   '/tms/lm/carregamento': typeof AuthenticatedTmsLmCarregamentoRoute
   '/tms/lm/comprovantes': typeof AuthenticatedTmsLmComprovantesRoute
@@ -696,6 +713,7 @@ export interface FileRoutesByTo {
   '/api/public/v1/empresas': typeof ApiPublicV1EmpresasRouteWithChildren
   '/api/public/v1/filiais': typeof ApiPublicV1FiliaisRoute
   '/api/public/v1/health': typeof ApiPublicV1HealthRoute
+  '/api/public/v1/openapi.json': typeof ApiPublicV1OpenapiDotjsonRoute
   '/api/public/v1/perfis': typeof ApiPublicV1PerfisRoute
   '/api/public/v1/tabelas-frete': typeof ApiPublicV1TabelasFreteRoute
   '/api/public/v1/usuarios': typeof ApiPublicV1UsuariosRouteWithChildren
@@ -745,7 +763,7 @@ export interface FileRoutesById {
   '/_authenticated/valuation': typeof AuthenticatedValuationRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/admin/perfis': typeof AuthenticatedAdminPerfisRoute
-  '/_authenticated/admin/px-api': typeof AuthenticatedAdminPxApiRoute
+  '/_authenticated/admin/px-api': typeof AuthenticatedAdminPxApiRouteWithChildren
   '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/_authenticated/financial-intelligence/break-even': typeof AuthenticatedFinancialIntelligenceBreakEvenRoute
   '/_authenticated/financial-intelligence/dfc': typeof AuthenticatedFinancialIntelligenceDfcRoute
@@ -765,6 +783,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/financial-intelligence/': typeof AuthenticatedFinancialIntelligenceIndexRoute
   '/_authenticated/tms/': typeof AuthenticatedTmsIndexRoute
+  '/_authenticated/admin/px-api/docs': typeof AuthenticatedAdminPxApiDocsRoute
   '/_authenticated/tms/etiquetas/$minuta': typeof AuthenticatedTmsEtiquetasMinutaRoute
   '/_authenticated/tms/lm/carregamento': typeof AuthenticatedTmsLmCarregamentoRoute
   '/_authenticated/tms/lm/comprovantes': typeof AuthenticatedTmsLmComprovantesRoute
@@ -782,6 +801,7 @@ export interface FileRoutesById {
   '/api/public/v1/empresas': typeof ApiPublicV1EmpresasRouteWithChildren
   '/api/public/v1/filiais': typeof ApiPublicV1FiliaisRoute
   '/api/public/v1/health': typeof ApiPublicV1HealthRoute
+  '/api/public/v1/openapi.json': typeof ApiPublicV1OpenapiDotjsonRoute
   '/api/public/v1/perfis': typeof ApiPublicV1PerfisRoute
   '/api/public/v1/tabelas-frete': typeof ApiPublicV1TabelasFreteRoute
   '/api/public/v1/usuarios': typeof ApiPublicV1UsuariosRouteWithChildren
@@ -851,6 +871,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/financial-intelligence/'
     | '/tms/'
+    | '/admin/px-api/docs'
     | '/tms/etiquetas/$minuta'
     | '/tms/lm/carregamento'
     | '/tms/lm/comprovantes'
@@ -868,6 +889,7 @@ export interface FileRouteTypes {
     | '/api/public/v1/empresas'
     | '/api/public/v1/filiais'
     | '/api/public/v1/health'
+    | '/api/public/v1/openapi.json'
     | '/api/public/v1/perfis'
     | '/api/public/v1/tabelas-frete'
     | '/api/public/v1/usuarios'
@@ -933,6 +955,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/financial-intelligence'
     | '/tms'
+    | '/admin/px-api/docs'
     | '/tms/etiquetas/$minuta'
     | '/tms/lm/carregamento'
     | '/tms/lm/comprovantes'
@@ -950,6 +973,7 @@ export interface FileRouteTypes {
     | '/api/public/v1/empresas'
     | '/api/public/v1/filiais'
     | '/api/public/v1/health'
+    | '/api/public/v1/openapi.json'
     | '/api/public/v1/perfis'
     | '/api/public/v1/tabelas-frete'
     | '/api/public/v1/usuarios'
@@ -1018,6 +1042,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/'
     | '/_authenticated/financial-intelligence/'
     | '/_authenticated/tms/'
+    | '/_authenticated/admin/px-api/docs'
     | '/_authenticated/tms/etiquetas/$minuta'
     | '/_authenticated/tms/lm/carregamento'
     | '/_authenticated/tms/lm/comprovantes'
@@ -1035,6 +1060,7 @@ export interface FileRouteTypes {
     | '/api/public/v1/empresas'
     | '/api/public/v1/filiais'
     | '/api/public/v1/health'
+    | '/api/public/v1/openapi.json'
     | '/api/public/v1/perfis'
     | '/api/public/v1/tabelas-frete'
     | '/api/public/v1/usuarios'
@@ -1065,6 +1091,7 @@ export interface RootRouteChildren {
   ApiPublicV1EmpresasRoute: typeof ApiPublicV1EmpresasRouteWithChildren
   ApiPublicV1FiliaisRoute: typeof ApiPublicV1FiliaisRoute
   ApiPublicV1HealthRoute: typeof ApiPublicV1HealthRoute
+  ApiPublicV1OpenapiDotjsonRoute: typeof ApiPublicV1OpenapiDotjsonRoute
   ApiPublicV1PerfisRoute: typeof ApiPublicV1PerfisRoute
   ApiPublicV1TabelasFreteRoute: typeof ApiPublicV1TabelasFreteRoute
   ApiPublicV1UsuariosRoute: typeof ApiPublicV1UsuariosRouteWithChildren
@@ -1431,6 +1458,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicV1PerfisRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/v1/openapi.json': {
+      id: '/api/public/v1/openapi.json'
+      path: '/api/public/v1/openapi.json'
+      fullPath: '/api/public/v1/openapi.json'
+      preLoaderRoute: typeof ApiPublicV1OpenapiDotjsonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/v1/health': {
       id: '/api/public/v1/health'
       path: '/api/public/v1/health'
@@ -1549,6 +1583,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/tms/etiquetas/$minuta'
       preLoaderRoute: typeof AuthenticatedTmsEtiquetasMinutaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/px-api/docs': {
+      id: '/_authenticated/admin/px-api/docs'
+      path: '/docs'
+      fullPath: '/admin/px-api/docs'
+      preLoaderRoute: typeof AuthenticatedAdminPxApiDocsRouteImport
+      parentRoute: typeof AuthenticatedAdminPxApiRoute
     }
     '/api/public/v1/usuarios/$id': {
       id: '/api/public/v1/usuarios/$id'
@@ -1682,6 +1723,20 @@ const AuthenticatedFinancialIntelligenceRouteWithChildren =
     AuthenticatedFinancialIntelligenceRouteChildren,
   )
 
+interface AuthenticatedAdminPxApiRouteChildren {
+  AuthenticatedAdminPxApiDocsRoute: typeof AuthenticatedAdminPxApiDocsRoute
+}
+
+const AuthenticatedAdminPxApiRouteChildren: AuthenticatedAdminPxApiRouteChildren =
+  {
+    AuthenticatedAdminPxApiDocsRoute: AuthenticatedAdminPxApiDocsRoute,
+  }
+
+const AuthenticatedAdminPxApiRouteWithChildren =
+  AuthenticatedAdminPxApiRoute._addFileChildren(
+    AuthenticatedAdminPxApiRouteChildren,
+  )
+
 interface AuthenticatedTmsSolicitacoesRouteChildren {
   AuthenticatedTmsSolicitacoesNovaRoute: typeof AuthenticatedTmsSolicitacoesNovaRoute
   AuthenticatedTmsSolicitacoesIndexRoute: typeof AuthenticatedTmsSolicitacoesIndexRoute
@@ -1752,7 +1807,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedValuationRoute: typeof AuthenticatedValuationRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedAdminPerfisRoute: typeof AuthenticatedAdminPerfisRoute
-  AuthenticatedAdminPxApiRoute: typeof AuthenticatedAdminPxApiRoute
+  AuthenticatedAdminPxApiRoute: typeof AuthenticatedAdminPxApiRouteWithChildren
   AuthenticatedAdminUsuariosRoute: typeof AuthenticatedAdminUsuariosRoute
   AuthenticatedRegistryClientesRoute: typeof AuthenticatedRegistryClientesRoute
   AuthenticatedTmsClientesRoute: typeof AuthenticatedTmsClientesRoute
@@ -1808,7 +1863,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedValuationRoute: AuthenticatedValuationRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedAdminPerfisRoute: AuthenticatedAdminPerfisRoute,
-  AuthenticatedAdminPxApiRoute: AuthenticatedAdminPxApiRoute,
+  AuthenticatedAdminPxApiRoute: AuthenticatedAdminPxApiRouteWithChildren,
   AuthenticatedAdminUsuariosRoute: AuthenticatedAdminUsuariosRoute,
   AuthenticatedRegistryClientesRoute: AuthenticatedRegistryClientesRoute,
   AuthenticatedTmsClientesRoute: AuthenticatedTmsClientesRoute,
@@ -1941,6 +1996,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicV1EmpresasRoute: ApiPublicV1EmpresasRouteWithChildren,
   ApiPublicV1FiliaisRoute: ApiPublicV1FiliaisRoute,
   ApiPublicV1HealthRoute: ApiPublicV1HealthRoute,
+  ApiPublicV1OpenapiDotjsonRoute: ApiPublicV1OpenapiDotjsonRoute,
   ApiPublicV1PerfisRoute: ApiPublicV1PerfisRoute,
   ApiPublicV1TabelasFreteRoute: ApiPublicV1TabelasFreteRoute,
   ApiPublicV1UsuariosRoute: ApiPublicV1UsuariosRouteWithChildren,
