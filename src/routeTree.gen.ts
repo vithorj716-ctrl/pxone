@@ -60,6 +60,7 @@ import { Route as AuthenticatedTmsLmIndexRouteImport } from './routes/_authentic
 import { Route as ApiPublicV1UsuariosRouteImport } from './routes/api/public/v1/usuarios'
 import { Route as ApiPublicV1TabelasFreteRouteImport } from './routes/api/public/v1/tabelas-frete'
 import { Route as ApiPublicV1PerfisRouteImport } from './routes/api/public/v1/perfis'
+import { Route as ApiPublicV1OpenapiDotjsonRouteImport } from './routes/api/public/v1/openapi[.]json'
 import { Route as ApiPublicV1HealthRouteImport } from './routes/api/public/v1/health'
 import { Route as ApiPublicV1FiliaisRouteImport } from './routes/api/public/v1/filiais'
 import { Route as ApiPublicV1EmpresasRouteImport } from './routes/api/public/v1/empresas'
@@ -79,7 +80,6 @@ import { Route as AuthenticatedTmsLmCarregamentoRouteImport } from './routes/_au
 import { Route as AuthenticatedTmsEtiquetasMinutaRouteImport } from './routes/_authenticated/tms.etiquetas.$minuta'
 import { Route as AuthenticatedAdminPxApiDocsRouteImport } from './routes/_authenticated/admin.px-api.docs'
 import { Route as ApiPublicV1UsuariosIdRouteImport } from './routes/api/public/v1/usuarios.$id'
-import { Route as ApiPublicV1OpenapiJsonRouteImport } from './routes/api/public/v1/openapi.json'
 import { Route as ApiPublicV1EmpresasIdRouteImport } from './routes/api/public/v1/empresas.$id'
 import { Route as ApiPublicV1ClientesIdRouteImport } from './routes/api/public/v1/clientes.$id'
 import { Route as ApiPublicV1AuthTokenRouteImport } from './routes/api/public/v1/auth/token'
@@ -370,6 +370,12 @@ const ApiPublicV1PerfisRoute = ApiPublicV1PerfisRouteImport.update({
   path: '/api/public/v1/perfis',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicV1OpenapiDotjsonRoute =
+  ApiPublicV1OpenapiDotjsonRouteImport.update({
+    id: '/api/public/v1/openapi.json',
+    path: '/api/public/v1/openapi.json',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicV1HealthRoute = ApiPublicV1HealthRouteImport.update({
   id: '/api/public/v1/health',
   path: '/api/public/v1/health',
@@ -477,11 +483,6 @@ const ApiPublicV1UsuariosIdRoute = ApiPublicV1UsuariosIdRouteImport.update({
   id: '/$id',
   path: '/$id',
   getParentRoute: () => ApiPublicV1UsuariosRoute,
-} as any)
-const ApiPublicV1OpenapiJsonRoute = ApiPublicV1OpenapiJsonRouteImport.update({
-  id: '/api/public/v1/openapi/json',
-  path: '/api/public/v1/openapi/json',
-  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicV1EmpresasIdRoute = ApiPublicV1EmpresasIdRouteImport.update({
   id: '/$id',
@@ -628,6 +629,7 @@ export interface FileRoutesByFullPath {
   '/api/public/v1/empresas': typeof ApiPublicV1EmpresasRouteWithChildren
   '/api/public/v1/filiais': typeof ApiPublicV1FiliaisRoute
   '/api/public/v1/health': typeof ApiPublicV1HealthRoute
+  '/api/public/v1/openapi.json': typeof ApiPublicV1OpenapiDotjsonRoute
   '/api/public/v1/perfis': typeof ApiPublicV1PerfisRoute
   '/api/public/v1/tabelas-frete': typeof ApiPublicV1TabelasFreteRoute
   '/api/public/v1/usuarios': typeof ApiPublicV1UsuariosRouteWithChildren
@@ -639,7 +641,6 @@ export interface FileRoutesByFullPath {
   '/api/public/v1/auth/token': typeof ApiPublicV1AuthTokenRoute
   '/api/public/v1/clientes/$id': typeof ApiPublicV1ClientesIdRouteWithChildren
   '/api/public/v1/empresas/$id': typeof ApiPublicV1EmpresasIdRoute
-  '/api/public/v1/openapi/json': typeof ApiPublicV1OpenapiJsonRoute
   '/api/public/v1/usuarios/$id': typeof ApiPublicV1UsuariosIdRoute
   '/api/public/v1/clientes/$id/conta-corrente': typeof ApiPublicV1ClientesIdContaCorrenteRoute
   '/api/public/v1/clientes/$id/contatos': typeof ApiPublicV1ClientesIdContatosRouteWithChildren
@@ -712,6 +713,7 @@ export interface FileRoutesByTo {
   '/api/public/v1/empresas': typeof ApiPublicV1EmpresasRouteWithChildren
   '/api/public/v1/filiais': typeof ApiPublicV1FiliaisRoute
   '/api/public/v1/health': typeof ApiPublicV1HealthRoute
+  '/api/public/v1/openapi.json': typeof ApiPublicV1OpenapiDotjsonRoute
   '/api/public/v1/perfis': typeof ApiPublicV1PerfisRoute
   '/api/public/v1/tabelas-frete': typeof ApiPublicV1TabelasFreteRoute
   '/api/public/v1/usuarios': typeof ApiPublicV1UsuariosRouteWithChildren
@@ -723,7 +725,6 @@ export interface FileRoutesByTo {
   '/api/public/v1/auth/token': typeof ApiPublicV1AuthTokenRoute
   '/api/public/v1/clientes/$id': typeof ApiPublicV1ClientesIdRouteWithChildren
   '/api/public/v1/empresas/$id': typeof ApiPublicV1EmpresasIdRoute
-  '/api/public/v1/openapi/json': typeof ApiPublicV1OpenapiJsonRoute
   '/api/public/v1/usuarios/$id': typeof ApiPublicV1UsuariosIdRoute
   '/api/public/v1/clientes/$id/conta-corrente': typeof ApiPublicV1ClientesIdContaCorrenteRoute
   '/api/public/v1/clientes/$id/contatos': typeof ApiPublicV1ClientesIdContatosRouteWithChildren
@@ -800,6 +801,7 @@ export interface FileRoutesById {
   '/api/public/v1/empresas': typeof ApiPublicV1EmpresasRouteWithChildren
   '/api/public/v1/filiais': typeof ApiPublicV1FiliaisRoute
   '/api/public/v1/health': typeof ApiPublicV1HealthRoute
+  '/api/public/v1/openapi.json': typeof ApiPublicV1OpenapiDotjsonRoute
   '/api/public/v1/perfis': typeof ApiPublicV1PerfisRoute
   '/api/public/v1/tabelas-frete': typeof ApiPublicV1TabelasFreteRoute
   '/api/public/v1/usuarios': typeof ApiPublicV1UsuariosRouteWithChildren
@@ -811,7 +813,6 @@ export interface FileRoutesById {
   '/api/public/v1/auth/token': typeof ApiPublicV1AuthTokenRoute
   '/api/public/v1/clientes/$id': typeof ApiPublicV1ClientesIdRouteWithChildren
   '/api/public/v1/empresas/$id': typeof ApiPublicV1EmpresasIdRoute
-  '/api/public/v1/openapi/json': typeof ApiPublicV1OpenapiJsonRoute
   '/api/public/v1/usuarios/$id': typeof ApiPublicV1UsuariosIdRoute
   '/api/public/v1/clientes/$id/conta-corrente': typeof ApiPublicV1ClientesIdContaCorrenteRoute
   '/api/public/v1/clientes/$id/contatos': typeof ApiPublicV1ClientesIdContatosRouteWithChildren
@@ -888,6 +889,7 @@ export interface FileRouteTypes {
     | '/api/public/v1/empresas'
     | '/api/public/v1/filiais'
     | '/api/public/v1/health'
+    | '/api/public/v1/openapi.json'
     | '/api/public/v1/perfis'
     | '/api/public/v1/tabelas-frete'
     | '/api/public/v1/usuarios'
@@ -899,7 +901,6 @@ export interface FileRouteTypes {
     | '/api/public/v1/auth/token'
     | '/api/public/v1/clientes/$id'
     | '/api/public/v1/empresas/$id'
-    | '/api/public/v1/openapi/json'
     | '/api/public/v1/usuarios/$id'
     | '/api/public/v1/clientes/$id/conta-corrente'
     | '/api/public/v1/clientes/$id/contatos'
@@ -972,6 +973,7 @@ export interface FileRouteTypes {
     | '/api/public/v1/empresas'
     | '/api/public/v1/filiais'
     | '/api/public/v1/health'
+    | '/api/public/v1/openapi.json'
     | '/api/public/v1/perfis'
     | '/api/public/v1/tabelas-frete'
     | '/api/public/v1/usuarios'
@@ -983,7 +985,6 @@ export interface FileRouteTypes {
     | '/api/public/v1/auth/token'
     | '/api/public/v1/clientes/$id'
     | '/api/public/v1/empresas/$id'
-    | '/api/public/v1/openapi/json'
     | '/api/public/v1/usuarios/$id'
     | '/api/public/v1/clientes/$id/conta-corrente'
     | '/api/public/v1/clientes/$id/contatos'
@@ -1059,6 +1060,7 @@ export interface FileRouteTypes {
     | '/api/public/v1/empresas'
     | '/api/public/v1/filiais'
     | '/api/public/v1/health'
+    | '/api/public/v1/openapi.json'
     | '/api/public/v1/perfis'
     | '/api/public/v1/tabelas-frete'
     | '/api/public/v1/usuarios'
@@ -1070,7 +1072,6 @@ export interface FileRouteTypes {
     | '/api/public/v1/auth/token'
     | '/api/public/v1/clientes/$id'
     | '/api/public/v1/empresas/$id'
-    | '/api/public/v1/openapi/json'
     | '/api/public/v1/usuarios/$id'
     | '/api/public/v1/clientes/$id/conta-corrente'
     | '/api/public/v1/clientes/$id/contatos'
@@ -1090,12 +1091,12 @@ export interface RootRouteChildren {
   ApiPublicV1EmpresasRoute: typeof ApiPublicV1EmpresasRouteWithChildren
   ApiPublicV1FiliaisRoute: typeof ApiPublicV1FiliaisRoute
   ApiPublicV1HealthRoute: typeof ApiPublicV1HealthRoute
+  ApiPublicV1OpenapiDotjsonRoute: typeof ApiPublicV1OpenapiDotjsonRoute
   ApiPublicV1PerfisRoute: typeof ApiPublicV1PerfisRoute
   ApiPublicV1TabelasFreteRoute: typeof ApiPublicV1TabelasFreteRoute
   ApiPublicV1UsuariosRoute: typeof ApiPublicV1UsuariosRouteWithChildren
   ApiPublicV1AuthRefreshRoute: typeof ApiPublicV1AuthRefreshRoute
   ApiPublicV1AuthTokenRoute: typeof ApiPublicV1AuthTokenRoute
-  ApiPublicV1OpenapiJsonRoute: typeof ApiPublicV1OpenapiJsonRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1457,6 +1458,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicV1PerfisRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/v1/openapi.json': {
+      id: '/api/public/v1/openapi.json'
+      path: '/api/public/v1/openapi.json'
+      fullPath: '/api/public/v1/openapi.json'
+      preLoaderRoute: typeof ApiPublicV1OpenapiDotjsonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/v1/health': {
       id: '/api/public/v1/health'
       path: '/api/public/v1/health'
@@ -1589,13 +1597,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/public/v1/usuarios/$id'
       preLoaderRoute: typeof ApiPublicV1UsuariosIdRouteImport
       parentRoute: typeof ApiPublicV1UsuariosRoute
-    }
-    '/api/public/v1/openapi/json': {
-      id: '/api/public/v1/openapi/json'
-      path: '/api/public/v1/openapi/json'
-      fullPath: '/api/public/v1/openapi/json'
-      preLoaderRoute: typeof ApiPublicV1OpenapiJsonRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/api/public/v1/empresas/$id': {
       id: '/api/public/v1/empresas/$id'
@@ -1995,12 +1996,12 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicV1EmpresasRoute: ApiPublicV1EmpresasRouteWithChildren,
   ApiPublicV1FiliaisRoute: ApiPublicV1FiliaisRoute,
   ApiPublicV1HealthRoute: ApiPublicV1HealthRoute,
+  ApiPublicV1OpenapiDotjsonRoute: ApiPublicV1OpenapiDotjsonRoute,
   ApiPublicV1PerfisRoute: ApiPublicV1PerfisRoute,
   ApiPublicV1TabelasFreteRoute: ApiPublicV1TabelasFreteRoute,
   ApiPublicV1UsuariosRoute: ApiPublicV1UsuariosRouteWithChildren,
   ApiPublicV1AuthRefreshRoute: ApiPublicV1AuthRefreshRoute,
   ApiPublicV1AuthTokenRoute: ApiPublicV1AuthTokenRoute,
-  ApiPublicV1OpenapiJsonRoute: ApiPublicV1OpenapiJsonRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
