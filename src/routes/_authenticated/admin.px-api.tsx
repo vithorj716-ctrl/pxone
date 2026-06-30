@@ -82,6 +82,12 @@ function PxApiAdmin() {
             </div>
           </div>
         </div>
+        <Link
+          to="/admin/px-api/docs"
+          className="text-xs px-3 py-1.5 rounded-md border border-border hover:bg-surface/60"
+        >
+          Swagger UI ↗
+        </Link>
       </header>
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
