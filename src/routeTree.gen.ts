@@ -84,10 +84,14 @@ import { Route as ApiPublicV1AuthTokenRouteImport } from './routes/api/public/v1
 import { Route as ApiPublicV1AuthRefreshRouteImport } from './routes/api/public/v1/auth/refresh'
 import { Route as AuthenticatedTmsLmRotasNumeroRouteImport } from './routes/_authenticated/tms.lm.rotas.$numero'
 import { Route as AuthenticatedTmsLmMotoristaRotaIdRouteImport } from './routes/_authenticated/tms.lm.motorista.$rotaId'
+import { Route as ApiPublicV1ClientesIdReativarRouteImport } from './routes/api/public/v1/clientes.$id.reativar'
 import { Route as ApiPublicV1ClientesIdLancamentosRouteImport } from './routes/api/public/v1/clientes.$id.lancamentos'
+import { Route as ApiPublicV1ClientesIdInativarRouteImport } from './routes/api/public/v1/clientes.$id.inativar'
 import { Route as ApiPublicV1ClientesIdEnderecosRouteImport } from './routes/api/public/v1/clientes.$id.enderecos'
 import { Route as ApiPublicV1ClientesIdContatosRouteImport } from './routes/api/public/v1/clientes.$id.contatos'
 import { Route as ApiPublicV1ClientesIdContaCorrenteRouteImport } from './routes/api/public/v1/clientes.$id.conta-corrente'
+import { Route as ApiPublicV1ClientesIdEnderecosEnderecoIdRouteImport } from './routes/api/public/v1/clientes.$id.enderecos.$enderecoId'
+import { Route as ApiPublicV1ClientesIdContatosContatoIdRouteImport } from './routes/api/public/v1/clientes.$id.contatos.$contatoId'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -498,10 +502,22 @@ const AuthenticatedTmsLmMotoristaRotaIdRoute =
     path: '/tms/lm/motorista/$rotaId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicV1ClientesIdReativarRoute =
+  ApiPublicV1ClientesIdReativarRouteImport.update({
+    id: '/reativar',
+    path: '/reativar',
+    getParentRoute: () => ApiPublicV1ClientesIdRoute,
+  } as any)
 const ApiPublicV1ClientesIdLancamentosRoute =
   ApiPublicV1ClientesIdLancamentosRouteImport.update({
     id: '/lancamentos',
     path: '/lancamentos',
+    getParentRoute: () => ApiPublicV1ClientesIdRoute,
+  } as any)
+const ApiPublicV1ClientesIdInativarRoute =
+  ApiPublicV1ClientesIdInativarRouteImport.update({
+    id: '/inativar',
+    path: '/inativar',
     getParentRoute: () => ApiPublicV1ClientesIdRoute,
   } as any)
 const ApiPublicV1ClientesIdEnderecosRoute =
@@ -521,6 +537,18 @@ const ApiPublicV1ClientesIdContaCorrenteRoute =
     id: '/conta-corrente',
     path: '/conta-corrente',
     getParentRoute: () => ApiPublicV1ClientesIdRoute,
+  } as any)
+const ApiPublicV1ClientesIdEnderecosEnderecoIdRoute =
+  ApiPublicV1ClientesIdEnderecosEnderecoIdRouteImport.update({
+    id: '/$enderecoId',
+    path: '/$enderecoId',
+    getParentRoute: () => ApiPublicV1ClientesIdEnderecosRoute,
+  } as any)
+const ApiPublicV1ClientesIdContatosContatoIdRoute =
+  ApiPublicV1ClientesIdContatosContatoIdRouteImport.update({
+    id: '/$contatoId',
+    path: '/$contatoId',
+    getParentRoute: () => ApiPublicV1ClientesIdContatosRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -599,9 +627,13 @@ export interface FileRoutesByFullPath {
   '/api/public/v1/empresas/$id': typeof ApiPublicV1EmpresasIdRoute
   '/api/public/v1/usuarios/$id': typeof ApiPublicV1UsuariosIdRoute
   '/api/public/v1/clientes/$id/conta-corrente': typeof ApiPublicV1ClientesIdContaCorrenteRoute
-  '/api/public/v1/clientes/$id/contatos': typeof ApiPublicV1ClientesIdContatosRoute
-  '/api/public/v1/clientes/$id/enderecos': typeof ApiPublicV1ClientesIdEnderecosRoute
+  '/api/public/v1/clientes/$id/contatos': typeof ApiPublicV1ClientesIdContatosRouteWithChildren
+  '/api/public/v1/clientes/$id/enderecos': typeof ApiPublicV1ClientesIdEnderecosRouteWithChildren
+  '/api/public/v1/clientes/$id/inativar': typeof ApiPublicV1ClientesIdInativarRoute
   '/api/public/v1/clientes/$id/lancamentos': typeof ApiPublicV1ClientesIdLancamentosRoute
+  '/api/public/v1/clientes/$id/reativar': typeof ApiPublicV1ClientesIdReativarRoute
+  '/api/public/v1/clientes/$id/contatos/$contatoId': typeof ApiPublicV1ClientesIdContatosContatoIdRoute
+  '/api/public/v1/clientes/$id/enderecos/$enderecoId': typeof ApiPublicV1ClientesIdEnderecosEnderecoIdRoute
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
@@ -677,9 +709,13 @@ export interface FileRoutesByTo {
   '/api/public/v1/empresas/$id': typeof ApiPublicV1EmpresasIdRoute
   '/api/public/v1/usuarios/$id': typeof ApiPublicV1UsuariosIdRoute
   '/api/public/v1/clientes/$id/conta-corrente': typeof ApiPublicV1ClientesIdContaCorrenteRoute
-  '/api/public/v1/clientes/$id/contatos': typeof ApiPublicV1ClientesIdContatosRoute
-  '/api/public/v1/clientes/$id/enderecos': typeof ApiPublicV1ClientesIdEnderecosRoute
+  '/api/public/v1/clientes/$id/contatos': typeof ApiPublicV1ClientesIdContatosRouteWithChildren
+  '/api/public/v1/clientes/$id/enderecos': typeof ApiPublicV1ClientesIdEnderecosRouteWithChildren
+  '/api/public/v1/clientes/$id/inativar': typeof ApiPublicV1ClientesIdInativarRoute
   '/api/public/v1/clientes/$id/lancamentos': typeof ApiPublicV1ClientesIdLancamentosRoute
+  '/api/public/v1/clientes/$id/reativar': typeof ApiPublicV1ClientesIdReativarRoute
+  '/api/public/v1/clientes/$id/contatos/$contatoId': typeof ApiPublicV1ClientesIdContatosContatoIdRoute
+  '/api/public/v1/clientes/$id/enderecos/$enderecoId': typeof ApiPublicV1ClientesIdEnderecosEnderecoIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -759,9 +795,13 @@ export interface FileRoutesById {
   '/api/public/v1/empresas/$id': typeof ApiPublicV1EmpresasIdRoute
   '/api/public/v1/usuarios/$id': typeof ApiPublicV1UsuariosIdRoute
   '/api/public/v1/clientes/$id/conta-corrente': typeof ApiPublicV1ClientesIdContaCorrenteRoute
-  '/api/public/v1/clientes/$id/contatos': typeof ApiPublicV1ClientesIdContatosRoute
-  '/api/public/v1/clientes/$id/enderecos': typeof ApiPublicV1ClientesIdEnderecosRoute
+  '/api/public/v1/clientes/$id/contatos': typeof ApiPublicV1ClientesIdContatosRouteWithChildren
+  '/api/public/v1/clientes/$id/enderecos': typeof ApiPublicV1ClientesIdEnderecosRouteWithChildren
+  '/api/public/v1/clientes/$id/inativar': typeof ApiPublicV1ClientesIdInativarRoute
   '/api/public/v1/clientes/$id/lancamentos': typeof ApiPublicV1ClientesIdLancamentosRoute
+  '/api/public/v1/clientes/$id/reativar': typeof ApiPublicV1ClientesIdReativarRoute
+  '/api/public/v1/clientes/$id/contatos/$contatoId': typeof ApiPublicV1ClientesIdContatosContatoIdRoute
+  '/api/public/v1/clientes/$id/enderecos/$enderecoId': typeof ApiPublicV1ClientesIdEnderecosEnderecoIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -843,7 +883,11 @@ export interface FileRouteTypes {
     | '/api/public/v1/clientes/$id/conta-corrente'
     | '/api/public/v1/clientes/$id/contatos'
     | '/api/public/v1/clientes/$id/enderecos'
+    | '/api/public/v1/clientes/$id/inativar'
     | '/api/public/v1/clientes/$id/lancamentos'
+    | '/api/public/v1/clientes/$id/reativar'
+    | '/api/public/v1/clientes/$id/contatos/$contatoId'
+    | '/api/public/v1/clientes/$id/enderecos/$enderecoId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/auth'
@@ -921,7 +965,11 @@ export interface FileRouteTypes {
     | '/api/public/v1/clientes/$id/conta-corrente'
     | '/api/public/v1/clientes/$id/contatos'
     | '/api/public/v1/clientes/$id/enderecos'
+    | '/api/public/v1/clientes/$id/inativar'
     | '/api/public/v1/clientes/$id/lancamentos'
+    | '/api/public/v1/clientes/$id/reativar'
+    | '/api/public/v1/clientes/$id/contatos/$contatoId'
+    | '/api/public/v1/clientes/$id/enderecos/$enderecoId'
   id:
     | '__root__'
     | '/_authenticated'
@@ -1002,7 +1050,11 @@ export interface FileRouteTypes {
     | '/api/public/v1/clientes/$id/conta-corrente'
     | '/api/public/v1/clientes/$id/contatos'
     | '/api/public/v1/clientes/$id/enderecos'
+    | '/api/public/v1/clientes/$id/inativar'
     | '/api/public/v1/clientes/$id/lancamentos'
+    | '/api/public/v1/clientes/$id/reativar'
+    | '/api/public/v1/clientes/$id/contatos/$contatoId'
+    | '/api/public/v1/clientes/$id/enderecos/$enderecoId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1547,11 +1599,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTmsLmMotoristaRotaIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/v1/clientes/$id/reativar': {
+      id: '/api/public/v1/clientes/$id/reativar'
+      path: '/reativar'
+      fullPath: '/api/public/v1/clientes/$id/reativar'
+      preLoaderRoute: typeof ApiPublicV1ClientesIdReativarRouteImport
+      parentRoute: typeof ApiPublicV1ClientesIdRoute
+    }
     '/api/public/v1/clientes/$id/lancamentos': {
       id: '/api/public/v1/clientes/$id/lancamentos'
       path: '/lancamentos'
       fullPath: '/api/public/v1/clientes/$id/lancamentos'
       preLoaderRoute: typeof ApiPublicV1ClientesIdLancamentosRouteImport
+      parentRoute: typeof ApiPublicV1ClientesIdRoute
+    }
+    '/api/public/v1/clientes/$id/inativar': {
+      id: '/api/public/v1/clientes/$id/inativar'
+      path: '/inativar'
+      fullPath: '/api/public/v1/clientes/$id/inativar'
+      preLoaderRoute: typeof ApiPublicV1ClientesIdInativarRouteImport
       parentRoute: typeof ApiPublicV1ClientesIdRoute
     }
     '/api/public/v1/clientes/$id/enderecos': {
@@ -1574,6 +1640,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/public/v1/clientes/$id/conta-corrente'
       preLoaderRoute: typeof ApiPublicV1ClientesIdContaCorrenteRouteImport
       parentRoute: typeof ApiPublicV1ClientesIdRoute
+    }
+    '/api/public/v1/clientes/$id/enderecos/$enderecoId': {
+      id: '/api/public/v1/clientes/$id/enderecos/$enderecoId'
+      path: '/$enderecoId'
+      fullPath: '/api/public/v1/clientes/$id/enderecos/$enderecoId'
+      preLoaderRoute: typeof ApiPublicV1ClientesIdEnderecosEnderecoIdRouteImport
+      parentRoute: typeof ApiPublicV1ClientesIdEnderecosRoute
+    }
+    '/api/public/v1/clientes/$id/contatos/$contatoId': {
+      id: '/api/public/v1/clientes/$id/contatos/$contatoId'
+      path: '/$contatoId'
+      fullPath: '/api/public/v1/clientes/$id/contatos/$contatoId'
+      preLoaderRoute: typeof ApiPublicV1ClientesIdContatosContatoIdRouteImport
+      parentRoute: typeof ApiPublicV1ClientesIdContatosRoute
     }
   }
 }
@@ -1764,19 +1844,55 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface ApiPublicV1ClientesIdContatosRouteChildren {
+  ApiPublicV1ClientesIdContatosContatoIdRoute: typeof ApiPublicV1ClientesIdContatosContatoIdRoute
+}
+
+const ApiPublicV1ClientesIdContatosRouteChildren: ApiPublicV1ClientesIdContatosRouteChildren =
+  {
+    ApiPublicV1ClientesIdContatosContatoIdRoute:
+      ApiPublicV1ClientesIdContatosContatoIdRoute,
+  }
+
+const ApiPublicV1ClientesIdContatosRouteWithChildren =
+  ApiPublicV1ClientesIdContatosRoute._addFileChildren(
+    ApiPublicV1ClientesIdContatosRouteChildren,
+  )
+
+interface ApiPublicV1ClientesIdEnderecosRouteChildren {
+  ApiPublicV1ClientesIdEnderecosEnderecoIdRoute: typeof ApiPublicV1ClientesIdEnderecosEnderecoIdRoute
+}
+
+const ApiPublicV1ClientesIdEnderecosRouteChildren: ApiPublicV1ClientesIdEnderecosRouteChildren =
+  {
+    ApiPublicV1ClientesIdEnderecosEnderecoIdRoute:
+      ApiPublicV1ClientesIdEnderecosEnderecoIdRoute,
+  }
+
+const ApiPublicV1ClientesIdEnderecosRouteWithChildren =
+  ApiPublicV1ClientesIdEnderecosRoute._addFileChildren(
+    ApiPublicV1ClientesIdEnderecosRouteChildren,
+  )
+
 interface ApiPublicV1ClientesIdRouteChildren {
   ApiPublicV1ClientesIdContaCorrenteRoute: typeof ApiPublicV1ClientesIdContaCorrenteRoute
-  ApiPublicV1ClientesIdContatosRoute: typeof ApiPublicV1ClientesIdContatosRoute
-  ApiPublicV1ClientesIdEnderecosRoute: typeof ApiPublicV1ClientesIdEnderecosRoute
+  ApiPublicV1ClientesIdContatosRoute: typeof ApiPublicV1ClientesIdContatosRouteWithChildren
+  ApiPublicV1ClientesIdEnderecosRoute: typeof ApiPublicV1ClientesIdEnderecosRouteWithChildren
+  ApiPublicV1ClientesIdInativarRoute: typeof ApiPublicV1ClientesIdInativarRoute
   ApiPublicV1ClientesIdLancamentosRoute: typeof ApiPublicV1ClientesIdLancamentosRoute
+  ApiPublicV1ClientesIdReativarRoute: typeof ApiPublicV1ClientesIdReativarRoute
 }
 
 const ApiPublicV1ClientesIdRouteChildren: ApiPublicV1ClientesIdRouteChildren = {
   ApiPublicV1ClientesIdContaCorrenteRoute:
     ApiPublicV1ClientesIdContaCorrenteRoute,
-  ApiPublicV1ClientesIdContatosRoute: ApiPublicV1ClientesIdContatosRoute,
-  ApiPublicV1ClientesIdEnderecosRoute: ApiPublicV1ClientesIdEnderecosRoute,
+  ApiPublicV1ClientesIdContatosRoute:
+    ApiPublicV1ClientesIdContatosRouteWithChildren,
+  ApiPublicV1ClientesIdEnderecosRoute:
+    ApiPublicV1ClientesIdEnderecosRouteWithChildren,
+  ApiPublicV1ClientesIdInativarRoute: ApiPublicV1ClientesIdInativarRoute,
   ApiPublicV1ClientesIdLancamentosRoute: ApiPublicV1ClientesIdLancamentosRoute,
+  ApiPublicV1ClientesIdReativarRoute: ApiPublicV1ClientesIdReativarRoute,
 }
 
 const ApiPublicV1ClientesIdRouteWithChildren =
