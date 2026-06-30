@@ -53,6 +53,7 @@ import { Route as AuthenticatedFinancialIntelligenceDreRouteImport } from './rou
 import { Route as AuthenticatedFinancialIntelligenceDfcRouteImport } from './routes/_authenticated/financial-intelligence.dfc'
 import { Route as AuthenticatedFinancialIntelligenceBreakEvenRouteImport } from './routes/_authenticated/financial-intelligence.break-even'
 import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin.usuarios'
+import { Route as AuthenticatedAdminPxApiRouteImport } from './routes/_authenticated/admin.px-api'
 import { Route as AuthenticatedAdminPerfisRouteImport } from './routes/_authenticated/admin.perfis'
 import { Route as AuthenticatedTmsSolicitacoesIndexRouteImport } from './routes/_authenticated/tms.solicitacoes.index'
 import { Route as AuthenticatedTmsLmIndexRouteImport } from './routes/_authenticated/tms.lm.index'
@@ -316,6 +317,11 @@ const AuthenticatedAdminUsuariosRoute =
     path: '/admin/usuarios',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminPxApiRoute = AuthenticatedAdminPxApiRouteImport.update({
+  id: '/admin/px-api',
+  path: '/admin/px-api',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAdminPerfisRoute =
   AuthenticatedAdminPerfisRouteImport.update({
     id: '/admin/perfis',
@@ -480,6 +486,7 @@ export interface FileRoutesByFullPath {
   '/timeline': typeof AuthenticatedTimelineRoute
   '/valuation': typeof AuthenticatedValuationRoute
   '/admin/perfis': typeof AuthenticatedAdminPerfisRoute
+  '/admin/px-api': typeof AuthenticatedAdminPxApiRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/financial-intelligence/break-even': typeof AuthenticatedFinancialIntelligenceBreakEvenRoute
   '/financial-intelligence/dfc': typeof AuthenticatedFinancialIntelligenceDfcRoute
@@ -548,6 +555,7 @@ export interface FileRoutesByTo {
   '/valuation': typeof AuthenticatedValuationRoute
   '/': typeof AuthenticatedIndexRoute
   '/admin/perfis': typeof AuthenticatedAdminPerfisRoute
+  '/admin/px-api': typeof AuthenticatedAdminPxApiRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/financial-intelligence/break-even': typeof AuthenticatedFinancialIntelligenceBreakEvenRoute
   '/financial-intelligence/dfc': typeof AuthenticatedFinancialIntelligenceDfcRoute
@@ -618,6 +626,7 @@ export interface FileRoutesById {
   '/_authenticated/valuation': typeof AuthenticatedValuationRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/admin/perfis': typeof AuthenticatedAdminPerfisRoute
+  '/_authenticated/admin/px-api': typeof AuthenticatedAdminPxApiRoute
   '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/_authenticated/financial-intelligence/break-even': typeof AuthenticatedFinancialIntelligenceBreakEvenRoute
   '/_authenticated/financial-intelligence/dfc': typeof AuthenticatedFinancialIntelligenceDfcRoute
@@ -689,6 +698,7 @@ export interface FileRouteTypes {
     | '/timeline'
     | '/valuation'
     | '/admin/perfis'
+    | '/admin/px-api'
     | '/admin/usuarios'
     | '/financial-intelligence/break-even'
     | '/financial-intelligence/dfc'
@@ -757,6 +767,7 @@ export interface FileRouteTypes {
     | '/valuation'
     | '/'
     | '/admin/perfis'
+    | '/admin/px-api'
     | '/admin/usuarios'
     | '/financial-intelligence/break-even'
     | '/financial-intelligence/dfc'
@@ -826,6 +837,7 @@ export interface FileRouteTypes {
     | '/_authenticated/valuation'
     | '/_authenticated/'
     | '/_authenticated/admin/perfis'
+    | '/_authenticated/admin/px-api'
     | '/_authenticated/admin/usuarios'
     | '/_authenticated/financial-intelligence/break-even'
     | '/_authenticated/financial-intelligence/dfc'
@@ -1190,6 +1202,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminUsuariosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/px-api': {
+      id: '/_authenticated/admin/px-api'
+      path: '/admin/px-api'
+      fullPath: '/admin/px-api'
+      preLoaderRoute: typeof AuthenticatedAdminPxApiRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/perfis': {
       id: '/_authenticated/admin/perfis'
       path: '/admin/perfis'
@@ -1455,6 +1474,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedValuationRoute: typeof AuthenticatedValuationRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedAdminPerfisRoute: typeof AuthenticatedAdminPerfisRoute
+  AuthenticatedAdminPxApiRoute: typeof AuthenticatedAdminPxApiRoute
   AuthenticatedAdminUsuariosRoute: typeof AuthenticatedAdminUsuariosRoute
   AuthenticatedRegistryClientesRoute: typeof AuthenticatedRegistryClientesRoute
   AuthenticatedTmsClientesRoute: typeof AuthenticatedTmsClientesRoute
@@ -1510,6 +1530,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedValuationRoute: AuthenticatedValuationRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedAdminPerfisRoute: AuthenticatedAdminPerfisRoute,
+  AuthenticatedAdminPxApiRoute: AuthenticatedAdminPxApiRoute,
   AuthenticatedAdminUsuariosRoute: AuthenticatedAdminUsuariosRoute,
   AuthenticatedRegistryClientesRoute: AuthenticatedRegistryClientesRoute,
   AuthenticatedTmsClientesRoute: AuthenticatedTmsClientesRoute,
