@@ -18,6 +18,16 @@ export const Route = createFileRoute("/api/public/v1/clientes/$id/reativar")({
             .maybeSingle();
           if (error) return pxErr("INTERNAL", "Falha ao reativar cliente.", { requestId: ctx.requestId, details: error.message });
           if (!data) return pxErr("NOT_FOUND", "Cliente não encontrado.", { requestId: ctx.requestId });
+          await (ctx.supabase as any)
+            .from("px_registry_vinculos")
+            .upsert(
+              { cliente_id: data.id, sistema_key: "pxlog" },
+              { onConflict: "cliente_id,sistema_key", ignoreDuplicates: true },
+            );
+          await (ctx.supabase as any)
+            .from("tms_clientes")
+            .update({ ativo: true })
+            .eq("registry_id", data.id);
           return pxOk(data, { message: "Cliente reativado.", requestId: ctx.requestId });
         }),
       GET: async ({ request }) => methodNotAllowed(["POST"], getRequestId(request)),
