@@ -57,7 +57,12 @@ import { Route as AuthenticatedAdminPxApiRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminPerfisRouteImport } from './routes/_authenticated/admin.perfis'
 import { Route as AuthenticatedTmsSolicitacoesIndexRouteImport } from './routes/_authenticated/tms.solicitacoes.index'
 import { Route as AuthenticatedTmsLmIndexRouteImport } from './routes/_authenticated/tms.lm.index'
+import { Route as ApiPublicV1UsuariosRouteImport } from './routes/api/public/v1/usuarios'
+import { Route as ApiPublicV1TabelasFreteRouteImport } from './routes/api/public/v1/tabelas-frete'
+import { Route as ApiPublicV1PerfisRouteImport } from './routes/api/public/v1/perfis'
 import { Route as ApiPublicV1HealthRouteImport } from './routes/api/public/v1/health'
+import { Route as ApiPublicV1FiliaisRouteImport } from './routes/api/public/v1/filiais'
+import { Route as ApiPublicV1EmpresasRouteImport } from './routes/api/public/v1/empresas'
 import { Route as ApiPublicV1ClientesRouteImport } from './routes/api/public/v1/clientes'
 import { Route as AuthenticatedTmsViagensCodigoRouteImport } from './routes/_authenticated/tms.viagens.$codigo'
 import { Route as AuthenticatedTmsSolicitacoesNovaRouteImport } from './routes/_authenticated/tms.solicitacoes.nova'
@@ -72,11 +77,16 @@ import { Route as AuthenticatedTmsLmConfiguracoesRouteImport } from './routes/_a
 import { Route as AuthenticatedTmsLmComprovantesRouteImport } from './routes/_authenticated/tms.lm.comprovantes'
 import { Route as AuthenticatedTmsLmCarregamentoRouteImport } from './routes/_authenticated/tms.lm.carregamento'
 import { Route as AuthenticatedTmsEtiquetasMinutaRouteImport } from './routes/_authenticated/tms.etiquetas.$minuta'
+import { Route as ApiPublicV1UsuariosIdRouteImport } from './routes/api/public/v1/usuarios.$id'
+import { Route as ApiPublicV1EmpresasIdRouteImport } from './routes/api/public/v1/empresas.$id'
 import { Route as ApiPublicV1ClientesIdRouteImport } from './routes/api/public/v1/clientes.$id'
 import { Route as ApiPublicV1AuthTokenRouteImport } from './routes/api/public/v1/auth/token'
 import { Route as ApiPublicV1AuthRefreshRouteImport } from './routes/api/public/v1/auth/refresh'
 import { Route as AuthenticatedTmsLmRotasNumeroRouteImport } from './routes/_authenticated/tms.lm.rotas.$numero'
 import { Route as AuthenticatedTmsLmMotoristaRotaIdRouteImport } from './routes/_authenticated/tms.lm.motorista.$rotaId'
+import { Route as ApiPublicV1ClientesIdLancamentosRouteImport } from './routes/api/public/v1/clientes.$id.lancamentos'
+import { Route as ApiPublicV1ClientesIdEnderecosRouteImport } from './routes/api/public/v1/clientes.$id.enderecos'
+import { Route as ApiPublicV1ClientesIdContatosRouteImport } from './routes/api/public/v1/clientes.$id.contatos'
 import { Route as ApiPublicV1ClientesIdContaCorrenteRouteImport } from './routes/api/public/v1/clientes.$id.conta-corrente'
 
 const LoginRoute = LoginRouteImport.update({
@@ -339,9 +349,34 @@ const AuthenticatedTmsLmIndexRoute = AuthenticatedTmsLmIndexRouteImport.update({
   path: '/tms/lm/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicV1UsuariosRoute = ApiPublicV1UsuariosRouteImport.update({
+  id: '/api/public/v1/usuarios',
+  path: '/api/public/v1/usuarios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicV1TabelasFreteRoute = ApiPublicV1TabelasFreteRouteImport.update({
+  id: '/api/public/v1/tabelas-frete',
+  path: '/api/public/v1/tabelas-frete',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicV1PerfisRoute = ApiPublicV1PerfisRouteImport.update({
+  id: '/api/public/v1/perfis',
+  path: '/api/public/v1/perfis',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicV1HealthRoute = ApiPublicV1HealthRouteImport.update({
   id: '/api/public/v1/health',
   path: '/api/public/v1/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicV1FiliaisRoute = ApiPublicV1FiliaisRouteImport.update({
+  id: '/api/public/v1/filiais',
+  path: '/api/public/v1/filiais',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicV1EmpresasRoute = ApiPublicV1EmpresasRouteImport.update({
+  id: '/api/public/v1/empresas',
+  path: '/api/public/v1/empresas',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicV1ClientesRoute = ApiPublicV1ClientesRouteImport.update({
@@ -426,6 +461,16 @@ const AuthenticatedTmsEtiquetasMinutaRoute =
     path: '/tms/etiquetas/$minuta',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicV1UsuariosIdRoute = ApiPublicV1UsuariosIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiPublicV1UsuariosRoute,
+} as any)
+const ApiPublicV1EmpresasIdRoute = ApiPublicV1EmpresasIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiPublicV1EmpresasRoute,
+} as any)
 const ApiPublicV1ClientesIdRoute = ApiPublicV1ClientesIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -452,6 +497,24 @@ const AuthenticatedTmsLmMotoristaRotaIdRoute =
     id: '/tms/lm/motorista/$rotaId',
     path: '/tms/lm/motorista/$rotaId',
     getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const ApiPublicV1ClientesIdLancamentosRoute =
+  ApiPublicV1ClientesIdLancamentosRouteImport.update({
+    id: '/lancamentos',
+    path: '/lancamentos',
+    getParentRoute: () => ApiPublicV1ClientesIdRoute,
+  } as any)
+const ApiPublicV1ClientesIdEnderecosRoute =
+  ApiPublicV1ClientesIdEnderecosRouteImport.update({
+    id: '/enderecos',
+    path: '/enderecos',
+    getParentRoute: () => ApiPublicV1ClientesIdRoute,
+  } as any)
+const ApiPublicV1ClientesIdContatosRoute =
+  ApiPublicV1ClientesIdContatosRouteImport.update({
+    id: '/contatos',
+    path: '/contatos',
+    getParentRoute: () => ApiPublicV1ClientesIdRoute,
   } as any)
 const ApiPublicV1ClientesIdContaCorrenteRoute =
   ApiPublicV1ClientesIdContaCorrenteRouteImport.update({
@@ -520,7 +583,12 @@ export interface FileRoutesByFullPath {
   '/tms/solicitacoes/nova': typeof AuthenticatedTmsSolicitacoesNovaRoute
   '/tms/viagens/$codigo': typeof AuthenticatedTmsViagensCodigoRoute
   '/api/public/v1/clientes': typeof ApiPublicV1ClientesRouteWithChildren
+  '/api/public/v1/empresas': typeof ApiPublicV1EmpresasRouteWithChildren
+  '/api/public/v1/filiais': typeof ApiPublicV1FiliaisRoute
   '/api/public/v1/health': typeof ApiPublicV1HealthRoute
+  '/api/public/v1/perfis': typeof ApiPublicV1PerfisRoute
+  '/api/public/v1/tabelas-frete': typeof ApiPublicV1TabelasFreteRoute
+  '/api/public/v1/usuarios': typeof ApiPublicV1UsuariosRouteWithChildren
   '/tms/lm/': typeof AuthenticatedTmsLmIndexRoute
   '/tms/solicitacoes/': typeof AuthenticatedTmsSolicitacoesIndexRoute
   '/tms/lm/motorista/$rotaId': typeof AuthenticatedTmsLmMotoristaRotaIdRoute
@@ -528,7 +596,12 @@ export interface FileRoutesByFullPath {
   '/api/public/v1/auth/refresh': typeof ApiPublicV1AuthRefreshRoute
   '/api/public/v1/auth/token': typeof ApiPublicV1AuthTokenRoute
   '/api/public/v1/clientes/$id': typeof ApiPublicV1ClientesIdRouteWithChildren
+  '/api/public/v1/empresas/$id': typeof ApiPublicV1EmpresasIdRoute
+  '/api/public/v1/usuarios/$id': typeof ApiPublicV1UsuariosIdRoute
   '/api/public/v1/clientes/$id/conta-corrente': typeof ApiPublicV1ClientesIdContaCorrenteRoute
+  '/api/public/v1/clientes/$id/contatos': typeof ApiPublicV1ClientesIdContatosRoute
+  '/api/public/v1/clientes/$id/enderecos': typeof ApiPublicV1ClientesIdEnderecosRoute
+  '/api/public/v1/clientes/$id/lancamentos': typeof ApiPublicV1ClientesIdLancamentosRoute
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
@@ -588,7 +661,12 @@ export interface FileRoutesByTo {
   '/tms/solicitacoes/nova': typeof AuthenticatedTmsSolicitacoesNovaRoute
   '/tms/viagens/$codigo': typeof AuthenticatedTmsViagensCodigoRoute
   '/api/public/v1/clientes': typeof ApiPublicV1ClientesRouteWithChildren
+  '/api/public/v1/empresas': typeof ApiPublicV1EmpresasRouteWithChildren
+  '/api/public/v1/filiais': typeof ApiPublicV1FiliaisRoute
   '/api/public/v1/health': typeof ApiPublicV1HealthRoute
+  '/api/public/v1/perfis': typeof ApiPublicV1PerfisRoute
+  '/api/public/v1/tabelas-frete': typeof ApiPublicV1TabelasFreteRoute
+  '/api/public/v1/usuarios': typeof ApiPublicV1UsuariosRouteWithChildren
   '/tms/lm': typeof AuthenticatedTmsLmIndexRoute
   '/tms/solicitacoes': typeof AuthenticatedTmsSolicitacoesIndexRoute
   '/tms/lm/motorista/$rotaId': typeof AuthenticatedTmsLmMotoristaRotaIdRoute
@@ -596,7 +674,12 @@ export interface FileRoutesByTo {
   '/api/public/v1/auth/refresh': typeof ApiPublicV1AuthRefreshRoute
   '/api/public/v1/auth/token': typeof ApiPublicV1AuthTokenRoute
   '/api/public/v1/clientes/$id': typeof ApiPublicV1ClientesIdRouteWithChildren
+  '/api/public/v1/empresas/$id': typeof ApiPublicV1EmpresasIdRoute
+  '/api/public/v1/usuarios/$id': typeof ApiPublicV1UsuariosIdRoute
   '/api/public/v1/clientes/$id/conta-corrente': typeof ApiPublicV1ClientesIdContaCorrenteRoute
+  '/api/public/v1/clientes/$id/contatos': typeof ApiPublicV1ClientesIdContatosRoute
+  '/api/public/v1/clientes/$id/enderecos': typeof ApiPublicV1ClientesIdEnderecosRoute
+  '/api/public/v1/clientes/$id/lancamentos': typeof ApiPublicV1ClientesIdLancamentosRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -660,7 +743,12 @@ export interface FileRoutesById {
   '/_authenticated/tms/solicitacoes/nova': typeof AuthenticatedTmsSolicitacoesNovaRoute
   '/_authenticated/tms/viagens/$codigo': typeof AuthenticatedTmsViagensCodigoRoute
   '/api/public/v1/clientes': typeof ApiPublicV1ClientesRouteWithChildren
+  '/api/public/v1/empresas': typeof ApiPublicV1EmpresasRouteWithChildren
+  '/api/public/v1/filiais': typeof ApiPublicV1FiliaisRoute
   '/api/public/v1/health': typeof ApiPublicV1HealthRoute
+  '/api/public/v1/perfis': typeof ApiPublicV1PerfisRoute
+  '/api/public/v1/tabelas-frete': typeof ApiPublicV1TabelasFreteRoute
+  '/api/public/v1/usuarios': typeof ApiPublicV1UsuariosRouteWithChildren
   '/_authenticated/tms/lm/': typeof AuthenticatedTmsLmIndexRoute
   '/_authenticated/tms/solicitacoes/': typeof AuthenticatedTmsSolicitacoesIndexRoute
   '/_authenticated/tms/lm/motorista/$rotaId': typeof AuthenticatedTmsLmMotoristaRotaIdRoute
@@ -668,7 +756,12 @@ export interface FileRoutesById {
   '/api/public/v1/auth/refresh': typeof ApiPublicV1AuthRefreshRoute
   '/api/public/v1/auth/token': typeof ApiPublicV1AuthTokenRoute
   '/api/public/v1/clientes/$id': typeof ApiPublicV1ClientesIdRouteWithChildren
+  '/api/public/v1/empresas/$id': typeof ApiPublicV1EmpresasIdRoute
+  '/api/public/v1/usuarios/$id': typeof ApiPublicV1UsuariosIdRoute
   '/api/public/v1/clientes/$id/conta-corrente': typeof ApiPublicV1ClientesIdContaCorrenteRoute
+  '/api/public/v1/clientes/$id/contatos': typeof ApiPublicV1ClientesIdContatosRoute
+  '/api/public/v1/clientes/$id/enderecos': typeof ApiPublicV1ClientesIdEnderecosRoute
+  '/api/public/v1/clientes/$id/lancamentos': typeof ApiPublicV1ClientesIdLancamentosRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -732,7 +825,12 @@ export interface FileRouteTypes {
     | '/tms/solicitacoes/nova'
     | '/tms/viagens/$codigo'
     | '/api/public/v1/clientes'
+    | '/api/public/v1/empresas'
+    | '/api/public/v1/filiais'
     | '/api/public/v1/health'
+    | '/api/public/v1/perfis'
+    | '/api/public/v1/tabelas-frete'
+    | '/api/public/v1/usuarios'
     | '/tms/lm/'
     | '/tms/solicitacoes/'
     | '/tms/lm/motorista/$rotaId'
@@ -740,7 +838,12 @@ export interface FileRouteTypes {
     | '/api/public/v1/auth/refresh'
     | '/api/public/v1/auth/token'
     | '/api/public/v1/clientes/$id'
+    | '/api/public/v1/empresas/$id'
+    | '/api/public/v1/usuarios/$id'
     | '/api/public/v1/clientes/$id/conta-corrente'
+    | '/api/public/v1/clientes/$id/contatos'
+    | '/api/public/v1/clientes/$id/enderecos'
+    | '/api/public/v1/clientes/$id/lancamentos'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/auth'
@@ -800,7 +903,12 @@ export interface FileRouteTypes {
     | '/tms/solicitacoes/nova'
     | '/tms/viagens/$codigo'
     | '/api/public/v1/clientes'
+    | '/api/public/v1/empresas'
+    | '/api/public/v1/filiais'
     | '/api/public/v1/health'
+    | '/api/public/v1/perfis'
+    | '/api/public/v1/tabelas-frete'
+    | '/api/public/v1/usuarios'
     | '/tms/lm'
     | '/tms/solicitacoes'
     | '/tms/lm/motorista/$rotaId'
@@ -808,7 +916,12 @@ export interface FileRouteTypes {
     | '/api/public/v1/auth/refresh'
     | '/api/public/v1/auth/token'
     | '/api/public/v1/clientes/$id'
+    | '/api/public/v1/empresas/$id'
+    | '/api/public/v1/usuarios/$id'
     | '/api/public/v1/clientes/$id/conta-corrente'
+    | '/api/public/v1/clientes/$id/contatos'
+    | '/api/public/v1/clientes/$id/enderecos'
+    | '/api/public/v1/clientes/$id/lancamentos'
   id:
     | '__root__'
     | '/_authenticated'
@@ -871,7 +984,12 @@ export interface FileRouteTypes {
     | '/_authenticated/tms/solicitacoes/nova'
     | '/_authenticated/tms/viagens/$codigo'
     | '/api/public/v1/clientes'
+    | '/api/public/v1/empresas'
+    | '/api/public/v1/filiais'
     | '/api/public/v1/health'
+    | '/api/public/v1/perfis'
+    | '/api/public/v1/tabelas-frete'
+    | '/api/public/v1/usuarios'
     | '/_authenticated/tms/lm/'
     | '/_authenticated/tms/solicitacoes/'
     | '/_authenticated/tms/lm/motorista/$rotaId'
@@ -879,7 +997,12 @@ export interface FileRouteTypes {
     | '/api/public/v1/auth/refresh'
     | '/api/public/v1/auth/token'
     | '/api/public/v1/clientes/$id'
+    | '/api/public/v1/empresas/$id'
+    | '/api/public/v1/usuarios/$id'
     | '/api/public/v1/clientes/$id/conta-corrente'
+    | '/api/public/v1/clientes/$id/contatos'
+    | '/api/public/v1/clientes/$id/enderecos'
+    | '/api/public/v1/clientes/$id/lancamentos'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -887,7 +1010,12 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   LoginRoute: typeof LoginRoute
   ApiPublicV1ClientesRoute: typeof ApiPublicV1ClientesRouteWithChildren
+  ApiPublicV1EmpresasRoute: typeof ApiPublicV1EmpresasRouteWithChildren
+  ApiPublicV1FiliaisRoute: typeof ApiPublicV1FiliaisRoute
   ApiPublicV1HealthRoute: typeof ApiPublicV1HealthRoute
+  ApiPublicV1PerfisRoute: typeof ApiPublicV1PerfisRoute
+  ApiPublicV1TabelasFreteRoute: typeof ApiPublicV1TabelasFreteRoute
+  ApiPublicV1UsuariosRoute: typeof ApiPublicV1UsuariosRouteWithChildren
   ApiPublicV1AuthRefreshRoute: typeof ApiPublicV1AuthRefreshRoute
   ApiPublicV1AuthTokenRoute: typeof ApiPublicV1AuthTokenRoute
 }
@@ -1230,11 +1358,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTmsLmIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/v1/usuarios': {
+      id: '/api/public/v1/usuarios'
+      path: '/api/public/v1/usuarios'
+      fullPath: '/api/public/v1/usuarios'
+      preLoaderRoute: typeof ApiPublicV1UsuariosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/v1/tabelas-frete': {
+      id: '/api/public/v1/tabelas-frete'
+      path: '/api/public/v1/tabelas-frete'
+      fullPath: '/api/public/v1/tabelas-frete'
+      preLoaderRoute: typeof ApiPublicV1TabelasFreteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/v1/perfis': {
+      id: '/api/public/v1/perfis'
+      path: '/api/public/v1/perfis'
+      fullPath: '/api/public/v1/perfis'
+      preLoaderRoute: typeof ApiPublicV1PerfisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/v1/health': {
       id: '/api/public/v1/health'
       path: '/api/public/v1/health'
       fullPath: '/api/public/v1/health'
       preLoaderRoute: typeof ApiPublicV1HealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/v1/filiais': {
+      id: '/api/public/v1/filiais'
+      path: '/api/public/v1/filiais'
+      fullPath: '/api/public/v1/filiais'
+      preLoaderRoute: typeof ApiPublicV1FiliaisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/v1/empresas': {
+      id: '/api/public/v1/empresas'
+      path: '/api/public/v1/empresas'
+      fullPath: '/api/public/v1/empresas'
+      preLoaderRoute: typeof ApiPublicV1EmpresasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/v1/clientes': {
@@ -1335,6 +1498,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTmsEtiquetasMinutaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/v1/usuarios/$id': {
+      id: '/api/public/v1/usuarios/$id'
+      path: '/$id'
+      fullPath: '/api/public/v1/usuarios/$id'
+      preLoaderRoute: typeof ApiPublicV1UsuariosIdRouteImport
+      parentRoute: typeof ApiPublicV1UsuariosRoute
+    }
+    '/api/public/v1/empresas/$id': {
+      id: '/api/public/v1/empresas/$id'
+      path: '/$id'
+      fullPath: '/api/public/v1/empresas/$id'
+      preLoaderRoute: typeof ApiPublicV1EmpresasIdRouteImport
+      parentRoute: typeof ApiPublicV1EmpresasRoute
+    }
     '/api/public/v1/clientes/$id': {
       id: '/api/public/v1/clientes/$id'
       path: '/$id'
@@ -1369,6 +1546,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/tms/lm/motorista/$rotaId'
       preLoaderRoute: typeof AuthenticatedTmsLmMotoristaRotaIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/public/v1/clientes/$id/lancamentos': {
+      id: '/api/public/v1/clientes/$id/lancamentos'
+      path: '/lancamentos'
+      fullPath: '/api/public/v1/clientes/$id/lancamentos'
+      preLoaderRoute: typeof ApiPublicV1ClientesIdLancamentosRouteImport
+      parentRoute: typeof ApiPublicV1ClientesIdRoute
+    }
+    '/api/public/v1/clientes/$id/enderecos': {
+      id: '/api/public/v1/clientes/$id/enderecos'
+      path: '/enderecos'
+      fullPath: '/api/public/v1/clientes/$id/enderecos'
+      preLoaderRoute: typeof ApiPublicV1ClientesIdEnderecosRouteImport
+      parentRoute: typeof ApiPublicV1ClientesIdRoute
+    }
+    '/api/public/v1/clientes/$id/contatos': {
+      id: '/api/public/v1/clientes/$id/contatos'
+      path: '/contatos'
+      fullPath: '/api/public/v1/clientes/$id/contatos'
+      preLoaderRoute: typeof ApiPublicV1ClientesIdContatosRouteImport
+      parentRoute: typeof ApiPublicV1ClientesIdRoute
     }
     '/api/public/v1/clientes/$id/conta-corrente': {
       id: '/api/public/v1/clientes/$id/conta-corrente'
@@ -1568,11 +1766,17 @@ const AuthenticatedRouteRouteWithChildren =
 
 interface ApiPublicV1ClientesIdRouteChildren {
   ApiPublicV1ClientesIdContaCorrenteRoute: typeof ApiPublicV1ClientesIdContaCorrenteRoute
+  ApiPublicV1ClientesIdContatosRoute: typeof ApiPublicV1ClientesIdContatosRoute
+  ApiPublicV1ClientesIdEnderecosRoute: typeof ApiPublicV1ClientesIdEnderecosRoute
+  ApiPublicV1ClientesIdLancamentosRoute: typeof ApiPublicV1ClientesIdLancamentosRoute
 }
 
 const ApiPublicV1ClientesIdRouteChildren: ApiPublicV1ClientesIdRouteChildren = {
   ApiPublicV1ClientesIdContaCorrenteRoute:
     ApiPublicV1ClientesIdContaCorrenteRoute,
+  ApiPublicV1ClientesIdContatosRoute: ApiPublicV1ClientesIdContatosRoute,
+  ApiPublicV1ClientesIdEnderecosRoute: ApiPublicV1ClientesIdEnderecosRoute,
+  ApiPublicV1ClientesIdLancamentosRoute: ApiPublicV1ClientesIdLancamentosRoute,
 }
 
 const ApiPublicV1ClientesIdRouteWithChildren =
@@ -1591,12 +1795,39 @@ const ApiPublicV1ClientesRouteChildren: ApiPublicV1ClientesRouteChildren = {
 const ApiPublicV1ClientesRouteWithChildren =
   ApiPublicV1ClientesRoute._addFileChildren(ApiPublicV1ClientesRouteChildren)
 
+interface ApiPublicV1EmpresasRouteChildren {
+  ApiPublicV1EmpresasIdRoute: typeof ApiPublicV1EmpresasIdRoute
+}
+
+const ApiPublicV1EmpresasRouteChildren: ApiPublicV1EmpresasRouteChildren = {
+  ApiPublicV1EmpresasIdRoute: ApiPublicV1EmpresasIdRoute,
+}
+
+const ApiPublicV1EmpresasRouteWithChildren =
+  ApiPublicV1EmpresasRoute._addFileChildren(ApiPublicV1EmpresasRouteChildren)
+
+interface ApiPublicV1UsuariosRouteChildren {
+  ApiPublicV1UsuariosIdRoute: typeof ApiPublicV1UsuariosIdRoute
+}
+
+const ApiPublicV1UsuariosRouteChildren: ApiPublicV1UsuariosRouteChildren = {
+  ApiPublicV1UsuariosIdRoute: ApiPublicV1UsuariosIdRoute,
+}
+
+const ApiPublicV1UsuariosRouteWithChildren =
+  ApiPublicV1UsuariosRoute._addFileChildren(ApiPublicV1UsuariosRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   LoginRoute: LoginRoute,
   ApiPublicV1ClientesRoute: ApiPublicV1ClientesRouteWithChildren,
+  ApiPublicV1EmpresasRoute: ApiPublicV1EmpresasRouteWithChildren,
+  ApiPublicV1FiliaisRoute: ApiPublicV1FiliaisRoute,
   ApiPublicV1HealthRoute: ApiPublicV1HealthRoute,
+  ApiPublicV1PerfisRoute: ApiPublicV1PerfisRoute,
+  ApiPublicV1TabelasFreteRoute: ApiPublicV1TabelasFreteRoute,
+  ApiPublicV1UsuariosRoute: ApiPublicV1UsuariosRouteWithChildren,
   ApiPublicV1AuthRefreshRoute: ApiPublicV1AuthRefreshRoute,
   ApiPublicV1AuthTokenRoute: ApiPublicV1AuthTokenRoute,
 }

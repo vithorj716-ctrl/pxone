@@ -20,6 +20,7 @@ const ESCOPOS_VALIDOS = [
   "usuarios:read",
   "empresas:read",
   "permissoes:read",
+  "perfis:read",
   "categorias:read",
   "tabela-frete:read",
   "admin:write",
