@@ -29,6 +29,10 @@ export const Route = createFileRoute("/api/public/v1/clientes/$id/inativar")({
             .maybeSingle();
           if (error) return pxErr("INTERNAL", "Falha ao inativar cliente.", { requestId: ctx.requestId, details: error.message });
           if (!data) return pxErr("NOT_FOUND", "Cliente não encontrado.", { requestId: ctx.requestId });
+          await (ctx.supabase as any)
+            .from("tms_clientes")
+            .update({ ativo: false })
+            .eq("registry_id", data.id);
           return pxOk(data, { message: "Cliente inativado.", requestId: ctx.requestId });
         }),
       GET: async ({ request }) => methodNotAllowed(["POST"], getRequestId(request)),
