@@ -25,8 +25,9 @@ function b64urlDecode(s: string): Uint8Array {
   return out;
 }
 
-function utf8(s: string): Uint8Array {
-  return new TextEncoder().encode(s);
+function utf8(s: string): ArrayBuffer {
+  // Cast para satisfazer o tipo BufferSource estrito da Web Crypto.
+  return new TextEncoder().encode(s).buffer as ArrayBuffer;
 }
 
 async function hmacKey(secret: string): Promise<CryptoKey> {
