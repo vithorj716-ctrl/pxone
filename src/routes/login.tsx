@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/login")({
@@ -15,6 +16,7 @@ function LoginPage() {
   const [login, setLogin] = useState("");
   const [senha, setSenha] = useState("");
   const [loading, setLoading] = useState(false);
+  const [mostrarSenha, setMostrarSenha] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
 
   async function onSubmit(e: React.FormEvent) {
@@ -56,13 +58,23 @@ function LoginPage() {
         </div>
         <div className="space-y-1.5">
           <label className="text-xs text-muted-foreground">Senha</label>
-          <input
-            type="password"
-            value={senha}
-            onChange={(e) => setSenha(e.target.value)}
-            className="w-full bg-background ring-1 ring-border rounded-md px-3 py-2 text-sm outline-none focus:ring-brand"
-            autoComplete="current-password"
-          />
+          <div className="relative">
+            <input
+              type={mostrarSenha ? "text" : "password"}
+              value={senha}
+              onChange={(e) => setSenha(e.target.value)}
+              className="w-full bg-background ring-1 ring-border rounded-md pl-3 pr-10 py-2 text-sm outline-none focus:ring-brand"
+              autoComplete="current-password"
+            />
+            <button
+              type="button"
+              onClick={() => setMostrarSenha((v) => !v)}
+              aria-label={mostrarSenha ? "Ocultar senha" : "Mostrar senha"}
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded text-muted-foreground hover:text-foreground"
+            >
+              {mostrarSenha ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+            </button>
+          </div>
         </div>
         {erro && <div className="text-xs text-red-400">{erro}</div>}
         <button
