@@ -130,6 +130,7 @@ function PropostaDetalhe() {
                     <Button variant="outline">Ver cotação nº {data.cotacao.numero}</Button>
                   </Link>
                 )}
+                <Button variant="outline" onClick={gerarLink}><Link2 className="size-4 mr-1.5" /> Gerar link do cliente</Button>
                 <Button variant="ghost" className="text-red-600" onClick={remover}><Trash2 className="size-4 mr-1.5" /> Excluir</Button>
               </div>
               {p.status !== "aceita" && !data.minuta && (
