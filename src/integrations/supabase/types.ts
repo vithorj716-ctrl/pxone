@@ -1974,6 +1974,186 @@ export type Database = {
           },
         ]
       }
+      pxsales_cotacoes: {
+        Row: {
+          advalorem_percentual: number
+          cliente_id: string | null
+          condicao_pagamento: string | null
+          contato_email: string | null
+          contato_nome: string | null
+          contato_telefone: string | null
+          created_at: string
+          created_by: string | null
+          cubagem: number
+          desconto_percentual: number
+          destino_cep: string | null
+          destino_cidade: string | null
+          destino_uf: string | null
+          empresa_nome: string
+          frequencia_mensal: number | null
+          gris_percentual: number
+          id: string
+          lead_id: string | null
+          numero: number
+          observacoes: string | null
+          oportunidade_id: string | null
+          origem_cep: string | null
+          origem_cidade: string | null
+          origem_uf: string | null
+          pedagio: number
+          peso: number
+          peso_cubado: number
+          peso_taxado: number
+          prazo_dias: number
+          qtd_volumes: number
+          responsavel_id: string | null
+          status: string
+          tabela_frete_id: string | null
+          tabela_frete_nome: string | null
+          taxas_extras: number
+          tipo_mercadoria: string | null
+          tipo_operacao: string
+          updated_at: string
+          updated_by: string | null
+          validade_ate: string | null
+          valor_base: number
+          valor_coleta: number
+          valor_entrega: number
+          valor_mercadoria: number
+          valor_total: number
+        }
+        Insert: {
+          advalorem_percentual?: number
+          cliente_id?: string | null
+          condicao_pagamento?: string | null
+          contato_email?: string | null
+          contato_nome?: string | null
+          contato_telefone?: string | null
+          created_at?: string
+          created_by?: string | null
+          cubagem?: number
+          desconto_percentual?: number
+          destino_cep?: string | null
+          destino_cidade?: string | null
+          destino_uf?: string | null
+          empresa_nome: string
+          frequencia_mensal?: number | null
+          gris_percentual?: number
+          id?: string
+          lead_id?: string | null
+          numero?: number
+          observacoes?: string | null
+          oportunidade_id?: string | null
+          origem_cep?: string | null
+          origem_cidade?: string | null
+          origem_uf?: string | null
+          pedagio?: number
+          peso?: number
+          peso_cubado?: number
+          peso_taxado?: number
+          prazo_dias?: number
+          qtd_volumes?: number
+          responsavel_id?: string | null
+          status?: string
+          tabela_frete_id?: string | null
+          tabela_frete_nome?: string | null
+          taxas_extras?: number
+          tipo_mercadoria?: string | null
+          tipo_operacao?: string
+          updated_at?: string
+          updated_by?: string | null
+          validade_ate?: string | null
+          valor_base?: number
+          valor_coleta?: number
+          valor_entrega?: number
+          valor_mercadoria?: number
+          valor_total?: number
+        }
+        Update: {
+          advalorem_percentual?: number
+          cliente_id?: string | null
+          condicao_pagamento?: string | null
+          contato_email?: string | null
+          contato_nome?: string | null
+          contato_telefone?: string | null
+          created_at?: string
+          created_by?: string | null
+          cubagem?: number
+          desconto_percentual?: number
+          destino_cep?: string | null
+          destino_cidade?: string | null
+          destino_uf?: string | null
+          empresa_nome?: string
+          frequencia_mensal?: number | null
+          gris_percentual?: number
+          id?: string
+          lead_id?: string | null
+          numero?: number
+          observacoes?: string | null
+          oportunidade_id?: string | null
+          origem_cep?: string | null
+          origem_cidade?: string | null
+          origem_uf?: string | null
+          pedagio?: number
+          peso?: number
+          peso_cubado?: number
+          peso_taxado?: number
+          prazo_dias?: number
+          qtd_volumes?: number
+          responsavel_id?: string | null
+          status?: string
+          tabela_frete_id?: string | null
+          tabela_frete_nome?: string | null
+          taxas_extras?: number
+          tipo_mercadoria?: string | null
+          tipo_operacao?: string
+          updated_at?: string
+          updated_by?: string | null
+          validade_ate?: string | null
+          valor_base?: number
+          valor_coleta?: number
+          valor_entrega?: number
+          valor_mercadoria?: number
+          valor_total?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pxsales_cotacoes_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "px_cliente_saldo"
+            referencedColumns: ["cliente_id"]
+          },
+          {
+            foreignKeyName: "pxsales_cotacoes_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "px_registry_clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pxsales_cotacoes_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "pxsales_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pxsales_cotacoes_oportunidade_id_fkey"
+            columns: ["oportunidade_id"]
+            isOneToOne: false
+            referencedRelation: "pxsales_oportunidades"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pxsales_cotacoes_tabela_frete_id_fkey"
+            columns: ["tabela_frete_id"]
+            isOneToOne: false
+            referencedRelation: "tms_tabela_frete"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pxsales_leads: {
         Row: {
           cidade: string | null
@@ -2258,6 +2438,164 @@ export type Database = {
           updated_by?: string | null
         }
         Relationships: []
+      }
+      pxsales_proposta_historico: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          observacao: string | null
+          proposta_id: string
+          status_anterior: string | null
+          status_novo: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          observacao?: string | null
+          proposta_id: string
+          status_anterior?: string | null
+          status_novo: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          observacao?: string | null
+          proposta_id?: string
+          status_anterior?: string | null
+          status_novo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pxsales_proposta_historico_proposta_id_fkey"
+            columns: ["proposta_id"]
+            isOneToOne: false
+            referencedRelation: "pxsales_propostas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pxsales_propostas: {
+        Row: {
+          aceita_em: string | null
+          anexos: Json
+          cliente_id: string | null
+          condicao_pagamento: string | null
+          condicoes: string | null
+          cotacao_id: string | null
+          created_at: string
+          created_by: string | null
+          empresa_nome: string
+          enviada_em: string | null
+          escopo: string | null
+          id: string
+          minuta_id: string | null
+          motivo: string | null
+          numero: number
+          oportunidade_id: string | null
+          recusada_em: string | null
+          responsavel_id: string | null
+          status: string
+          titulo: string
+          updated_at: string
+          updated_by: string | null
+          validade_ate: string | null
+          valor_total: number
+          visualizada_em: string | null
+        }
+        Insert: {
+          aceita_em?: string | null
+          anexos?: Json
+          cliente_id?: string | null
+          condicao_pagamento?: string | null
+          condicoes?: string | null
+          cotacao_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          empresa_nome: string
+          enviada_em?: string | null
+          escopo?: string | null
+          id?: string
+          minuta_id?: string | null
+          motivo?: string | null
+          numero?: number
+          oportunidade_id?: string | null
+          recusada_em?: string | null
+          responsavel_id?: string | null
+          status?: string
+          titulo: string
+          updated_at?: string
+          updated_by?: string | null
+          validade_ate?: string | null
+          valor_total?: number
+          visualizada_em?: string | null
+        }
+        Update: {
+          aceita_em?: string | null
+          anexos?: Json
+          cliente_id?: string | null
+          condicao_pagamento?: string | null
+          condicoes?: string | null
+          cotacao_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          empresa_nome?: string
+          enviada_em?: string | null
+          escopo?: string | null
+          id?: string
+          minuta_id?: string | null
+          motivo?: string | null
+          numero?: number
+          oportunidade_id?: string | null
+          recusada_em?: string | null
+          responsavel_id?: string | null
+          status?: string
+          titulo?: string
+          updated_at?: string
+          updated_by?: string | null
+          validade_ate?: string | null
+          valor_total?: number
+          visualizada_em?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pxsales_propostas_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "px_cliente_saldo"
+            referencedColumns: ["cliente_id"]
+          },
+          {
+            foreignKeyName: "pxsales_propostas_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "px_registry_clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pxsales_propostas_cotacao_id_fkey"
+            columns: ["cotacao_id"]
+            isOneToOne: false
+            referencedRelation: "pxsales_cotacoes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pxsales_propostas_minuta_id_fkey"
+            columns: ["minuta_id"]
+            isOneToOne: false
+            referencedRelation: "tms_minutas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pxsales_propostas_oportunidade_id_fkey"
+            columns: ["oportunidade_id"]
+            isOneToOne: false
+            referencedRelation: "pxsales_oportunidades"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       risks: {
         Row: {
