@@ -40,6 +40,18 @@ function PropostaDetalhe() {
   const fnStatus = useServerFn(setStatusProposta);
   const fnExcluir = useServerFn(excluirProposta);
   const fnPxLog = useServerFn(enviarPropostaParaPxLog);
+  const fnLink = useServerFn(gerarLinkPortal);
+
+  async function gerarLink() {
+    try {
+      const r = await fnLink({ data: { proposta_id: id, dias: 15 } });
+      const url = `${window.location.origin}/portal/proposta/${r.token}`;
+      await navigator.clipboard.writeText(url);
+      toast.success("Link do cliente copiado. Válido por 15 dias.");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Não foi possível gerar o link");
+    }
+  }
 
   const { data, isLoading } = useQuery({
     queryKey: ["pxsales", "proposta", id],
