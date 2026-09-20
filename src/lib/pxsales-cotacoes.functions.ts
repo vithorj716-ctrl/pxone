@@ -1,8 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { calcularFrete, type TabelaFrete } from "@/pxsales/frete-calc";
+import { assertPermissao, auditar, escopoEmpresas, faixa, resolveEmpresaId } from "./pxsales-guard";
 
-// PXSales — Etapa 4: cotações (com tabela de frete do PXLog), propostas e envio para a operação.
+// PXSales — cotações (com tabela de frete do PXLog), propostas e envio para a operação.
+// Acesso validado no servidor: permissão do perfil + empresa do grupo + RLS.
 
 export type TabelaFreteRow = TabelaFrete & {
   cliente_id: string | null;
@@ -13,6 +15,7 @@ export type TabelaFreteRow = TabelaFrete & {
 export type CotacaoRow = {
   id: string;
   numero: number;
+  empresa_id: string;
   cliente_id: string | null;
   oportunidade_id: string | null;
   empresa_nome: string;
@@ -57,6 +60,7 @@ export type CotacaoRow = {
 export type PropostaRow = {
   id: string;
   numero: number;
+  empresa_id: string;
   cotacao_id: string | null;
   cliente_id: string | null;
   oportunidade_id: string | null;
@@ -87,6 +91,16 @@ const i = (v: unknown, def = 0) => {
   return Number.isFinite(x) ? x : def;
 };
 
+/** Estados finais: não voltam atrás pela tela, preservando o histórico comercial. */
+const COTACAO_FINAL = ["aprovada", "recusada", "cancelada", "convertida"];
+const PROPOSTA_FINAL = ["aceita", "recusada", "cancelada"];
+const PROPOSTA_TRANSICOES: Record<string, string[]> = {
+  rascunho: ["enviada", "cancelada"],
+  enviada: ["visualizada", "em_negociacao", "aceita", "recusada", "cancelada"],
+  visualizada: ["em_negociacao", "aceita", "recusada", "cancelada"],
+  em_negociacao: ["enviada", "aceita", "recusada", "cancelada"],
+};
+
 /* ------------------------------ TABELAS DE FRETE ----------------------------- */
 
 export const listTabelasFrete = createServerFn({ method: "POST" })
@@ -94,9 +108,14 @@ export const listTabelasFrete = createServerFn({ method: "POST" })
   .inputValidator((d: { cliente_id?: string | null } | undefined) => d ?? {})
   .handler(async ({ context }): Promise<TabelaFreteRow[]> => {
     const sb = context.supabase as any;
+    const userId = (context as any).userId as string;
+    await assertPermissao(sb, userId, "pxsales.cotacoes.view");
+
     const { data, error } = await sb
       .from("tms_tabela_frete")
-      .select("id,nome,cliente_id,origem,destino,tipo_cobranca,valor_coleta,valor_entrega,valor_kg,valor_m3,valor_minimo,prazo_dias")
+      .select(
+        "id,nome,cliente_id,origem,destino,tipo_cobranca,valor_coleta,valor_entrega,valor_kg,valor_m3,valor_minimo,prazo_dias",
+      )
       .eq("ativo", true)
       .order("nome", { ascending: true })
       .limit(300);
@@ -108,11 +127,27 @@ export const listTabelasFrete = createServerFn({ method: "POST" })
 
 export const listCotacoes = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { search?: string; status?: string; cliente_id?: string; meus?: boolean } | undefined) => d ?? {})
+  .inputValidator(
+    (
+      d:
+        | { search?: string; status?: string; cliente_id?: string; meus?: boolean; empresa_id?: string | null; page?: number; pageSize?: number }
+        | undefined,
+    ) => d ?? {},
+  )
   .handler(async ({ data, context }): Promise<CotacaoRow[]> => {
     const sb = context.supabase as any;
     const userId = (context as any).userId as string;
-    let q = sb.from("pxsales_cotacoes").select("*").order("created_at", { ascending: false }).limit(400);
+    await assertPermissao(sb, userId, "pxsales.cotacoes.view");
+    const empresas = await escopoEmpresas(sb, userId, data.empresa_id);
+    if (!empresas.length) return [];
+    const { from, to } = faixa(data.page, data.pageSize);
+
+    let q = sb
+      .from("pxsales_cotacoes")
+      .select("*")
+      .in("empresa_id", empresas)
+      .order("created_at", { ascending: false })
+      .range(from, to);
     if (data.status) q = q.eq("status", data.status);
     if (data.cliente_id) q = q.eq("cliente_id", data.cliente_id);
     if (data.meus) q = q.eq("responsavel_id", userId);
@@ -133,6 +168,9 @@ export const getCotacao = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
+    const userId = (context as any).userId as string;
+    await assertPermissao(sb, userId, "pxsales.cotacoes.view");
+
     const { data: cotacao, error } = await sb.from("pxsales_cotacoes").select("*").eq("id", data.id).maybeSingle();
     if (error) throw new Error(error.message);
     if (!cotacao) throw new Error("Cotação não encontrada.");
@@ -153,6 +191,7 @@ export const saveCotacao = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<{ id: string }> => {
     const sb = context.supabase as any;
     const userId = (context as any).userId as string;
+    await assertPermissao(sb, userId, data.id ? "pxsales.cotacoes.edit" : "pxsales.cotacoes.create");
 
     let tabela: TabelaFrete | null = null;
     if (data.tabela_frete_id) {
@@ -175,7 +214,7 @@ export const saveCotacao = createServerFn({ method: "POST" })
       desconto_percentual: n(data.desconto_percentual),
     });
 
-    const payload = {
+    const payload: Record<string, any> = {
       cliente_id: data.cliente_id || null,
       oportunidade_id: data.oportunidade_id || null,
       lead_id: data.lead_id || null,
@@ -219,16 +258,24 @@ export const saveCotacao = createServerFn({ method: "POST" })
     };
 
     if (data.id) {
+      const { data: atual } = await sb.from("pxsales_cotacoes").select("status").eq("id", data.id).maybeSingle();
+      if (atual && COTACAO_FINAL.includes(atual.status))
+        throw new Error("Esta cotação já foi encerrada e não pode mais ser alterada.");
+      delete payload["status"];
       const { error } = await sb.from("pxsales_cotacoes").update(payload).eq("id", data.id);
       if (error) throw new Error(error.message);
+      await auditar(sb, userId, "pxsales_cotacoes", data.id, "atualizada", { valor_total: calc.valor_total });
       return { id: data.id as string };
     }
+
+    const empresaId = await resolveEmpresaId(sb, userId, data.empresa_id);
     const { data: row, error } = await sb
       .from("pxsales_cotacoes")
-      .insert({ ...payload, created_by: userId })
+      .insert({ ...payload, empresa_id: empresaId, created_by: userId })
       .select("id")
       .single();
     if (error) throw new Error(error.message);
+    await auditar(sb, userId, "pxsales_cotacoes", row.id, "criada", { valor_total: calc.valor_total });
     return { id: row.id as string };
   });
 
@@ -240,11 +287,25 @@ export const setStatusCotacao = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
+    const userId = (context as any).userId as string;
+    await assertPermissao(
+      sb,
+      userId,
+      data.status === "aprovada" ? "pxsales.cotacoes.approve" : "pxsales.cotacoes.edit",
+    );
+
+    const { data: atual } = await sb.from("pxsales_cotacoes").select("status").eq("id", data.id).maybeSingle();
+    if (!atual) throw new Error("Cotação não encontrada.");
+    if (atual.status === data.status) return { ok: true };
+    if (COTACAO_FINAL.includes(atual.status))
+      throw new Error(`Cotação já ${atual.status}: o status não pode mais mudar.`);
+
     const { error } = await sb
       .from("pxsales_cotacoes")
-      .update({ status: data.status, updated_by: (context as any).userId })
+      .update({ status: data.status, updated_by: userId })
       .eq("id", data.id);
     if (error) throw new Error(error.message);
+    await auditar(sb, userId, "pxsales_cotacoes", data.id, "status", { de: atual.status, para: data.status });
     return { ok: true };
   });
 
@@ -256,8 +317,18 @@ export const excluirCotacao = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
+    const userId = (context as any).userId as string;
+    await assertPermissao(sb, userId, "pxsales.cotacoes.edit");
+
+    const { count } = await sb
+      .from("pxsales_propostas")
+      .select("id", { count: "exact", head: true })
+      .eq("cotacao_id", data.id);
+    if ((count ?? 0) > 0) throw new Error("Esta cotação já gerou proposta e não pode ser excluída.");
+
     const { error } = await sb.from("pxsales_cotacoes").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
+    await auditar(sb, userId, "pxsales_cotacoes", data.id, "excluida");
     return { ok: true };
   });
 
@@ -274,11 +345,24 @@ async function registrarHistorico(sb: any, propostaId: string, anterior: string 
 
 export const listPropostas = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { search?: string; status?: string; meus?: boolean } | undefined) => d ?? {})
+  .inputValidator(
+    (d: { search?: string; status?: string; meus?: boolean; empresa_id?: string | null; page?: number; pageSize?: number } | undefined) =>
+      d ?? {},
+  )
   .handler(async ({ data, context }): Promise<PropostaRow[]> => {
     const sb = context.supabase as any;
     const userId = (context as any).userId as string;
-    let q = sb.from("pxsales_propostas").select("*").order("created_at", { ascending: false }).limit(400);
+    await assertPermissao(sb, userId, "pxsales.propostas.view");
+    const empresas = await escopoEmpresas(sb, userId, data.empresa_id);
+    if (!empresas.length) return [];
+    const { from, to } = faixa(data.page, data.pageSize);
+
+    let q = sb
+      .from("pxsales_propostas")
+      .select("*")
+      .in("empresa_id", empresas)
+      .order("created_at", { ascending: false })
+      .range(from, to);
     if (data.status) q = q.eq("status", data.status);
     if (data.meus) q = q.eq("responsavel_id", userId);
     if (data.search) {
@@ -298,6 +382,9 @@ export const getProposta = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
+    const userId = (context as any).userId as string;
+    await assertPermissao(sb, userId, "pxsales.propostas.view");
+
     const { data: proposta, error } = await sb.from("pxsales_propostas").select("*").eq("id", data.id).maybeSingle();
     if (error) throw new Error(error.message);
     if (!proposta) throw new Error("Proposta não encontrada.");
@@ -337,6 +424,7 @@ export const gerarPropostaDaCotacao = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<{ id: string }> => {
     const sb = context.supabase as any;
     const userId = (context as any).userId as string;
+    await assertPermissao(sb, userId, "pxsales.propostas.create");
 
     const { data: c, error: e1 } = await sb.from("pxsales_cotacoes").select("*").eq("id", data.cotacao_id).maybeSingle();
     if (e1) throw new Error(e1.message);
@@ -349,6 +437,7 @@ export const gerarPropostaDaCotacao = createServerFn({ method: "POST" })
     const { data: row, error } = await sb
       .from("pxsales_propostas")
       .insert({
+        empresa_id: c.empresa_id,
         cotacao_id: c.id,
         cliente_id: c.cliente_id,
         oportunidade_id: c.oportunidade_id,
@@ -371,6 +460,7 @@ export const gerarPropostaDaCotacao = createServerFn({ method: "POST" })
 
     await registrarHistorico(sb, row.id, null, "rascunho", "Proposta gerada a partir da cotação");
     await sb.from("pxsales_cotacoes").update({ status: "enviada", updated_by: userId }).eq("id", c.id);
+    await auditar(sb, userId, "pxsales_propostas", row.id, "criada", { cotacao_id: c.id });
 
     return { id: row.id as string };
   });
@@ -384,18 +474,30 @@ export const setStatusProposta = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
     const userId = (context as any).userId as string;
+    await assertPermissao(sb, userId, "pxsales.propostas.create");
 
     const { data: atual } = await sb.from("pxsales_propostas").select("status").eq("id", data.id).maybeSingle();
+    if (!atual) throw new Error("Proposta não encontrada.");
+    if (atual.status === data.status) return { ok: true };
+    if (PROPOSTA_FINAL.includes(atual.status))
+      throw new Error("Esta proposta já foi encerrada e o status não pode mais mudar.");
+    const permitidos = PROPOSTA_TRANSICOES[atual.status] ?? [];
+    if (!permitidos.includes(data.status))
+      throw new Error(`Mudança de status inválida: ${atual.status} → ${data.status}.`);
+    if (["recusada", "cancelada"].includes(data.status) && !data.motivo?.trim())
+      throw new Error("Informe o motivo.");
+
     const agora = new Date().toISOString();
     const patch: Record<string, any> = { status: data.status, updated_by: userId, motivo: data.motivo ?? null };
-    if (data.status === "enviada") patch.enviada_em = agora;
-    if (data.status === "visualizada") patch.visualizada_em = agora;
-    if (data.status === "aceita") patch.aceita_em = agora;
-    if (data.status === "recusada") patch.recusada_em = agora;
+    if (data.status === "enviada") patch["enviada_em"] = agora;
+    if (data.status === "visualizada") patch["visualizada_em"] = agora;
+    if (data.status === "aceita") patch["aceita_em"] = agora;
+    if (data.status === "recusada") patch["recusada_em"] = agora;
 
     const { error } = await sb.from("pxsales_propostas").update(patch).eq("id", data.id);
     if (error) throw new Error(error.message);
-    await registrarHistorico(sb, data.id, atual?.status ?? null, data.status, data.motivo);
+    await registrarHistorico(sb, data.id, atual.status, data.status, data.motivo);
+    await auditar(sb, userId, "pxsales_propostas", data.id, "status", { de: atual.status, para: data.status });
     return { ok: true };
   });
 
@@ -407,16 +509,26 @@ export const excluirProposta = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
+    const userId = (context as any).userId as string;
+    await assertPermissao(sb, userId, "pxsales.propostas.create");
+
+    const { data: p } = await sb.from("pxsales_propostas").select("status,minuta_id").eq("id", data.id).maybeSingle();
+    if (!p) throw new Error("Proposta não encontrada.");
+    if (p.minuta_id) throw new Error("Esta proposta já virou embarque no PXLog e não pode ser excluída.");
+    if (p.status === "aceita") throw new Error("Proposta aceita não pode ser excluída.");
+
     const { error } = await sb.from("pxsales_propostas").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
+    await auditar(sb, userId, "pxsales_propostas", data.id, "excluida");
     return { ok: true };
   });
 
 /* --------------------------- INTEGRAÇÃO COM O PXLOG -------------------------- */
 
 /**
- * Proposta aceita vira embarque no PXLog: cria a minuta com os dados da cotação,
- * reutilizando o cliente do cadastro único (nunca duplica cliente).
+ * Proposta aceita vira embarque no PXLog em uma única transação no banco
+ * (RPC pxsales_converter_proposta_pxlog): cliente reaproveitado do cadastro único,
+ * minuta, evento operacional, histórico e auditoria — tudo junto ou nada.
  */
 export const enviarPropostaParaPxLog = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -427,86 +539,11 @@ export const enviarPropostaParaPxLog = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<{ minuta_id: string; numero: number }> => {
     const sb = context.supabase as any;
     const userId = (context as any).userId as string;
+    await assertPermissao(sb, userId, "pxsales.propostas.create");
 
-    const { data: p, error: e1 } = await sb.from("pxsales_propostas").select("*").eq("id", data.proposta_id).maybeSingle();
-    if (e1) throw new Error(e1.message);
-    if (!p) throw new Error("Proposta não encontrada.");
-    if (p.minuta_id) throw new Error("Esta proposta já gerou um embarque no PXLog.");
-    if (p.status !== "aceita") throw new Error("Só é possível enviar para a operação depois que a proposta for aceita.");
-    if (!p.cotacao_id) throw new Error("A proposta não tem cotação vinculada.");
-
-    const { data: c } = await sb.from("pxsales_cotacoes").select("*").eq("id", p.cotacao_id).maybeSingle();
-    if (!c) throw new Error("Cotação da proposta não encontrada.");
-
-    // Cliente do PXLog espelhado do cadastro único
-    let tmsClienteId: string | null = null;
-    if (p.cliente_id) {
-      const { data: tc } = await sb.from("tms_clientes").select("id").eq("registry_id", p.cliente_id).maybeSingle();
-      if (tc) tmsClienteId = tc.id;
-      else {
-        const { data: reg } = await sb
-          .from("px_registry_clientes")
-          .select("id,razao_social,nome_fantasia,cnpj,cidade,uf,email,telefone")
-          .eq("id", p.cliente_id)
-          .maybeSingle();
-        if (reg) {
-          const { data: novo, error: e2 } = await sb
-            .from("tms_clientes")
-            .insert({
-              registry_id: reg.id,
-              nome: reg.nome_fantasia || reg.razao_social,
-              cnpj: reg.cnpj,
-              cidade: reg.cidade,
-              uf: reg.uf,
-              email: reg.email,
-              telefone: reg.telefone,
-            })
-            .select("id")
-            .single();
-          if (e2) throw new Error(e2.message);
-          tmsClienteId = novo.id;
-        }
-      }
-    }
-
-    const origem = [c.origem_cidade, c.origem_uf].filter(Boolean).join("/") || "Origem a definir";
-    const destino = [c.destino_cidade, c.destino_uf].filter(Boolean).join("/") || "Destino a definir";
-
-    const { data: minuta, error: e3 } = await sb
-      .from("tms_minutas")
-      .insert({
-        cliente_id: tmsClienteId,
-        remetente: { nome: c.empresa_nome, cidade: c.origem_cidade, uf: c.origem_uf, cep: c.origem_cep },
-        destinatario: { nome: "A confirmar", cidade: c.destino_cidade, uf: c.destino_uf, cep: c.destino_cep },
-        origem,
-        destino,
-        qtd_volumes: c.qtd_volumes ?? 1,
-        peso: c.peso ?? 0,
-        cubagem: c.cubagem ?? 0,
-        peso_cubado: c.peso_cubado ?? 0,
-        peso_taxado: c.peso_taxado ?? 0,
-        valor_mercadoria: c.valor_mercadoria ?? 0,
-        tipo_mercadoria: c.tipo_mercadoria,
-        valor_frete: p.valor_total ?? c.valor_total ?? 0,
-        prazo_dias: c.prazo_dias ?? 1,
-        status: "solicitado",
-        responsavel_id: userId,
-        observacoes: `Origem comercial: proposta PXSales nº ${p.numero}`,
-      })
-      .select("id,numero")
-      .single();
-    if (e3) throw new Error(e3.message);
-
-    await sb.from("tms_eventos").insert({
-      minuta_id: minuta.id,
-      tipo: "solicitado",
-      origem_evento: "pxsales",
-      operador_id: userId,
-      payload: { proposta_id: p.id, proposta_numero: p.numero },
+    const { data: res, error } = await sb.rpc("pxsales_converter_proposta_pxlog", {
+      p_proposta_id: data.proposta_id,
     });
-
-    await sb.from("pxsales_propostas").update({ minuta_id: minuta.id, updated_by: userId }).eq("id", p.id);
-    await registrarHistorico(sb, p.id, p.status, "aceita", `Embarque nº ${minuta.numero} criado no PXLog`);
-
-    return { minuta_id: minuta.id as string, numero: minuta.numero as number };
+    if (error) throw new Error(error.message);
+    return { minuta_id: (res as any).minuta_id as string, numero: Number((res as any).numero) };
   });
