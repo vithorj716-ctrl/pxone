@@ -500,7 +500,9 @@ export const enviarPropostaParaPxLog = createServerFn({ method: "POST" })
     await sb.from("tms_eventos").insert({
       minuta_id: minuta.id,
       tipo: "solicitado",
-      descricao: `Embarque criado a partir da proposta comercial nº ${p.numero} (PXSales).`,
+      origem_evento: "pxsales",
+      operador_id: userId,
+      payload: { proposta_id: p.id, proposta_numero: p.numero },
     });
 
     await sb.from("pxsales_propostas").update({ minuta_id: minuta.id, updated_by: userId }).eq("id", p.id);
