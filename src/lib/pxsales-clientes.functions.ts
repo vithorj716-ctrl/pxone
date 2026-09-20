@@ -47,6 +47,10 @@ export const listSalesClientes = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
+    const userId = (context as any).userId as string;
+    await assertPermissao(sb, userId, "pxsales.clientes.view");
+    const financeiro = await podeVerFinanceiro(sb, userId);
+    const { from, to } = faixa((data as any).page, (data as any).pageSize ?? 200);
 
     let q = sb
       .from("px_registry_clientes")
@@ -126,14 +130,14 @@ export const listSalesClientes = createServerFn({ method: "POST" })
         ativo: c.ativo !== false,
         telefone: c.telefone ?? null,
         email: c.email ?? null,
-        limite_credito: c.limite_credito ?? null,
+        limite_credito: financeiro ? c.limite_credito ?? null : null,
         condicao_pagamento: c.condicao_pagamento ?? null,
         vinculado_pxsales: vincSet.has(c.id),
         contatos: cContatos.get(c.id) ?? 0,
         enderecos: cEnderecos.get(c.id) ?? 0,
         minutas: op?.qtd ?? 0,
         ultima_minuta: op?.ultima ?? null,
-        faturamento_30d: op?.valor30 ?? 0,
+        faturamento_30d: financeiro ? op?.valor30 ?? 0 : 0,
       };
     });
   });
