@@ -155,9 +155,7 @@ export function AppShell({ children, title, subtitle, rightPanel, headerActions 
     <>
       <div className="p-4 flex items-center justify-between">
         <Link to="/" onClick={onNavigate} className="flex items-center gap-2 overflow-hidden">
-          <div className="size-7 rounded-md flex items-center justify-center shrink-0" style={{ background: "var(--gradient-brand)" }}>
-            <span className="text-[11px] font-bold text-brand-foreground">PX</span>
-          </div>
+          <PxGrupoLogo height={26} className="shrink-0" />
           {!collapsed && (
             <div className="overflow-hidden">
               <span className="text-base font-semibold tracking-tight block leading-none">PXOne</span>

@@ -41,9 +41,7 @@ function LauncherPage() {
     <div className="min-h-screen bg-background text-foreground">
       <header className="h-14 px-4 sm:px-6 border-b border-border flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="size-7 rounded-md flex items-center justify-center" style={{ background: "var(--gradient-brand)" }}>
-            <span className="text-[11px] font-bold text-brand-foreground">PX</span>
-          </div>
+          <PxGrupoLogo height={26} className="shrink-0" />
           <div>
             <div className="text-sm font-semibold leading-none">PX Platform</div>
             <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Selecionar Sistema</div>
