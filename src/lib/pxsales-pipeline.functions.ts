@@ -285,6 +285,7 @@ export const converterLead = createServerFn({ method: "POST" })
     const { data: op, error: e2 } = await sb
       .from("pxsales_oportunidades")
       .insert({
+        empresa_id: lead.empresa_id,
         titulo: `Oportunidade — ${lead.empresa}`,
         cliente_id: clienteId,
         lead_id: lead.id,
