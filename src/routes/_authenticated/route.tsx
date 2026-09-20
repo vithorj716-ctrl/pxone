@@ -6,9 +6,9 @@ export const Route = createFileRoute("/_authenticated")({
   ssr: false,
   staleTime: 30_000,
   beforeLoad: async ({ location }) => {
-    // A sessão já é validada nas operações protegidas. Ler o estado local aqui
-    // evita uma chamada remota bloqueando cada clique do menu.
-    const { data } = await supabase.auth.getSession();
+    // A sessão já é validada nas operações protegidas. Ler o estado local (com
+    // cache curto em memória) evita qualquer espera a cada clique do menu.
+    const data = await getCachedSession();
     if (!data.session?.user) {
       throw redirect({ to: "/login" });
     }
@@ -22,3 +22,14 @@ export const Route = createFileRoute("/_authenticated")({
   },
   component: () => <Outlet />,
 });
+
+// Cache curto da sessão local para transições instantâneas entre telas.
+let sessionCache: { at: number; value: Awaited<ReturnType<typeof supabase.auth.getSession>>["data"] } | null = null;
+
+async function getCachedSession() {
+  const now = Date.now();
+  if (sessionCache && now - sessionCache.at < 15_000) return sessionCache.value;
+  const { data } = await supabase.auth.getSession();
+  sessionCache = { at: now, value: data };
+  return data;
+}
