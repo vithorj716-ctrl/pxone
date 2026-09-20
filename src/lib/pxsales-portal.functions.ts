@@ -221,7 +221,7 @@ export const responderPropostaPublica = createServerFn({ method: "POST" })
       proposta_id: p.id,
       status_anterior: p.status,
       status_novo: status,
-      motivo: `Portal do cliente${quem ? ` — ${quem}` : ""}${msg ? `: ${msg}` : ""}`,
+      observacao: `Portal do cliente${quem ? ` — ${quem}` : ""}${msg ? `: ${msg}` : ""}`,
     });
     await sb.from("pxsales_portal_eventos").insert({
       proposta_id: p.id,
