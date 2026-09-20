@@ -22,3 +22,14 @@ export const Route = createFileRoute("/_authenticated")({
   },
   component: () => <Outlet />,
 });
+
+// Cache curto da sessão local para transições instantâneas entre telas.
+let sessionCache: { at: number; value: Awaited<ReturnType<typeof supabase.auth.getSession>>["data"] } | null = null;
+
+async function getCachedSession() {
+  const now = Date.now();
+  if (sessionCache && now - sessionCache.at < 15_000) return sessionCache.value;
+  const { data } = await supabase.auth.getSession();
+  sessionCache = { at: now, value: data };
+  return data;
+}
