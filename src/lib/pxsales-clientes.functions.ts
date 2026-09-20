@@ -1,6 +1,18 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { onlyDigits } from "./cnpj";
+import { assertPermissao, auditar, faixa } from "./pxsales-guard";
+import { PXSALES_SISTEMA_KEY } from "@/pxsales/pxsales.permissions";
+
+/** Dados financeiros do cliente só aparecem para quem tem a permissão específica. */
+async function podeVerFinanceiro(sb: any, userId: string): Promise<boolean> {
+  const { data } = await sb.rpc("px_has_permission", {
+    _user_id: userId,
+    _sistema: PXSALES_SISTEMA_KEY,
+    _acao: "pxsales.clientes.financeiro.view",
+  });
+  return !!data;
+}
 
 // PXSales — leitura comercial sobre o cadastro único (PX Registry) e a operação real (PXLog).
 // Nenhuma base paralela de clientes é criada aqui.
