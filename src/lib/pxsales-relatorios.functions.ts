@@ -43,11 +43,11 @@ export const getDashboardPxSales = createServerFn({ method: "GET" })
     const hoje = new Date().toISOString();
 
     const [leads, oportunidades, cotacoes, propostas, atividades, comissoes, clientes] = await Promise.all([
-      sb.from("pxsales_leads").select("id,etapa,valor_estimado,created_at").limit(2000),
+      sb.from("pxsales_leads").select("id,etapa,potencial_mensal,created_at").limit(2000),
       sb.from("pxsales_oportunidades").select("id,etapa,valor_estimado").limit(2000),
       sb.from("pxsales_cotacoes").select("id,status,valor_total").limit(2000),
       sb.from("pxsales_propostas").select("id,numero,empresa_nome,valor_total,status,created_at").order("created_at", { ascending: false }).limit(500),
-      sb.from("pxsales_atividades").select("id,titulo,tipo,data_prevista,concluida,empresa_nome").order("data_prevista", { ascending: true }).limit(200),
+      sb.from("pxsales_atividades").select("id,assunto,tipo,prevista_para,concluida,cliente_id").order("prevista_para", { ascending: true }).limit(200),
       sb.from("pxsales_comissoes").select("valor,status").limit(2000),
       sb.from("px_registry_clientes").select("id,ativo").limit(5000),
     ]);
@@ -87,7 +87,7 @@ export const getDashboardPxSales = createServerFn({ method: "GET" })
         taxa_conversao: respondidas ? Math.round((aceitas.length / respondidas) * 100) : 0,
         ticket_medio: aceitas.length ? valorAceitas / aceitas.length : 0,
         clientes_ativos: clis.filter((c) => c.ativo !== false).length,
-        followups_atrasados: atvs.filter((a) => !a.concluida && a.data_prevista && a.data_prevista < hoje).length,
+        followups_atrasados: atvs.filter((a) => !a.concluida && a.prevista_para && a.prevista_para < hoje).length,
         comissoes_previstas: coms.filter((c) => c.status === "prevista").reduce((s, c) => s + num(c.valor), 0),
       },
       agenda: atvs
@@ -95,12 +95,12 @@ export const getDashboardPxSales = createServerFn({ method: "GET" })
         .slice(0, 40)
         .map((a) => ({
           id: a.id,
-          titulo: a.titulo,
+          titulo: a.assunto,
           tipo: a.tipo,
-          data_prevista: a.data_prevista ?? null,
-          empresa_nome: a.empresa_nome ?? null,
+          data_prevista: a.prevista_para ?? null,
+          empresa_nome: null,
           concluida: !!a.concluida,
-          atrasada: !!a.data_prevista && a.data_prevista < hoje,
+          atrasada: !!a.prevista_para && a.prevista_para < hoje,
         })),
       ultimas_propostas: props.slice(0, 8).map((p) => ({
         id: p.id,
