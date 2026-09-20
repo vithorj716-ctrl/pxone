@@ -2194,6 +2194,60 @@ export type Database = {
           },
         ]
       }
+      pxsales_cotacao_componentes: {
+        Row: {
+          base: number
+          codigo: string
+          cotacao_id: string
+          created_at: string
+          detalhe: Json
+          empresa_id: string
+          id: string
+          nome: string
+          ordem: number
+          valor: number
+        }
+        Insert: {
+          base?: number
+          codigo: string
+          cotacao_id: string
+          created_at?: string
+          detalhe?: Json
+          empresa_id: string
+          id?: string
+          nome: string
+          ordem?: number
+          valor?: number
+        }
+        Update: {
+          base?: number
+          codigo?: string
+          cotacao_id?: string
+          created_at?: string
+          detalhe?: Json
+          empresa_id?: string
+          id?: string
+          nome?: string
+          ordem?: number
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pxsales_cotacao_componentes_cotacao_id_fkey"
+            columns: ["cotacao_id"]
+            isOneToOne: false
+            referencedRelation: "pxsales_cotacoes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pxsales_cotacao_componentes_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pxsales_cotacoes: {
         Row: {
           advalorem_percentual: number
@@ -2206,6 +2260,7 @@ export type Database = {
           created_by: string | null
           cubagem: number
           desconto_percentual: number
+          desconto_valor: number
           destino_cep: string | null
           destino_cidade: string | null
           destino_uf: string | null
@@ -2228,9 +2283,15 @@ export type Database = {
           prazo_dias: number
           qtd_volumes: number
           responsavel_id: string | null
+          snapshot: Json
           status: string
+          subtotal: number
           tabela_frete_id: string | null
           tabela_frete_nome: string | null
+          tabela_id: string | null
+          tabela_nome: string | null
+          tabela_versao: number | null
+          tabela_versao_id: string | null
           taxas_extras: number
           tipo_mercadoria: string | null
           tipo_operacao: string
@@ -2254,6 +2315,7 @@ export type Database = {
           created_by?: string | null
           cubagem?: number
           desconto_percentual?: number
+          desconto_valor?: number
           destino_cep?: string | null
           destino_cidade?: string | null
           destino_uf?: string | null
@@ -2276,9 +2338,15 @@ export type Database = {
           prazo_dias?: number
           qtd_volumes?: number
           responsavel_id?: string | null
+          snapshot?: Json
           status?: string
+          subtotal?: number
           tabela_frete_id?: string | null
           tabela_frete_nome?: string | null
+          tabela_id?: string | null
+          tabela_nome?: string | null
+          tabela_versao?: number | null
+          tabela_versao_id?: string | null
           taxas_extras?: number
           tipo_mercadoria?: string | null
           tipo_operacao?: string
@@ -2302,6 +2370,7 @@ export type Database = {
           created_by?: string | null
           cubagem?: number
           desconto_percentual?: number
+          desconto_valor?: number
           destino_cep?: string | null
           destino_cidade?: string | null
           destino_uf?: string | null
@@ -2324,9 +2393,15 @@ export type Database = {
           prazo_dias?: number
           qtd_volumes?: number
           responsavel_id?: string | null
+          snapshot?: Json
           status?: string
+          subtotal?: number
           tabela_frete_id?: string | null
           tabela_frete_nome?: string | null
+          tabela_id?: string | null
+          tabela_nome?: string | null
+          tabela_versao?: number | null
+          tabela_versao_id?: string | null
           taxas_extras?: number
           tipo_mercadoria?: string | null
           tipo_operacao?: string
@@ -2380,6 +2455,20 @@ export type Database = {
             columns: ["tabela_frete_id"]
             isOneToOne: false
             referencedRelation: "tms_tabela_frete"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pxsales_cotacoes_tabela_id_fkey"
+            columns: ["tabela_id"]
+            isOneToOne: false
+            referencedRelation: "pxsales_tabelas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pxsales_cotacoes_tabela_versao_id_fkey"
+            columns: ["tabela_versao_id"]
+            isOneToOne: false
+            referencedRelation: "pxsales_tabela_versoes"
             referencedColumns: ["id"]
           },
         ]
@@ -2689,6 +2778,100 @@ export type Database = {
         }
         Relationships: []
       }
+      pxsales_portal_acessos: {
+        Row: {
+          ativo: boolean
+          baixar_comprovantes: boolean
+          cliente_id: string
+          created_at: string
+          created_by: string | null
+          empresa_id: string
+          expira_em: string | null
+          id: string
+          solicitar_cotacao: boolean
+          token: string
+          ultimo_acesso_em: string | null
+          updated_at: string
+          updated_by: string | null
+          ver_componentes: boolean
+          ver_comprovantes: boolean
+          ver_cotacoes: boolean
+          ver_documentos_fiscais: boolean
+          ver_entregas: boolean
+          ver_historico: boolean
+          ver_tabela: boolean
+          ver_valores: boolean
+        }
+        Insert: {
+          ativo?: boolean
+          baixar_comprovantes?: boolean
+          cliente_id: string
+          created_at?: string
+          created_by?: string | null
+          empresa_id: string
+          expira_em?: string | null
+          id?: string
+          solicitar_cotacao?: boolean
+          token: string
+          ultimo_acesso_em?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          ver_componentes?: boolean
+          ver_comprovantes?: boolean
+          ver_cotacoes?: boolean
+          ver_documentos_fiscais?: boolean
+          ver_entregas?: boolean
+          ver_historico?: boolean
+          ver_tabela?: boolean
+          ver_valores?: boolean
+        }
+        Update: {
+          ativo?: boolean
+          baixar_comprovantes?: boolean
+          cliente_id?: string
+          created_at?: string
+          created_by?: string | null
+          empresa_id?: string
+          expira_em?: string | null
+          id?: string
+          solicitar_cotacao?: boolean
+          token?: string
+          ultimo_acesso_em?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          ver_componentes?: boolean
+          ver_comprovantes?: boolean
+          ver_cotacoes?: boolean
+          ver_documentos_fiscais?: boolean
+          ver_entregas?: boolean
+          ver_historico?: boolean
+          ver_tabela?: boolean
+          ver_valores?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pxsales_portal_acessos_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "px_cliente_saldo"
+            referencedColumns: ["cliente_id"]
+          },
+          {
+            foreignKeyName: "pxsales_portal_acessos_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "px_registry_clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pxsales_portal_acessos_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pxsales_portal_eventos: {
         Row: {
           created_at: string
@@ -2933,6 +3116,259 @@ export type Database = {
           tentativas?: number
         }
         Relationships: []
+      }
+      pxsales_tabela_componentes: {
+        Row: {
+          ativo: boolean
+          codigo: string
+          config: Json
+          created_at: string
+          empresa_id: string
+          id: string
+          nome: string
+          ordem: number
+          tipo: string
+          updated_at: string
+          versao_id: string
+        }
+        Insert: {
+          ativo?: boolean
+          codigo: string
+          config?: Json
+          created_at?: string
+          empresa_id: string
+          id?: string
+          nome: string
+          ordem?: number
+          tipo: string
+          updated_at?: string
+          versao_id: string
+        }
+        Update: {
+          ativo?: boolean
+          codigo?: string
+          config?: Json
+          created_at?: string
+          empresa_id?: string
+          id?: string
+          nome?: string
+          ordem?: number
+          tipo?: string
+          updated_at?: string
+          versao_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pxsales_tabela_componentes_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pxsales_tabela_componentes_versao_id_fkey"
+            columns: ["versao_id"]
+            isOneToOne: false
+            referencedRelation: "pxsales_tabela_versoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pxsales_tabela_faixas: {
+        Row: {
+          componente_id: string
+          created_at: string
+          empresa_id: string
+          id: string
+          peso_max: number
+          peso_min: number
+          tipo_valor: string
+          valor: number
+          valor_minimo: number
+        }
+        Insert: {
+          componente_id: string
+          created_at?: string
+          empresa_id: string
+          id?: string
+          peso_max: number
+          peso_min?: number
+          tipo_valor?: string
+          valor?: number
+          valor_minimo?: number
+        }
+        Update: {
+          componente_id?: string
+          created_at?: string
+          empresa_id?: string
+          id?: string
+          peso_max?: number
+          peso_min?: number
+          tipo_valor?: string
+          valor?: number
+          valor_minimo?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pxsales_tabela_faixas_componente_id_fkey"
+            columns: ["componente_id"]
+            isOneToOne: false
+            referencedRelation: "pxsales_tabela_componentes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pxsales_tabela_faixas_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pxsales_tabela_versoes: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          empresa_id: string
+          id: string
+          observacoes: string | null
+          ordem_calculo: Json
+          publicada_em: string | null
+          publicada_por: string | null
+          status: string
+          tabela_id: string
+          updated_at: string
+          updated_by: string | null
+          versao: number
+          vigencia_fim: string | null
+          vigencia_inicio: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          empresa_id: string
+          id?: string
+          observacoes?: string | null
+          ordem_calculo?: Json
+          publicada_em?: string | null
+          publicada_por?: string | null
+          status?: string
+          tabela_id: string
+          updated_at?: string
+          updated_by?: string | null
+          versao: number
+          vigencia_fim?: string | null
+          vigencia_inicio?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          empresa_id?: string
+          id?: string
+          observacoes?: string | null
+          ordem_calculo?: Json
+          publicada_em?: string | null
+          publicada_por?: string | null
+          status?: string
+          tabela_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          versao?: number
+          vigencia_fim?: string | null
+          vigencia_inicio?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pxsales_tabela_versoes_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pxsales_tabela_versoes_tabela_id_fkey"
+            columns: ["tabela_id"]
+            isOneToOne: false
+            referencedRelation: "pxsales_tabelas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pxsales_tabelas: {
+        Row: {
+          cliente_id: string | null
+          created_at: string
+          created_by: string | null
+          descricao: string | null
+          empresa_id: string
+          id: string
+          nome: string
+          portal_mostrar_componentes: boolean
+          portal_mostrar_valores: boolean
+          portal_visivel: boolean
+          responsavel_id: string | null
+          status: string
+          tipo: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          cliente_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          descricao?: string | null
+          empresa_id: string
+          id?: string
+          nome: string
+          portal_mostrar_componentes?: boolean
+          portal_mostrar_valores?: boolean
+          portal_visivel?: boolean
+          responsavel_id?: string | null
+          status?: string
+          tipo?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          cliente_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          descricao?: string | null
+          empresa_id?: string
+          id?: string
+          nome?: string
+          portal_mostrar_componentes?: boolean
+          portal_mostrar_valores?: boolean
+          portal_visivel?: boolean
+          responsavel_id?: string | null
+          status?: string
+          tipo?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pxsales_tabelas_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "px_cliente_saldo"
+            referencedColumns: ["cliente_id"]
+          },
+          {
+            foreignKeyName: "pxsales_tabelas_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "px_registry_clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pxsales_tabelas_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       risks: {
         Row: {
@@ -4232,6 +4668,15 @@ export type Database = {
         Args: { p_proposta_id: string }
         Returns: Json
       }
+      pxsales_nova_versao: {
+        Args: {
+          _tabela_id: string
+          _vigencia_fim: string
+          _vigencia_inicio: string
+        }
+        Returns: string
+      }
+      pxsales_publicar_versao: { Args: { _versao_id: string }; Returns: string }
       pxsales_rate_limit: {
         Args: {
           p_chave: string
