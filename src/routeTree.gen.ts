@@ -96,6 +96,7 @@ import { Route as AuthenticatedTmsLmConfiguracoesRouteImport } from './routes/_a
 import { Route as AuthenticatedTmsLmComprovantesRouteImport } from './routes/_authenticated/tms.lm.comprovantes'
 import { Route as AuthenticatedTmsLmCarregamentoRouteImport } from './routes/_authenticated/tms.lm.carregamento'
 import { Route as AuthenticatedTmsEtiquetasMinutaRouteImport } from './routes/_authenticated/tms.etiquetas.$minuta'
+import { Route as AuthenticatedSalesTabelasIdRouteImport } from './routes/_authenticated/sales.tabelas.$id'
 import { Route as AuthenticatedSalesPropostasIdRouteImport } from './routes/_authenticated/sales.propostas.$id'
 import { Route as AuthenticatedSalesCotacoesIdRouteImport } from './routes/_authenticated/sales.cotacoes.$id'
 import { Route as AuthenticatedSalesClientesIdRouteImport } from './routes/_authenticated/sales.clientes.$id'
@@ -600,6 +601,12 @@ const AuthenticatedTmsEtiquetasMinutaRoute =
     path: '/tms/etiquetas/$minuta',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedSalesTabelasIdRoute =
+  AuthenticatedSalesTabelasIdRouteImport.update({
+    id: '/sales/tabelas/$id',
+    path: '/sales/tabelas/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedSalesPropostasIdRoute =
   AuthenticatedSalesPropostasIdRouteImport.update({
     id: '/sales/propostas/$id',
@@ -792,6 +799,7 @@ export interface FileRoutesByFullPath {
   '/sales/clientes/$id': typeof AuthenticatedSalesClientesIdRoute
   '/sales/cotacoes/$id': typeof AuthenticatedSalesCotacoesIdRoute
   '/sales/propostas/$id': typeof AuthenticatedSalesPropostasIdRoute
+  '/sales/tabelas/$id': typeof AuthenticatedSalesTabelasIdRoute
   '/tms/etiquetas/$minuta': typeof AuthenticatedTmsEtiquetasMinutaRoute
   '/tms/lm/carregamento': typeof AuthenticatedTmsLmCarregamentoRoute
   '/tms/lm/comprovantes': typeof AuthenticatedTmsLmComprovantesRoute
@@ -900,6 +908,7 @@ export interface FileRoutesByTo {
   '/sales/clientes/$id': typeof AuthenticatedSalesClientesIdRoute
   '/sales/cotacoes/$id': typeof AuthenticatedSalesCotacoesIdRoute
   '/sales/propostas/$id': typeof AuthenticatedSalesPropostasIdRoute
+  '/sales/tabelas/$id': typeof AuthenticatedSalesTabelasIdRoute
   '/tms/etiquetas/$minuta': typeof AuthenticatedTmsEtiquetasMinutaRoute
   '/tms/lm/carregamento': typeof AuthenticatedTmsLmCarregamentoRoute
   '/tms/lm/comprovantes': typeof AuthenticatedTmsLmComprovantesRoute
@@ -1012,6 +1021,7 @@ export interface FileRoutesById {
   '/_authenticated/sales/clientes/$id': typeof AuthenticatedSalesClientesIdRoute
   '/_authenticated/sales/cotacoes/$id': typeof AuthenticatedSalesCotacoesIdRoute
   '/_authenticated/sales/propostas/$id': typeof AuthenticatedSalesPropostasIdRoute
+  '/_authenticated/sales/tabelas/$id': typeof AuthenticatedSalesTabelasIdRoute
   '/_authenticated/tms/etiquetas/$minuta': typeof AuthenticatedTmsEtiquetasMinutaRoute
   '/_authenticated/tms/lm/carregamento': typeof AuthenticatedTmsLmCarregamentoRoute
   '/_authenticated/tms/lm/comprovantes': typeof AuthenticatedTmsLmComprovantesRoute
@@ -1124,6 +1134,7 @@ export interface FileRouteTypes {
     | '/sales/clientes/$id'
     | '/sales/cotacoes/$id'
     | '/sales/propostas/$id'
+    | '/sales/tabelas/$id'
     | '/tms/etiquetas/$minuta'
     | '/tms/lm/carregamento'
     | '/tms/lm/comprovantes'
@@ -1232,6 +1243,7 @@ export interface FileRouteTypes {
     | '/sales/clientes/$id'
     | '/sales/cotacoes/$id'
     | '/sales/propostas/$id'
+    | '/sales/tabelas/$id'
     | '/tms/etiquetas/$minuta'
     | '/tms/lm/carregamento'
     | '/tms/lm/comprovantes'
@@ -1343,6 +1355,7 @@ export interface FileRouteTypes {
     | '/_authenticated/sales/clientes/$id'
     | '/_authenticated/sales/cotacoes/$id'
     | '/_authenticated/sales/propostas/$id'
+    | '/_authenticated/sales/tabelas/$id'
     | '/_authenticated/tms/etiquetas/$minuta'
     | '/_authenticated/tms/lm/carregamento'
     | '/_authenticated/tms/lm/comprovantes'
@@ -2023,6 +2036,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTmsEtiquetasMinutaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/sales/tabelas/$id': {
+      id: '/_authenticated/sales/tabelas/$id'
+      path: '/sales/tabelas/$id'
+      fullPath: '/sales/tabelas/$id'
+      preLoaderRoute: typeof AuthenticatedSalesTabelasIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/sales/propostas/$id': {
       id: '/_authenticated/sales/propostas/$id'
       path: '/sales/propostas/$id'
@@ -2318,6 +2338,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSalesClientesIdRoute: typeof AuthenticatedSalesClientesIdRoute
   AuthenticatedSalesCotacoesIdRoute: typeof AuthenticatedSalesCotacoesIdRoute
   AuthenticatedSalesPropostasIdRoute: typeof AuthenticatedSalesPropostasIdRoute
+  AuthenticatedSalesTabelasIdRoute: typeof AuthenticatedSalesTabelasIdRoute
   AuthenticatedTmsEtiquetasMinutaRoute: typeof AuthenticatedTmsEtiquetasMinutaRoute
   AuthenticatedTmsLmCarregamentoRoute: typeof AuthenticatedTmsLmCarregamentoRoute
   AuthenticatedTmsLmComprovantesRoute: typeof AuthenticatedTmsLmComprovantesRoute
@@ -2393,6 +2414,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSalesClientesIdRoute: AuthenticatedSalesClientesIdRoute,
   AuthenticatedSalesCotacoesIdRoute: AuthenticatedSalesCotacoesIdRoute,
   AuthenticatedSalesPropostasIdRoute: AuthenticatedSalesPropostasIdRoute,
+  AuthenticatedSalesTabelasIdRoute: AuthenticatedSalesTabelasIdRoute,
   AuthenticatedTmsEtiquetasMinutaRoute: AuthenticatedTmsEtiquetasMinutaRoute,
   AuthenticatedTmsLmCarregamentoRoute: AuthenticatedTmsLmCarregamentoRoute,
   AuthenticatedTmsLmComprovantesRoute: AuthenticatedTmsLmComprovantesRoute,
