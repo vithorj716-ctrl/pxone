@@ -1,5 +1,4 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getRequest } from "@tanstack/react-start/server";
 
 // PXSales — acompanhamento público lendo os dados reais do PXLog (sem duplicar informação).
 // Exige número + documento do contratante e limita tentativas para impedir varredura.
@@ -28,7 +27,7 @@ const soDigitos = (v: string) => (v ?? "").replace(/\D/g, "");
 
 export function origemChamada(): string {
   try {
-    const h = getRequest()?.headers;
+    const h = (await import("@tanstack/react-start/server")).getRequest()?.headers;
     return (
       h?.get("cf-connecting-ip") ||
       h?.get("x-forwarded-for")?.split(",")[0]?.trim() ||
