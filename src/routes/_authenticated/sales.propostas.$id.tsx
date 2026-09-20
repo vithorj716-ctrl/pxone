@@ -2,7 +2,8 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ArrowLeft, Truck, Trash2 } from "lucide-react";
+import { ArrowLeft, Truck, Trash2, Link2 } from "lucide-react";
+import { gerarLinkPortal } from "@/lib/pxsales-portal.functions";
 import { PxSalesShell } from "@/components/pxsales/pxsales-shell";
 import { Button } from "@/components/ui/button";
 import {
@@ -39,6 +40,18 @@ function PropostaDetalhe() {
   const fnStatus = useServerFn(setStatusProposta);
   const fnExcluir = useServerFn(excluirProposta);
   const fnPxLog = useServerFn(enviarPropostaParaPxLog);
+  const fnLink = useServerFn(gerarLinkPortal);
+
+  async function gerarLink() {
+    try {
+      const r = await fnLink({ data: { proposta_id: id, dias: 15 } });
+      const url = `${window.location.origin}/portal/proposta/${r.token}`;
+      await navigator.clipboard.writeText(url);
+      toast.success("Link do cliente copiado. Válido por 15 dias.");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Não foi possível gerar o link");
+    }
+  }
 
   const { data, isLoading } = useQuery({
     queryKey: ["pxsales", "proposta", id],
@@ -117,6 +130,7 @@ function PropostaDetalhe() {
                     <Button variant="outline">Ver cotação nº {data.cotacao.numero}</Button>
                   </Link>
                 )}
+                <Button variant="outline" onClick={gerarLink}><Link2 className="size-4 mr-1.5" /> Gerar link do cliente</Button>
                 <Button variant="ghost" className="text-red-600" onClick={remover}><Trash2 className="size-4 mr-1.5" /> Excluir</Button>
               </div>
               {p.status !== "aceita" && !data.minuta && (

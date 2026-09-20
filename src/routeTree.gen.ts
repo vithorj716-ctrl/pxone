@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as RastreioRouteImport } from './routes/rastreio'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
@@ -39,6 +40,7 @@ import { Route as AuthenticatedTmsIndexRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedSalesIndexRouteImport } from './routes/_authenticated/sales.index'
 import { Route as AuthenticatedFinancialIntelligenceIndexRouteImport } from './routes/_authenticated/financial-intelligence.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as PortalPropostaTokenRouteImport } from './routes/portal.proposta.$token'
 import { Route as AuthenticatedTmsViagensRouteImport } from './routes/_authenticated/tms.viagens'
 import { Route as AuthenticatedTmsTrackingRouteImport } from './routes/_authenticated/tms.tracking'
 import { Route as AuthenticatedTmsTabelaFreteRouteImport } from './routes/_authenticated/tms.tabela-frete'
@@ -116,6 +118,11 @@ import { Route as ApiPublicV1ClientesIdContaCorrenteRouteImport } from './routes
 import { Route as ApiPublicV1ClientesIdEnderecosEnderecoIdRouteImport } from './routes/api/public/v1/clientes.$id.enderecos.$enderecoId'
 import { Route as ApiPublicV1ClientesIdContatosContatoIdRouteImport } from './routes/api/public/v1/clientes.$id.contatos.$contatoId'
 
+const RastreioRoute = RastreioRouteImport.update({
+  id: '/rastreio',
+  path: '/rastreio',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -268,6 +275,11 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const PortalPropostaTokenRoute = PortalPropostaTokenRouteImport.update({
+  id: '/portal/proposta/$token',
+  path: '/portal/proposta/$token',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedTmsViagensRoute = AuthenticatedTmsViagensRouteImport.update({
   id: '/tms/viagens',
@@ -713,6 +725,7 @@ export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/auth': typeof AuthRoute
   '/login': typeof LoginRoute
+  '/rastreio': typeof RastreioRoute
   '/ai-analyst': typeof AuthenticatedAiAnalystRoute
   '/aplicacoes': typeof AuthenticatedAplicacoesRoute
   '/business-plan': typeof AuthenticatedBusinessPlanRoute
@@ -763,6 +776,7 @@ export interface FileRoutesByFullPath {
   '/tms/tabela-frete': typeof AuthenticatedTmsTabelaFreteRoute
   '/tms/tracking': typeof AuthenticatedTmsTrackingRoute
   '/tms/viagens': typeof AuthenticatedTmsViagensRouteWithChildren
+  '/portal/proposta/$token': typeof PortalPropostaTokenRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/financial-intelligence/': typeof AuthenticatedFinancialIntelligenceIndexRoute
   '/sales/': typeof AuthenticatedSalesIndexRoute
@@ -819,6 +833,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/login': typeof LoginRoute
+  '/rastreio': typeof RastreioRoute
   '/ai-analyst': typeof AuthenticatedAiAnalystRoute
   '/aplicacoes': typeof AuthenticatedAplicacoesRoute
   '/business-plan': typeof AuthenticatedBusinessPlanRoute
@@ -868,6 +883,7 @@ export interface FileRoutesByTo {
   '/tms/tabela-frete': typeof AuthenticatedTmsTabelaFreteRoute
   '/tms/tracking': typeof AuthenticatedTmsTrackingRoute
   '/tms/viagens': typeof AuthenticatedTmsViagensRouteWithChildren
+  '/portal/proposta/$token': typeof PortalPropostaTokenRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/financial-intelligence': typeof AuthenticatedFinancialIntelligenceIndexRoute
   '/sales': typeof AuthenticatedSalesIndexRoute
@@ -926,6 +942,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/login': typeof LoginRoute
+  '/rastreio': typeof RastreioRoute
   '/_authenticated/ai-analyst': typeof AuthenticatedAiAnalystRoute
   '/_authenticated/aplicacoes': typeof AuthenticatedAplicacoesRoute
   '/_authenticated/business-plan': typeof AuthenticatedBusinessPlanRoute
@@ -977,6 +994,7 @@ export interface FileRoutesById {
   '/_authenticated/tms/tabela-frete': typeof AuthenticatedTmsTabelaFreteRoute
   '/_authenticated/tms/tracking': typeof AuthenticatedTmsTrackingRoute
   '/_authenticated/tms/viagens': typeof AuthenticatedTmsViagensRouteWithChildren
+  '/portal/proposta/$token': typeof PortalPropostaTokenRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/financial-intelligence/': typeof AuthenticatedFinancialIntelligenceIndexRoute
   '/_authenticated/sales/': typeof AuthenticatedSalesIndexRoute
@@ -1036,6 +1054,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/login'
+    | '/rastreio'
     | '/ai-analyst'
     | '/aplicacoes'
     | '/business-plan'
@@ -1086,6 +1105,7 @@ export interface FileRouteTypes {
     | '/tms/tabela-frete'
     | '/tms/tracking'
     | '/tms/viagens'
+    | '/portal/proposta/$token'
     | '/admin/'
     | '/financial-intelligence/'
     | '/sales/'
@@ -1142,6 +1162,7 @@ export interface FileRouteTypes {
   to:
     | '/auth'
     | '/login'
+    | '/rastreio'
     | '/ai-analyst'
     | '/aplicacoes'
     | '/business-plan'
@@ -1191,6 +1212,7 @@ export interface FileRouteTypes {
     | '/tms/tabela-frete'
     | '/tms/tracking'
     | '/tms/viagens'
+    | '/portal/proposta/$token'
     | '/admin'
     | '/financial-intelligence'
     | '/sales'
@@ -1248,6 +1270,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/login'
+    | '/rastreio'
     | '/_authenticated/ai-analyst'
     | '/_authenticated/aplicacoes'
     | '/_authenticated/business-plan'
@@ -1299,6 +1322,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tms/tabela-frete'
     | '/_authenticated/tms/tracking'
     | '/_authenticated/tms/viagens'
+    | '/portal/proposta/$token'
     | '/_authenticated/admin/'
     | '/_authenticated/financial-intelligence/'
     | '/_authenticated/sales/'
@@ -1357,7 +1381,9 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   LoginRoute: typeof LoginRoute
+  RastreioRoute: typeof RastreioRoute
   SalesLoginRoute: typeof SalesLoginRoute
+  PortalPropostaTokenRoute: typeof PortalPropostaTokenRoute
   ApiPublicV1ClientesRoute: typeof ApiPublicV1ClientesRouteWithChildren
   ApiPublicV1EmpresasRoute: typeof ApiPublicV1EmpresasRouteWithChildren
   ApiPublicV1FiliaisRoute: typeof ApiPublicV1FiliaisRoute
@@ -1375,6 +1401,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/rastreio': {
+      id: '/rastreio'
+      path: '/rastreio'
+      fullPath: '/rastreio'
+      preLoaderRoute: typeof RastreioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -1584,6 +1617,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/portal/proposta/$token': {
+      id: '/portal/proposta/$token'
+      path: '/portal/proposta/$token'
+      fullPath: '/portal/proposta/$token'
+      preLoaderRoute: typeof PortalPropostaTokenRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/tms/viagens': {
       id: '/_authenticated/tms/viagens'
@@ -2447,7 +2487,9 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   LoginRoute: LoginRoute,
+  RastreioRoute: RastreioRoute,
   SalesLoginRoute: SalesLoginRoute,
+  PortalPropostaTokenRoute: PortalPropostaTokenRoute,
   ApiPublicV1ClientesRoute: ApiPublicV1ClientesRouteWithChildren,
   ApiPublicV1EmpresasRoute: ApiPublicV1EmpresasRouteWithChildren,
   ApiPublicV1FiliaisRoute: ApiPublicV1FiliaisRoute,

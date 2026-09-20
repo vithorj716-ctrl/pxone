@@ -1974,6 +1974,138 @@ export type Database = {
           },
         ]
       }
+      pxsales_comissao_regras: {
+        Row: {
+          ativo: boolean
+          base: string
+          created_at: string
+          created_by: string | null
+          id: string
+          nome: string
+          observacoes: string | null
+          percentual: number
+          responsavel_id: string | null
+          tipo: string
+          updated_at: string
+          updated_by: string | null
+          valor_fixo: number
+          vigencia_fim: string | null
+          vigencia_inicio: string
+        }
+        Insert: {
+          ativo?: boolean
+          base?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          nome: string
+          observacoes?: string | null
+          percentual?: number
+          responsavel_id?: string | null
+          tipo?: string
+          updated_at?: string
+          updated_by?: string | null
+          valor_fixo?: number
+          vigencia_fim?: string | null
+          vigencia_inicio?: string
+        }
+        Update: {
+          ativo?: boolean
+          base?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          nome?: string
+          observacoes?: string | null
+          percentual?: number
+          responsavel_id?: string | null
+          tipo?: string
+          updated_at?: string
+          updated_by?: string | null
+          valor_fixo?: number
+          vigencia_fim?: string | null
+          vigencia_inicio?: string
+        }
+        Relationships: []
+      }
+      pxsales_comissoes: {
+        Row: {
+          base_valor: number
+          cliente_id: string | null
+          competencia: string
+          congelada_em: string
+          created_at: string
+          created_by: string | null
+          empresa_nome: string
+          id: string
+          observacoes: string | null
+          percentual: number
+          proposta_id: string | null
+          regra_id: string | null
+          regra_snapshot: Json
+          responsavel_id: string | null
+          status: string
+          updated_at: string
+          updated_by: string | null
+          valor: number
+        }
+        Insert: {
+          base_valor?: number
+          cliente_id?: string | null
+          competencia?: string
+          congelada_em?: string
+          created_at?: string
+          created_by?: string | null
+          empresa_nome?: string
+          id?: string
+          observacoes?: string | null
+          percentual?: number
+          proposta_id?: string | null
+          regra_id?: string | null
+          regra_snapshot?: Json
+          responsavel_id?: string | null
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+          valor?: number
+        }
+        Update: {
+          base_valor?: number
+          cliente_id?: string | null
+          competencia?: string
+          congelada_em?: string
+          created_at?: string
+          created_by?: string | null
+          empresa_nome?: string
+          id?: string
+          observacoes?: string | null
+          percentual?: number
+          proposta_id?: string | null
+          regra_id?: string | null
+          regra_snapshot?: Json
+          responsavel_id?: string | null
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pxsales_comissoes_proposta_id_fkey"
+            columns: ["proposta_id"]
+            isOneToOne: false
+            referencedRelation: "pxsales_propostas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pxsales_comissoes_regra_id_fkey"
+            columns: ["regra_id"]
+            isOneToOne: false
+            referencedRelation: "pxsales_comissao_regras"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pxsales_cotacoes: {
         Row: {
           advalorem_percentual: number
@@ -2439,6 +2571,44 @@ export type Database = {
         }
         Relationships: []
       }
+      pxsales_portal_eventos: {
+        Row: {
+          created_at: string
+          id: string
+          mensagem: string | null
+          payload: Json
+          proposta_id: string
+          tipo: string
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          mensagem?: string | null
+          payload?: Json
+          proposta_id: string
+          tipo: string
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          mensagem?: string | null
+          payload?: Json
+          proposta_id?: string
+          tipo?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pxsales_portal_eventos_proposta_id_fkey"
+            columns: ["proposta_id"]
+            isOneToOne: false
+            referencedRelation: "pxsales_propostas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pxsales_proposta_historico: {
         Row: {
           created_at: string
@@ -2495,6 +2665,10 @@ export type Database = {
           motivo: string | null
           numero: number
           oportunidade_id: string | null
+          portal_aberta_em: string | null
+          portal_ativo: boolean
+          portal_expira_em: string | null
+          portal_token: string | null
           recusada_em: string | null
           responsavel_id: string | null
           status: string
@@ -2522,6 +2696,10 @@ export type Database = {
           motivo?: string | null
           numero?: number
           oportunidade_id?: string | null
+          portal_aberta_em?: string | null
+          portal_ativo?: boolean
+          portal_expira_em?: string | null
+          portal_token?: string | null
           recusada_em?: string | null
           responsavel_id?: string | null
           status?: string
@@ -2549,6 +2727,10 @@ export type Database = {
           motivo?: string | null
           numero?: number
           oportunidade_id?: string | null
+          portal_aberta_em?: string | null
+          portal_ativo?: boolean
+          portal_expira_em?: string | null
+          portal_token?: string | null
           recusada_em?: string | null
           responsavel_id?: string | null
           status?: string

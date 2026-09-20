@@ -1,25 +1,24 @@
 import { useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { PackageSearch, Copy } from "lucide-react";
-import { PxSalesShell } from "@/components/pxsales/pxsales-shell";
+import { PackageSearch, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
 import { rastrearEmbarque, type RastreioResultado } from "@/lib/pxsales-tracking.functions";
 
-export const Route = createFileRoute("/_authenticated/sales/tracking")({
+export const Route = createFileRoute("/rastreio")({
+  ssr: false,
   head: () => ({
     meta: [
-      { title: "PXSales — Acompanhamento de cargas | Grupo PX" },
-      { name: "description", content: "Consulte a situação dos embarques do cliente com os dados reais da operação." },
-      { property: "og:title", content: "PXSales — Acompanhamento de cargas" },
-      { property: "og:description", content: "Situação dos embarques com dados reais da operação." },
+      { title: "Rastrear embarque | Grupo PX" },
+      { name: "description", content: "Acompanhe em tempo real a situação do seu embarque com o Grupo PX." },
+      { property: "og:title", content: "Rastrear embarque — Grupo PX" },
+      { property: "og:description", content: "Acompanhe em tempo real a situação do seu embarque." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: TrackingPage,
+  component: RastreioPage,
 });
 
 const LABEL: Record<string, string> = {
@@ -42,7 +41,7 @@ const LABEL: Record<string, string> = {
 
 const dh = (v: string) => new Date(v).toLocaleString("pt-BR");
 
-function TrackingPage() {
+function RastreioPage() {
   const consultar = useServerFn(rastrearEmbarque);
   const [numero, setNumero] = useState("");
   const [documento, setDocumento] = useState("");
@@ -50,44 +49,43 @@ function TrackingPage() {
   const [carregando, setCarregando] = useState(false);
   const [res, setRes] = useState<RastreioResultado | null>(null);
 
-  async function buscar() {
+  async function buscar(e: React.FormEvent) {
+    e.preventDefault();
     setErro(null);
     setCarregando(true);
     setRes(null);
     try {
       setRes(await consultar({ data: { numero, documento } }));
-    } catch (e: any) {
-      setErro(e?.message ?? "Não foi possível consultar.");
+    } catch (err: any) {
+      setErro(err?.message ?? "Não foi possível consultar agora.");
     } finally {
       setCarregando(false);
     }
   }
 
-  async function copiarLink() {
-    const base = typeof window === "undefined" ? "" : window.location.origin;
-    await navigator.clipboard.writeText(`${base}/rastreio`);
-    toast.success("Link público copiado para enviar ao cliente.");
-  }
-
   return (
-    <PxSalesShell title="Acompanhamento" subtitle="Cargas em andamento">
-      <div className="space-y-4">
-        <div className="rounded-lg border p-4 flex flex-wrap items-center justify-between gap-3 text-sm text-muted-foreground">
-          <span>
-            O cliente acompanha sozinho pela página pública <Link to="/rastreio" className="underline">/rastreio</Link>, informando o
-            número do embarque e o CNPJ/CPF.
-          </span>
-          <Button size="sm" variant="outline" onClick={copiarLink}><Copy className="size-4 mr-1.5" /> Copiar link do cliente</Button>
+    <div className="min-h-screen bg-background text-foreground">
+      <header className="border-b">
+        <div className="mx-auto max-w-2xl px-4 py-4 flex items-center gap-2">
+          <Truck className="size-5 text-primary" />
+          <span className="font-semibold">Grupo PX — Acompanhe seu embarque</span>
         </div>
+      </header>
 
-        <div className="rounded-xl border p-4 space-y-3">
+      <main className="mx-auto max-w-2xl px-4 py-6 space-y-5">
+        <form onSubmit={buscar} className="rounded-xl border p-5 space-y-3">
+          <p className="text-sm text-muted-foreground">
+            Informe o número do embarque e o CNPJ ou CPF do contratante.
+          </p>
           <div className="flex flex-col sm:flex-row gap-2">
             <Input placeholder="Número do embarque" value={numero} onChange={(e) => setNumero(e.target.value)} />
-            <Input placeholder="CNPJ ou CPF do contratante" value={documento} onChange={(e) => setDocumento(e.target.value)} />
-            <Button onClick={buscar} disabled={carregando}><PackageSearch className="size-4 mr-1.5" /> Consultar</Button>
+            <Input placeholder="CNPJ ou CPF" value={documento} onChange={(e) => setDocumento(e.target.value)} />
+            <Button type="submit" disabled={carregando}>
+              <PackageSearch className="size-4 mr-1.5" /> Consultar
+            </Button>
           </div>
           {erro && <p className="text-sm text-red-600">{erro}</p>}
-        </div>
+        </form>
 
         {res && (
           <section className="rounded-xl border p-5 space-y-4">
@@ -101,12 +99,13 @@ function TrackingPage() {
                 {res.previsao_dias ? ` · previsão ${res.previsao_dias} dia(s)` : ""}
               </p>
             </div>
+
             <ol className="space-y-3">
               {res.eventos.length === 0 ? (
-                <li className="text-sm text-muted-foreground">Registrado em {dh(res.criada_em)}. Sem movimentação ainda.</li>
+                <li className="text-sm text-muted-foreground">Embarque registrado em {dh(res.criada_em)}. Aguardando movimentação.</li>
               ) : (
-                res.eventos.map((ev, i) => (
-                  <li key={`${ev.tipo}-${i}`} className="flex gap-3">
+                res.eventos.map((ev, idx) => (
+                  <li key={`${ev.tipo}-${idx}`} className="flex gap-3">
                     <span className="mt-1 size-2 rounded-full bg-primary shrink-0" />
                     <div>
                       <p className="text-sm font-medium">{LABEL[ev.tipo] ?? ev.tipo}</p>
@@ -118,7 +117,7 @@ function TrackingPage() {
             </ol>
           </section>
         )}
-      </div>
-    </PxSalesShell>
+      </main>
+    </div>
   );
 }
