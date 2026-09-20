@@ -2,7 +2,8 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ArrowLeft, Truck, Trash2 } from "lucide-react";
+import { ArrowLeft, Truck, Trash2, Link2 } from "lucide-react";
+import { gerarLinkPortal } from "@/lib/pxsales-portal.functions";
 import { PxSalesShell } from "@/components/pxsales/pxsales-shell";
 import { Button } from "@/components/ui/button";
 import {
