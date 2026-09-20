@@ -157,6 +157,9 @@
 @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
 @keyframes spinSlow { to { transform: rotate(360deg); } }
 @keyframes gradientShift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+@keyframes routeEnter { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes navigationProgress { from { transform: scaleX(0.08); } to { transform: scaleX(0.82); } }
+@keyframes navigationSpin { to { transform: rotate(360deg); } }
 
 /* ===== Animation utilities ===== */
 @utility animate-fade-in { animation: fadeIn 0.35s ease-out both; }
@@ -165,6 +168,58 @@
 @utility animate-slide-down { animation: slideDown 0.25s ease-out both; }
 @utility animate-pulse-glow { animation: pulseGlow 2s ease-in-out infinite; }
 @utility animate-spin-slow { animation: spinSlow 3s linear infinite; }
+@utility animate-route-enter { animation: routeEnter 180ms ease-out both; }
+
+.route-navigation-feedback {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.route-navigation-feedback.is-active { visibility: visible; }
+
+.route-navigation-bar {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 2px;
+  background: var(--color-brand);
+  box-shadow: 0 0 12px color-mix(in oklab, var(--color-brand) 55%, transparent);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.is-active .route-navigation-bar { animation: navigationProgress 700ms ease-out both; }
+
+.route-navigation-veil {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: color-mix(in oklab, var(--color-background) 96%, transparent);
+  opacity: 0;
+  transition: opacity 100ms ease;
+}
+
+.is-active .route-navigation-veil { opacity: 1; }
+
+.route-navigation-spinner {
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid var(--color-border);
+  border-top-color: var(--color-brand);
+  border-radius: 999px;
+  animation: navigationSpin 650ms linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-route-enter,
+  .is-active .route-navigation-bar,
+  .route-navigation-spinner {
+    animation: none;
+  }
+}
 
 /* Staggered delays for entrance animations */
 @utility stagger-1 { animation-delay: 60ms; }
