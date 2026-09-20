@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { useEmpresaAtiva } from "@/px-core/empresa-context";
 import {
   saveOportunidade,
   listResponsaveis,
@@ -43,6 +44,7 @@ export function OportunidadeDialog({
   const [form, setForm] = useState<Record<string, any>>(vazio);
   const [saving, setSaving] = useState(false);
   const save = useServerFn(saveOportunidade);
+  const { empresa } = useEmpresaAtiva();
   const qc = useQueryClient();
 
   const fnResp = useServerFn(listResponsaveis);
@@ -89,6 +91,7 @@ export function OportunidadeDialog({
       await save({
         data: {
           id: oportunidade?.id,
+          empresa_id: empresa?.id ?? null,
           titulo: form.titulo,
           cliente_id: form.cliente_id || null,
           empresa_nome: cli ? cli.nome_fantasia || cli.razao_social : form.empresa_nome || null,

@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { useEmpresaAtiva } from "@/px-core/empresa-context";
 import { saveCotacao, listTabelasFrete, type CotacaoRow } from "@/lib/pxsales-cotacoes.functions";
 import { listSalesClientes } from "@/lib/pxsales-clientes.functions";
 import { listResponsaveis } from "@/lib/pxsales-pipeline.functions";
@@ -61,6 +62,7 @@ export function CotacaoDialog({
   const [form, setForm] = useState<Record<string, any>>(vazio);
   const [saving, setSaving] = useState(false);
   const save = useServerFn(saveCotacao);
+  const { empresa: empresaAtiva } = useEmpresaAtiva();
   const qc = useQueryClient();
 
   const fnTabelas = useServerFn(listTabelasFrete);
@@ -118,7 +120,7 @@ export function CotacaoDialog({
     }
     setSaving(true);
     try {
-      const res = await save({ data: { ...form, id: cotacao?.id, empresa_nome: empresa } });
+      const res = await save({ data: { ...form, id: cotacao?.id, empresa_nome: empresa, empresa_id: empresaAtiva?.id ?? null } });
       toast.success(cotacao ? "Cotação atualizada" : `Cotação criada — ${brl(calc.valor_total)}`);
       void qc.invalidateQueries({ queryKey: ["pxsales", "cotacoes"] });
       onOpenChange(false);

@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { useEmpresaAtiva } from "@/px-core/empresa-context";
 import {
   listAtividades,
   saveAtividade,
@@ -70,6 +71,7 @@ function SalesFollowupsPage() {
   const qc = useQueryClient();
   const fn = useServerFn(listAtividades);
   const fnSave = useServerFn(saveAtividade);
+  const { empresa } = useEmpresaAtiva();
   const fnConcluir = useServerFn(concluirAtividade);
   const fnExcluir = useServerFn(excluirAtividade);
   const fnLeads = useServerFn(listLeads);
@@ -122,6 +124,7 @@ function SalesFollowupsPage() {
       await fnSave({
         data: {
           id: editId ?? undefined,
+          empresa_id: empresa?.id ?? null,
           tipo: form.tipo,
           assunto: form.assunto,
           descricao: form.descricao || null,
