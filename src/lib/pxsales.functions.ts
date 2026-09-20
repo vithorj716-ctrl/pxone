@@ -37,7 +37,9 @@ export const getPxSalesAccess = createServerFn({ method: "GET" })
       .eq("sistema_key", PXSALES_SISTEMA_KEY)
       .in("perfil_id", perfilIds);
 
-    const permissoes = Array.from(new Set((perms ?? []).map((p: any) => p.acao as string)));
+    const permissoes: string[] = Array.from(
+      new Set<string>((perms ?? []).map((p: any) => String(p.acao))),
+    );
     return {
       allowed: true,
       isAdmin: permissoes.includes("pxsales.settings.manage"),
