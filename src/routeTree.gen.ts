@@ -41,6 +41,7 @@ import { Route as AuthenticatedSalesIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedFinancialIntelligenceIndexRouteImport } from './routes/_authenticated/financial-intelligence.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as PortalPropostaTokenRouteImport } from './routes/portal.proposta.$token'
+import { Route as PortalClienteTokenRouteImport } from './routes/portal.cliente.$token'
 import { Route as AuthenticatedTmsViagensRouteImport } from './routes/_authenticated/tms.viagens'
 import { Route as AuthenticatedTmsTrackingRouteImport } from './routes/_authenticated/tms.tracking'
 import { Route as AuthenticatedTmsTabelaFreteRouteImport } from './routes/_authenticated/tms.tabela-frete'
@@ -281,6 +282,11 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
 const PortalPropostaTokenRoute = PortalPropostaTokenRouteImport.update({
   id: '/portal/proposta/$token',
   path: '/portal/proposta/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortalClienteTokenRoute = PortalClienteTokenRouteImport.update({
+  id: '/portal/cliente/$token',
+  path: '/portal/cliente/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedTmsViagensRoute = AuthenticatedTmsViagensRouteImport.update({
@@ -790,6 +796,7 @@ export interface FileRoutesByFullPath {
   '/tms/tabela-frete': typeof AuthenticatedTmsTabelaFreteRoute
   '/tms/tracking': typeof AuthenticatedTmsTrackingRoute
   '/tms/viagens': typeof AuthenticatedTmsViagensRouteWithChildren
+  '/portal/cliente/$token': typeof PortalClienteTokenRoute
   '/portal/proposta/$token': typeof PortalPropostaTokenRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/financial-intelligence/': typeof AuthenticatedFinancialIntelligenceIndexRoute
@@ -899,6 +906,7 @@ export interface FileRoutesByTo {
   '/tms/tabela-frete': typeof AuthenticatedTmsTabelaFreteRoute
   '/tms/tracking': typeof AuthenticatedTmsTrackingRoute
   '/tms/viagens': typeof AuthenticatedTmsViagensRouteWithChildren
+  '/portal/cliente/$token': typeof PortalClienteTokenRoute
   '/portal/proposta/$token': typeof PortalPropostaTokenRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/financial-intelligence': typeof AuthenticatedFinancialIntelligenceIndexRoute
@@ -1012,6 +1020,7 @@ export interface FileRoutesById {
   '/_authenticated/tms/tabela-frete': typeof AuthenticatedTmsTabelaFreteRoute
   '/_authenticated/tms/tracking': typeof AuthenticatedTmsTrackingRoute
   '/_authenticated/tms/viagens': typeof AuthenticatedTmsViagensRouteWithChildren
+  '/portal/cliente/$token': typeof PortalClienteTokenRoute
   '/portal/proposta/$token': typeof PortalPropostaTokenRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/financial-intelligence/': typeof AuthenticatedFinancialIntelligenceIndexRoute
@@ -1125,6 +1134,7 @@ export interface FileRouteTypes {
     | '/tms/tabela-frete'
     | '/tms/tracking'
     | '/tms/viagens'
+    | '/portal/cliente/$token'
     | '/portal/proposta/$token'
     | '/admin/'
     | '/financial-intelligence/'
@@ -1234,6 +1244,7 @@ export interface FileRouteTypes {
     | '/tms/tabela-frete'
     | '/tms/tracking'
     | '/tms/viagens'
+    | '/portal/cliente/$token'
     | '/portal/proposta/$token'
     | '/admin'
     | '/financial-intelligence'
@@ -1346,6 +1357,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tms/tabela-frete'
     | '/_authenticated/tms/tracking'
     | '/_authenticated/tms/viagens'
+    | '/portal/cliente/$token'
     | '/portal/proposta/$token'
     | '/_authenticated/admin/'
     | '/_authenticated/financial-intelligence/'
@@ -1409,6 +1421,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   RastreioRoute: typeof RastreioRoute
   SalesLoginRoute: typeof SalesLoginRoute
+  PortalClienteTokenRoute: typeof PortalClienteTokenRoute
   PortalPropostaTokenRoute: typeof PortalPropostaTokenRoute
   ApiPublicV1ClientesRoute: typeof ApiPublicV1ClientesRouteWithChildren
   ApiPublicV1EmpresasRoute: typeof ApiPublicV1EmpresasRouteWithChildren
@@ -1649,6 +1662,13 @@ declare module '@tanstack/react-router' {
       path: '/portal/proposta/$token'
       fullPath: '/portal/proposta/$token'
       preLoaderRoute: typeof PortalPropostaTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portal/cliente/$token': {
+      id: '/portal/cliente/$token'
+      path: '/portal/cliente/$token'
+      fullPath: '/portal/cliente/$token'
+      preLoaderRoute: typeof PortalClienteTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/tms/viagens': {
@@ -2533,6 +2553,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   RastreioRoute: RastreioRoute,
   SalesLoginRoute: SalesLoginRoute,
+  PortalClienteTokenRoute: PortalClienteTokenRoute,
   PortalPropostaTokenRoute: PortalPropostaTokenRoute,
   ApiPublicV1ClientesRoute: ApiPublicV1ClientesRouteWithChildren,
   ApiPublicV1EmpresasRoute: ApiPublicV1EmpresasRouteWithChildren,
