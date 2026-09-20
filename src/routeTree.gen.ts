@@ -71,6 +71,7 @@ import { Route as AuthenticatedAdminPxApiRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminPerfisRouteImport } from './routes/_authenticated/admin.perfis'
 import { Route as AuthenticatedTmsSolicitacoesIndexRouteImport } from './routes/_authenticated/tms.solicitacoes.index'
 import { Route as AuthenticatedTmsLmIndexRouteImport } from './routes/_authenticated/tms.lm.index'
+import { Route as AuthenticatedSalesTabelasIndexRouteImport } from './routes/_authenticated/sales.tabelas.index'
 import { Route as AuthenticatedSalesPropostasIndexRouteImport } from './routes/_authenticated/sales.propostas.index'
 import { Route as AuthenticatedSalesCotacoesIndexRouteImport } from './routes/_authenticated/sales.cotacoes.index'
 import { Route as AuthenticatedSalesClientesIndexRouteImport } from './routes/_authenticated/sales.clientes.index'
@@ -457,6 +458,12 @@ const AuthenticatedTmsLmIndexRoute = AuthenticatedTmsLmIndexRouteImport.update({
   path: '/tms/lm/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSalesTabelasIndexRoute =
+  AuthenticatedSalesTabelasIndexRouteImport.update({
+    id: '/sales/tabelas/',
+    path: '/sales/tabelas/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedSalesPropostasIndexRoute =
   AuthenticatedSalesPropostasIndexRouteImport.update({
     id: '/sales/propostas/',
@@ -809,6 +816,7 @@ export interface FileRoutesByFullPath {
   '/sales/clientes/': typeof AuthenticatedSalesClientesIndexRoute
   '/sales/cotacoes/': typeof AuthenticatedSalesCotacoesIndexRoute
   '/sales/propostas/': typeof AuthenticatedSalesPropostasIndexRoute
+  '/sales/tabelas/': typeof AuthenticatedSalesTabelasIndexRoute
   '/tms/lm/': typeof AuthenticatedTmsLmIndexRoute
   '/tms/solicitacoes/': typeof AuthenticatedTmsSolicitacoesIndexRoute
   '/tms/lm/motorista/$rotaId': typeof AuthenticatedTmsLmMotoristaRotaIdRoute
@@ -916,6 +924,7 @@ export interface FileRoutesByTo {
   '/sales/clientes': typeof AuthenticatedSalesClientesIndexRoute
   '/sales/cotacoes': typeof AuthenticatedSalesCotacoesIndexRoute
   '/sales/propostas': typeof AuthenticatedSalesPropostasIndexRoute
+  '/sales/tabelas': typeof AuthenticatedSalesTabelasIndexRoute
   '/tms/lm': typeof AuthenticatedTmsLmIndexRoute
   '/tms/solicitacoes': typeof AuthenticatedTmsSolicitacoesIndexRoute
   '/tms/lm/motorista/$rotaId': typeof AuthenticatedTmsLmMotoristaRotaIdRoute
@@ -1027,6 +1036,7 @@ export interface FileRoutesById {
   '/_authenticated/sales/clientes/': typeof AuthenticatedSalesClientesIndexRoute
   '/_authenticated/sales/cotacoes/': typeof AuthenticatedSalesCotacoesIndexRoute
   '/_authenticated/sales/propostas/': typeof AuthenticatedSalesPropostasIndexRoute
+  '/_authenticated/sales/tabelas/': typeof AuthenticatedSalesTabelasIndexRoute
   '/_authenticated/tms/lm/': typeof AuthenticatedTmsLmIndexRoute
   '/_authenticated/tms/solicitacoes/': typeof AuthenticatedTmsSolicitacoesIndexRoute
   '/_authenticated/tms/lm/motorista/$rotaId': typeof AuthenticatedTmsLmMotoristaRotaIdRoute
@@ -1138,6 +1148,7 @@ export interface FileRouteTypes {
     | '/sales/clientes/'
     | '/sales/cotacoes/'
     | '/sales/propostas/'
+    | '/sales/tabelas/'
     | '/tms/lm/'
     | '/tms/solicitacoes/'
     | '/tms/lm/motorista/$rotaId'
@@ -1245,6 +1256,7 @@ export interface FileRouteTypes {
     | '/sales/clientes'
     | '/sales/cotacoes'
     | '/sales/propostas'
+    | '/sales/tabelas'
     | '/tms/lm'
     | '/tms/solicitacoes'
     | '/tms/lm/motorista/$rotaId'
@@ -1355,6 +1367,7 @@ export interface FileRouteTypes {
     | '/_authenticated/sales/clientes/'
     | '/_authenticated/sales/cotacoes/'
     | '/_authenticated/sales/propostas/'
+    | '/_authenticated/sales/tabelas/'
     | '/_authenticated/tms/lm/'
     | '/_authenticated/tms/solicitacoes/'
     | '/_authenticated/tms/lm/motorista/$rotaId'
@@ -1835,6 +1848,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTmsLmIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/sales/tabelas/': {
+      id: '/_authenticated/sales/tabelas/'
+      path: '/sales/tabelas'
+      fullPath: '/sales/tabelas/'
+      preLoaderRoute: typeof AuthenticatedSalesTabelasIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/sales/propostas/': {
       id: '/_authenticated/sales/propostas/'
       path: '/sales/propostas'
@@ -2312,6 +2332,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSalesClientesIndexRoute: typeof AuthenticatedSalesClientesIndexRoute
   AuthenticatedSalesCotacoesIndexRoute: typeof AuthenticatedSalesCotacoesIndexRoute
   AuthenticatedSalesPropostasIndexRoute: typeof AuthenticatedSalesPropostasIndexRoute
+  AuthenticatedSalesTabelasIndexRoute: typeof AuthenticatedSalesTabelasIndexRoute
   AuthenticatedTmsLmIndexRoute: typeof AuthenticatedTmsLmIndexRoute
   AuthenticatedTmsLmMotoristaRotaIdRoute: typeof AuthenticatedTmsLmMotoristaRotaIdRoute
 }
@@ -2386,6 +2407,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSalesClientesIndexRoute: AuthenticatedSalesClientesIndexRoute,
   AuthenticatedSalesCotacoesIndexRoute: AuthenticatedSalesCotacoesIndexRoute,
   AuthenticatedSalesPropostasIndexRoute: AuthenticatedSalesPropostasIndexRoute,
+  AuthenticatedSalesTabelasIndexRoute: AuthenticatedSalesTabelasIndexRoute,
   AuthenticatedTmsLmIndexRoute: AuthenticatedTmsLmIndexRoute,
   AuthenticatedTmsLmMotoristaRotaIdRoute:
     AuthenticatedTmsLmMotoristaRotaIdRoute,
