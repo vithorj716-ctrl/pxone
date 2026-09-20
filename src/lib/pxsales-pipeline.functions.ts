@@ -443,14 +443,34 @@ export const getOportunidadeHistorico = createServerFn({ method: "POST" })
 export const listAtividades = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(
-    (d: { filtro?: "hoje" | "atrasados" | "programados" | "concluidos" | "todos"; meus?: boolean; lead_id?: string; oportunidade_id?: string } | undefined) =>
-      d ?? {},
+    (
+      d:
+        | {
+            filtro?: "hoje" | "atrasados" | "programados" | "concluidos" | "todos";
+            meus?: boolean;
+            lead_id?: string;
+            oportunidade_id?: string;
+            empresa_id?: string | null;
+            page?: number;
+            pageSize?: number;
+          }
+        | undefined,
+    ) => d ?? {},
   )
   .handler(async ({ data, context }): Promise<AtividadeRow[]> => {
     const sb = context.supabase as any;
     const userId = (context as any).userId as string;
+    await assertPermissao(sb, userId, "pxsales.leads.view");
+    const empresas = await escopoEmpresas(sb, userId, data.empresa_id);
+    if (!empresas.length) return [];
+    const { from, to } = faixa(data.page, data.pageSize);
 
-    let q = sb.from("pxsales_atividades").select("*").order("prevista_para", { ascending: true }).limit(500);
+    let q = sb
+      .from("pxsales_atividades")
+      .select("*")
+      .in("empresa_id", empresas)
+      .order("prevista_para", { ascending: true })
+      .range(from, to);
     if (data.lead_id) q = q.eq("lead_id", data.lead_id);
     if (data.oportunidade_id) q = q.eq("oportunidade_id", data.oportunidade_id);
     if (data.meus) q = q.eq("responsavel_id", userId);
@@ -495,7 +515,8 @@ export const saveAtividade = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
     const userId = (context as any).userId as string;
-    const { id, ...rest } = data;
+    await assertPermissao(sb, userId, "pxsales.leads.edit");
+    const { id, empresa_id: _empresaEntrada, ...rest } = data;
     const payload: Record<string, any> = {
       ...rest,
       lead_id: rest.lead_id || null,
@@ -510,9 +531,10 @@ export const saveAtividade = createServerFn({ method: "POST" })
       if (error) throw new Error(error.message);
       return { id };
     }
+    const empresaId = await resolveEmpresaId(sb, userId, rest.empresa_id);
     const { data: ins, error } = await sb
       .from("pxsales_atividades")
-      .insert({ ...payload, created_by: userId, responsavel_id: payload.responsavel_id ?? userId })
+      .insert({ ...payload, empresa_id: empresaId, created_by: userId, responsavel_id: payload.responsavel_id ?? userId })
       .select("id")
       .single();
     if (error) throw new Error(error.message);
@@ -525,6 +547,7 @@ export const concluirAtividade = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
     const userId = (context as any).userId as string;
+    await assertPermissao(sb, userId, "pxsales.leads.edit");
     const { error } = await sb
       .from("pxsales_atividades")
       .update({
@@ -543,6 +566,7 @@ export const excluirAtividade = createServerFn({ method: "POST" })
   .inputValidator((d: { id: string }) => d)
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
+    await assertPermissao(sb, (context as any).userId, "pxsales.leads.edit");
     const { error } = await sb.from("pxsales_atividades").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
