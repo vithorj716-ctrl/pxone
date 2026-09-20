@@ -50,9 +50,16 @@ import { Route as AuthenticatedTmsEntregasRouteImport } from './routes/_authenti
 import { Route as AuthenticatedTmsEmbarqueRouteImport } from './routes/_authenticated/tms.embarque'
 import { Route as AuthenticatedTmsConferenciaRouteImport } from './routes/_authenticated/tms.conferencia'
 import { Route as AuthenticatedTmsClientesRouteImport } from './routes/_authenticated/tms.clientes'
+import { Route as AuthenticatedSalesTrackingRouteImport } from './routes/_authenticated/sales.tracking'
+import { Route as AuthenticatedSalesRelatoriosRouteImport } from './routes/_authenticated/sales.relatorios'
+import { Route as AuthenticatedSalesPortalRouteImport } from './routes/_authenticated/sales.portal'
 import { Route as AuthenticatedSalesOportunidadesRouteImport } from './routes/_authenticated/sales.oportunidades'
 import { Route as AuthenticatedSalesLeadsRouteImport } from './routes/_authenticated/sales.leads'
+import { Route as AuthenticatedSalesFollowupsRouteImport } from './routes/_authenticated/sales.followups'
 import { Route as AuthenticatedSalesContatosRouteImport } from './routes/_authenticated/sales.contatos'
+import { Route as AuthenticatedSalesConfiguracoesRouteImport } from './routes/_authenticated/sales.configuracoes'
+import { Route as AuthenticatedSalesComissoesRouteImport } from './routes/_authenticated/sales.comissoes'
+import { Route as AuthenticatedSalesAgendaRouteImport } from './routes/_authenticated/sales.agenda'
 import { Route as AuthenticatedRegistryClientesRouteImport } from './routes/_authenticated/registry.clientes'
 import { Route as AuthenticatedFinancialIntelligenceDreRouteImport } from './routes/_authenticated/financial-intelligence.dre'
 import { Route as AuthenticatedFinancialIntelligenceDfcRouteImport } from './routes/_authenticated/financial-intelligence.dfc'
@@ -327,6 +334,24 @@ const AuthenticatedTmsClientesRoute =
     path: '/tms/clientes',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedSalesTrackingRoute =
+  AuthenticatedSalesTrackingRouteImport.update({
+    id: '/sales/tracking',
+    path: '/sales/tracking',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSalesRelatoriosRoute =
+  AuthenticatedSalesRelatoriosRouteImport.update({
+    id: '/sales/relatorios',
+    path: '/sales/relatorios',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSalesPortalRoute =
+  AuthenticatedSalesPortalRouteImport.update({
+    id: '/sales/portal',
+    path: '/sales/portal',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedSalesOportunidadesRoute =
   AuthenticatedSalesOportunidadesRouteImport.update({
     id: '/sales/oportunidades',
@@ -338,10 +363,34 @@ const AuthenticatedSalesLeadsRoute = AuthenticatedSalesLeadsRouteImport.update({
   path: '/sales/leads',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSalesFollowupsRoute =
+  AuthenticatedSalesFollowupsRouteImport.update({
+    id: '/sales/followups',
+    path: '/sales/followups',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedSalesContatosRoute =
   AuthenticatedSalesContatosRouteImport.update({
     id: '/sales/contatos',
     path: '/sales/contatos',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSalesConfiguracoesRoute =
+  AuthenticatedSalesConfiguracoesRouteImport.update({
+    id: '/sales/configuracoes',
+    path: '/sales/configuracoes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSalesComissoesRoute =
+  AuthenticatedSalesComissoesRouteImport.update({
+    id: '/sales/comissoes',
+    path: '/sales/comissoes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSalesAgendaRoute =
+  AuthenticatedSalesAgendaRouteImport.update({
+    id: '/sales/agenda',
+    path: '/sales/agenda',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedRegistryClientesRoute =
@@ -693,9 +742,16 @@ export interface FileRoutesByFullPath {
   '/financial-intelligence/dfc': typeof AuthenticatedFinancialIntelligenceDfcRoute
   '/financial-intelligence/dre': typeof AuthenticatedFinancialIntelligenceDreRoute
   '/registry/clientes': typeof AuthenticatedRegistryClientesRoute
+  '/sales/agenda': typeof AuthenticatedSalesAgendaRoute
+  '/sales/comissoes': typeof AuthenticatedSalesComissoesRoute
+  '/sales/configuracoes': typeof AuthenticatedSalesConfiguracoesRoute
   '/sales/contatos': typeof AuthenticatedSalesContatosRoute
+  '/sales/followups': typeof AuthenticatedSalesFollowupsRoute
   '/sales/leads': typeof AuthenticatedSalesLeadsRoute
   '/sales/oportunidades': typeof AuthenticatedSalesOportunidadesRoute
+  '/sales/portal': typeof AuthenticatedSalesPortalRoute
+  '/sales/relatorios': typeof AuthenticatedSalesRelatoriosRoute
+  '/sales/tracking': typeof AuthenticatedSalesTrackingRoute
   '/tms/clientes': typeof AuthenticatedTmsClientesRoute
   '/tms/conferencia': typeof AuthenticatedTmsConferenciaRoute
   '/tms/embarque': typeof AuthenticatedTmsEmbarqueRoute
@@ -792,9 +848,16 @@ export interface FileRoutesByTo {
   '/financial-intelligence/dfc': typeof AuthenticatedFinancialIntelligenceDfcRoute
   '/financial-intelligence/dre': typeof AuthenticatedFinancialIntelligenceDreRoute
   '/registry/clientes': typeof AuthenticatedRegistryClientesRoute
+  '/sales/agenda': typeof AuthenticatedSalesAgendaRoute
+  '/sales/comissoes': typeof AuthenticatedSalesComissoesRoute
+  '/sales/configuracoes': typeof AuthenticatedSalesConfiguracoesRoute
   '/sales/contatos': typeof AuthenticatedSalesContatosRoute
+  '/sales/followups': typeof AuthenticatedSalesFollowupsRoute
   '/sales/leads': typeof AuthenticatedSalesLeadsRoute
   '/sales/oportunidades': typeof AuthenticatedSalesOportunidadesRoute
+  '/sales/portal': typeof AuthenticatedSalesPortalRoute
+  '/sales/relatorios': typeof AuthenticatedSalesRelatoriosRoute
+  '/sales/tracking': typeof AuthenticatedSalesTrackingRoute
   '/tms/clientes': typeof AuthenticatedTmsClientesRoute
   '/tms/conferencia': typeof AuthenticatedTmsConferenciaRoute
   '/tms/embarque': typeof AuthenticatedTmsEmbarqueRoute
@@ -893,9 +956,16 @@ export interface FileRoutesById {
   '/_authenticated/financial-intelligence/dfc': typeof AuthenticatedFinancialIntelligenceDfcRoute
   '/_authenticated/financial-intelligence/dre': typeof AuthenticatedFinancialIntelligenceDreRoute
   '/_authenticated/registry/clientes': typeof AuthenticatedRegistryClientesRoute
+  '/_authenticated/sales/agenda': typeof AuthenticatedSalesAgendaRoute
+  '/_authenticated/sales/comissoes': typeof AuthenticatedSalesComissoesRoute
+  '/_authenticated/sales/configuracoes': typeof AuthenticatedSalesConfiguracoesRoute
   '/_authenticated/sales/contatos': typeof AuthenticatedSalesContatosRoute
+  '/_authenticated/sales/followups': typeof AuthenticatedSalesFollowupsRoute
   '/_authenticated/sales/leads': typeof AuthenticatedSalesLeadsRoute
   '/_authenticated/sales/oportunidades': typeof AuthenticatedSalesOportunidadesRoute
+  '/_authenticated/sales/portal': typeof AuthenticatedSalesPortalRoute
+  '/_authenticated/sales/relatorios': typeof AuthenticatedSalesRelatoriosRoute
+  '/_authenticated/sales/tracking': typeof AuthenticatedSalesTrackingRoute
   '/_authenticated/tms/clientes': typeof AuthenticatedTmsClientesRoute
   '/_authenticated/tms/conferencia': typeof AuthenticatedTmsConferenciaRoute
   '/_authenticated/tms/embarque': typeof AuthenticatedTmsEmbarqueRoute
@@ -995,9 +1065,16 @@ export interface FileRouteTypes {
     | '/financial-intelligence/dfc'
     | '/financial-intelligence/dre'
     | '/registry/clientes'
+    | '/sales/agenda'
+    | '/sales/comissoes'
+    | '/sales/configuracoes'
     | '/sales/contatos'
+    | '/sales/followups'
     | '/sales/leads'
     | '/sales/oportunidades'
+    | '/sales/portal'
+    | '/sales/relatorios'
+    | '/sales/tracking'
     | '/tms/clientes'
     | '/tms/conferencia'
     | '/tms/embarque'
@@ -1094,9 +1171,16 @@ export interface FileRouteTypes {
     | '/financial-intelligence/dfc'
     | '/financial-intelligence/dre'
     | '/registry/clientes'
+    | '/sales/agenda'
+    | '/sales/comissoes'
+    | '/sales/configuracoes'
     | '/sales/contatos'
+    | '/sales/followups'
     | '/sales/leads'
     | '/sales/oportunidades'
+    | '/sales/portal'
+    | '/sales/relatorios'
+    | '/sales/tracking'
     | '/tms/clientes'
     | '/tms/conferencia'
     | '/tms/embarque'
@@ -1194,9 +1278,16 @@ export interface FileRouteTypes {
     | '/_authenticated/financial-intelligence/dfc'
     | '/_authenticated/financial-intelligence/dre'
     | '/_authenticated/registry/clientes'
+    | '/_authenticated/sales/agenda'
+    | '/_authenticated/sales/comissoes'
+    | '/_authenticated/sales/configuracoes'
     | '/_authenticated/sales/contatos'
+    | '/_authenticated/sales/followups'
     | '/_authenticated/sales/leads'
     | '/_authenticated/sales/oportunidades'
+    | '/_authenticated/sales/portal'
+    | '/_authenticated/sales/relatorios'
+    | '/_authenticated/sales/tracking'
     | '/_authenticated/tms/clientes'
     | '/_authenticated/tms/conferencia'
     | '/_authenticated/tms/embarque'
@@ -1571,6 +1662,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTmsClientesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/sales/tracking': {
+      id: '/_authenticated/sales/tracking'
+      path: '/sales/tracking'
+      fullPath: '/sales/tracking'
+      preLoaderRoute: typeof AuthenticatedSalesTrackingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/sales/relatorios': {
+      id: '/_authenticated/sales/relatorios'
+      path: '/sales/relatorios'
+      fullPath: '/sales/relatorios'
+      preLoaderRoute: typeof AuthenticatedSalesRelatoriosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/sales/portal': {
+      id: '/_authenticated/sales/portal'
+      path: '/sales/portal'
+      fullPath: '/sales/portal'
+      preLoaderRoute: typeof AuthenticatedSalesPortalRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/sales/oportunidades': {
       id: '/_authenticated/sales/oportunidades'
       path: '/sales/oportunidades'
@@ -1585,11 +1697,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSalesLeadsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/sales/followups': {
+      id: '/_authenticated/sales/followups'
+      path: '/sales/followups'
+      fullPath: '/sales/followups'
+      preLoaderRoute: typeof AuthenticatedSalesFollowupsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/sales/contatos': {
       id: '/_authenticated/sales/contatos'
       path: '/sales/contatos'
       fullPath: '/sales/contatos'
       preLoaderRoute: typeof AuthenticatedSalesContatosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/sales/configuracoes': {
+      id: '/_authenticated/sales/configuracoes'
+      path: '/sales/configuracoes'
+      fullPath: '/sales/configuracoes'
+      preLoaderRoute: typeof AuthenticatedSalesConfiguracoesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/sales/comissoes': {
+      id: '/_authenticated/sales/comissoes'
+      path: '/sales/comissoes'
+      fullPath: '/sales/comissoes'
+      preLoaderRoute: typeof AuthenticatedSalesComissoesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/sales/agenda': {
+      id: '/_authenticated/sales/agenda'
+      path: '/sales/agenda'
+      fullPath: '/sales/agenda'
+      preLoaderRoute: typeof AuthenticatedSalesAgendaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/registry/clientes': {
@@ -2091,9 +2231,16 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminPxApiRoute: typeof AuthenticatedAdminPxApiRouteWithChildren
   AuthenticatedAdminUsuariosRoute: typeof AuthenticatedAdminUsuariosRoute
   AuthenticatedRegistryClientesRoute: typeof AuthenticatedRegistryClientesRoute
+  AuthenticatedSalesAgendaRoute: typeof AuthenticatedSalesAgendaRoute
+  AuthenticatedSalesComissoesRoute: typeof AuthenticatedSalesComissoesRoute
+  AuthenticatedSalesConfiguracoesRoute: typeof AuthenticatedSalesConfiguracoesRoute
   AuthenticatedSalesContatosRoute: typeof AuthenticatedSalesContatosRoute
+  AuthenticatedSalesFollowupsRoute: typeof AuthenticatedSalesFollowupsRoute
   AuthenticatedSalesLeadsRoute: typeof AuthenticatedSalesLeadsRoute
   AuthenticatedSalesOportunidadesRoute: typeof AuthenticatedSalesOportunidadesRoute
+  AuthenticatedSalesPortalRoute: typeof AuthenticatedSalesPortalRoute
+  AuthenticatedSalesRelatoriosRoute: typeof AuthenticatedSalesRelatoriosRoute
+  AuthenticatedSalesTrackingRoute: typeof AuthenticatedSalesTrackingRoute
   AuthenticatedTmsClientesRoute: typeof AuthenticatedTmsClientesRoute
   AuthenticatedTmsConferenciaRoute: typeof AuthenticatedTmsConferenciaRoute
   AuthenticatedTmsEmbarqueRoute: typeof AuthenticatedTmsEmbarqueRoute
@@ -2157,9 +2304,16 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminPxApiRoute: AuthenticatedAdminPxApiRouteWithChildren,
   AuthenticatedAdminUsuariosRoute: AuthenticatedAdminUsuariosRoute,
   AuthenticatedRegistryClientesRoute: AuthenticatedRegistryClientesRoute,
+  AuthenticatedSalesAgendaRoute: AuthenticatedSalesAgendaRoute,
+  AuthenticatedSalesComissoesRoute: AuthenticatedSalesComissoesRoute,
+  AuthenticatedSalesConfiguracoesRoute: AuthenticatedSalesConfiguracoesRoute,
   AuthenticatedSalesContatosRoute: AuthenticatedSalesContatosRoute,
+  AuthenticatedSalesFollowupsRoute: AuthenticatedSalesFollowupsRoute,
   AuthenticatedSalesLeadsRoute: AuthenticatedSalesLeadsRoute,
   AuthenticatedSalesOportunidadesRoute: AuthenticatedSalesOportunidadesRoute,
+  AuthenticatedSalesPortalRoute: AuthenticatedSalesPortalRoute,
+  AuthenticatedSalesRelatoriosRoute: AuthenticatedSalesRelatoriosRoute,
+  AuthenticatedSalesTrackingRoute: AuthenticatedSalesTrackingRoute,
   AuthenticatedTmsClientesRoute: AuthenticatedTmsClientesRoute,
   AuthenticatedTmsConferenciaRoute: AuthenticatedTmsConferenciaRoute,
   AuthenticatedTmsEmbarqueRoute: AuthenticatedTmsEmbarqueRoute,
