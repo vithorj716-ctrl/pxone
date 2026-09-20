@@ -40,7 +40,7 @@ function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <form onSubmit={onSubmit} className="w-full max-w-sm space-y-5 rounded-2xl ring-1 ring-border bg-surface/60 p-8">
         <div className="text-center space-y-1">
-          <PxGrupoLogo height={38} className="mx-auto mb-2" />
+          <PxGrupoLogo onDark height={38} className="mx-auto mb-2" />
           <h1 className="text-lg font-semibold">PX Platform</h1>
           <p className="text-xs text-muted-foreground">Acesso restrito</p>
         </div>

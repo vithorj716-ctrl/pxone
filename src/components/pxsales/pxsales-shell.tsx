@@ -142,7 +142,7 @@ export function PxSalesShell({ children, title, subtitle, headerActions }: Props
       {/* Sidebar desktop */}
       <aside className="hidden lg:flex w-60 flex-col border-r border-border shrink-0" style={{ background: "#0f0f12" }}>
         <div className="h-14 px-4 flex items-center gap-2 border-b border-border">
-          <PxGrupoLogo height={26} className="shrink-0" />
+          <PxGrupoLogo onDark height={26} className="shrink-0" />
           <div className="leading-none">
             <div className="text-sm font-semibold">PXSales</div>
             <div className="text-[9px] uppercase tracking-widest text-muted-foreground">Comercial</div>
@@ -166,7 +166,7 @@ export function PxSalesShell({ children, title, subtitle, headerActions }: Props
           <aside className="relative w-72 max-w-[85vw] flex flex-col border-r border-border" style={{ background: "#0f0f12" }}>
             <div className="h-14 px-4 flex items-center justify-between border-b border-border">
               <div className="flex items-center gap-2">
-                <PxGrupoLogo height={22} />
+                <PxGrupoLogo onDark height={22} />
                 <span className="text-sm font-semibold">PXSales</span>
               </div>
               <button onClick={() => setMenuOpen(false)} className="p-1.5 text-muted-foreground"><X className="size-4" /></button>

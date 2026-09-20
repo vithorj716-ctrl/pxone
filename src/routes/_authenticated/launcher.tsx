@@ -42,7 +42,7 @@ function LauncherPage() {
     <div className="min-h-screen bg-background text-foreground">
       <header className="h-14 px-4 sm:px-6 border-b border-border flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <PxGrupoLogo height={26} className="shrink-0" />
+          <PxGrupoLogo onDark height={26} className="shrink-0" />
           <div>
             <div className="text-sm font-semibold leading-none">PX Platform</div>
             <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Selecionar Sistema</div>
