@@ -1897,6 +1897,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           descricao: string | null
+          empresa_id: string
           id: string
           lead_id: string | null
           oportunidade_id: string | null
@@ -1915,6 +1916,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           descricao?: string | null
+          empresa_id: string
           id?: string
           lead_id?: string | null
           oportunidade_id?: string | null
@@ -1933,6 +1935,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           descricao?: string | null
+          empresa_id?: string
           id?: string
           lead_id?: string | null
           oportunidade_id?: string | null
@@ -1959,6 +1962,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "pxsales_atividades_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "pxsales_atividades_lead_id_fkey"
             columns: ["lead_id"]
             isOneToOne: false
@@ -1978,14 +1988,17 @@ export type Database = {
         Row: {
           ativo: boolean
           base: string
+          cliente_id: string | null
           created_at: string
           created_by: string | null
+          empresa_id: string
           id: string
           nome: string
           observacoes: string | null
           percentual: number
           responsavel_id: string | null
           tipo: string
+          tipo_operacao: string | null
           updated_at: string
           updated_by: string | null
           valor_fixo: number
@@ -1995,14 +2008,17 @@ export type Database = {
         Insert: {
           ativo?: boolean
           base?: string
+          cliente_id?: string | null
           created_at?: string
           created_by?: string | null
+          empresa_id: string
           id?: string
           nome: string
           observacoes?: string | null
           percentual?: number
           responsavel_id?: string | null
           tipo?: string
+          tipo_operacao?: string | null
           updated_at?: string
           updated_by?: string | null
           valor_fixo?: number
@@ -2012,84 +2028,156 @@ export type Database = {
         Update: {
           ativo?: boolean
           base?: string
+          cliente_id?: string | null
           created_at?: string
           created_by?: string | null
+          empresa_id?: string
           id?: string
           nome?: string
           observacoes?: string | null
           percentual?: number
           responsavel_id?: string | null
           tipo?: string
+          tipo_operacao?: string | null
           updated_at?: string
           updated_by?: string | null
           valor_fixo?: number
           vigencia_fim?: string | null
           vigencia_inicio?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "pxsales_comissao_regras_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "px_cliente_saldo"
+            referencedColumns: ["cliente_id"]
+          },
+          {
+            foreignKeyName: "pxsales_comissao_regras_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "px_registry_clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pxsales_comissao_regras_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       pxsales_comissoes: {
         Row: {
+          apurada_em: string
+          base: string
           base_valor: number
           cliente_id: string | null
+          comissao_origem_id: string | null
           competencia: string
           congelada_em: string
           created_at: string
           created_by: string | null
+          empresa_id: string
           empresa_nome: string
+          estornada_em: string | null
+          estornada_por: string | null
+          estorno_motivo: string | null
           id: string
           observacoes: string | null
           percentual: number
           proposta_id: string | null
           regra_id: string | null
+          regra_nome: string | null
           regra_snapshot: Json
+          regra_vigencia_fim: string | null
+          regra_vigencia_inicio: string | null
           responsavel_id: string | null
           status: string
           updated_at: string
           updated_by: string | null
           valor: number
+          valor_fixo: number
         }
         Insert: {
+          apurada_em?: string
+          base?: string
           base_valor?: number
           cliente_id?: string | null
+          comissao_origem_id?: string | null
           competencia?: string
           congelada_em?: string
           created_at?: string
           created_by?: string | null
+          empresa_id: string
           empresa_nome?: string
+          estornada_em?: string | null
+          estornada_por?: string | null
+          estorno_motivo?: string | null
           id?: string
           observacoes?: string | null
           percentual?: number
           proposta_id?: string | null
           regra_id?: string | null
+          regra_nome?: string | null
           regra_snapshot?: Json
+          regra_vigencia_fim?: string | null
+          regra_vigencia_inicio?: string | null
           responsavel_id?: string | null
           status?: string
           updated_at?: string
           updated_by?: string | null
           valor?: number
+          valor_fixo?: number
         }
         Update: {
+          apurada_em?: string
+          base?: string
           base_valor?: number
           cliente_id?: string | null
+          comissao_origem_id?: string | null
           competencia?: string
           congelada_em?: string
           created_at?: string
           created_by?: string | null
+          empresa_id?: string
           empresa_nome?: string
+          estornada_em?: string | null
+          estornada_por?: string | null
+          estorno_motivo?: string | null
           id?: string
           observacoes?: string | null
           percentual?: number
           proposta_id?: string | null
           regra_id?: string | null
+          regra_nome?: string | null
           regra_snapshot?: Json
+          regra_vigencia_fim?: string | null
+          regra_vigencia_inicio?: string | null
           responsavel_id?: string | null
           status?: string
           updated_at?: string
           updated_by?: string | null
           valor?: number
+          valor_fixo?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "pxsales_comissoes_comissao_origem_id_fkey"
+            columns: ["comissao_origem_id"]
+            isOneToOne: false
+            referencedRelation: "pxsales_comissoes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pxsales_comissoes_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "pxsales_comissoes_proposta_id_fkey"
             columns: ["proposta_id"]
@@ -2121,6 +2209,7 @@ export type Database = {
           destino_cep: string | null
           destino_cidade: string | null
           destino_uf: string | null
+          empresa_id: string
           empresa_nome: string
           frequencia_mensal: number | null
           gris_percentual: number
@@ -2168,6 +2257,7 @@ export type Database = {
           destino_cep?: string | null
           destino_cidade?: string | null
           destino_uf?: string | null
+          empresa_id: string
           empresa_nome: string
           frequencia_mensal?: number | null
           gris_percentual?: number
@@ -2215,6 +2305,7 @@ export type Database = {
           destino_cep?: string | null
           destino_cidade?: string | null
           destino_uf?: string | null
+          empresa_id?: string
           empresa_nome?: string
           frequencia_mensal?: number | null
           gris_percentual?: number
@@ -2264,6 +2355,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "pxsales_cotacoes_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "pxsales_cotacoes_lead_id_fkey"
             columns: ["lead_id"]
             isOneToOne: false
@@ -2299,6 +2397,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           empresa: string
+          empresa_id: string
           etapa: string
           id: string
           motivo_perda: string | null
@@ -2329,6 +2428,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           empresa: string
+          empresa_id: string
           etapa?: string
           id?: string
           motivo_perda?: string | null
@@ -2359,6 +2459,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           empresa?: string
+          empresa_id?: string
           etapa?: string
           id?: string
           motivo_perda?: string | null
@@ -2390,6 +2491,13 @@ export type Database = {
             columns: ["cliente_id"]
             isOneToOne: false
             referencedRelation: "px_registry_clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pxsales_leads_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
             referencedColumns: ["id"]
           },
         ]
@@ -2437,6 +2545,7 @@ export type Database = {
           cliente_id: string | null
           created_at: string
           created_by: string | null
+          empresa_id: string
           empresa_nome: string | null
           etapa: string
           fechada_em: string | null
@@ -2461,6 +2570,7 @@ export type Database = {
           cliente_id?: string | null
           created_at?: string
           created_by?: string | null
+          empresa_id: string
           empresa_nome?: string | null
           etapa?: string
           fechada_em?: string | null
@@ -2485,6 +2595,7 @@ export type Database = {
           cliente_id?: string | null
           created_at?: string
           created_by?: string | null
+          empresa_id?: string
           empresa_nome?: string | null
           etapa?: string
           fechada_em?: string | null
@@ -2518,6 +2629,13 @@ export type Database = {
             columns: ["cliente_id"]
             isOneToOne: false
             referencedRelation: "px_registry_clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pxsales_oportunidades_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
             referencedColumns: ["id"]
           },
           {
@@ -2657,6 +2775,7 @@ export type Database = {
           cotacao_id: string | null
           created_at: string
           created_by: string | null
+          empresa_id: string
           empresa_nome: string
           enviada_em: string | null
           escopo: string | null
@@ -2688,6 +2807,7 @@ export type Database = {
           cotacao_id?: string | null
           created_at?: string
           created_by?: string | null
+          empresa_id: string
           empresa_nome: string
           enviada_em?: string | null
           escopo?: string | null
@@ -2719,6 +2839,7 @@ export type Database = {
           cotacao_id?: string | null
           created_at?: string
           created_by?: string | null
+          empresa_id?: string
           empresa_nome?: string
           enviada_em?: string | null
           escopo?: string | null
@@ -2764,6 +2885,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "pxsales_propostas_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "pxsales_propostas_minuta_id_fkey"
             columns: ["minuta_id"]
             isOneToOne: false
@@ -2778,6 +2906,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      pxsales_public_acessos: {
+        Row: {
+          chave: string
+          created_at: string
+          escopo: string
+          id: string
+          janela_inicio: string
+          tentativas: number
+        }
+        Insert: {
+          chave: string
+          created_at?: string
+          escopo: string
+          id?: string
+          janela_inicio?: string
+          tentativas?: number
+        }
+        Update: {
+          chave?: string
+          created_at?: string
+          escopo?: string
+          id?: string
+          janela_inicio?: string
+          tentativas?: number
+        }
+        Relationships: []
       }
       risks: {
         Row: {
@@ -4056,6 +4211,49 @@ export type Database = {
         Returns: boolean
       }
       is_executive: { Args: { _user_id: string }; Returns: boolean }
+      px_can_access_empresa: {
+        Args: { _empresa_id: string; _user_id: string }
+        Returns: boolean
+      }
+      px_has_permission: {
+        Args: { _acao: string; _sistema: string; _user_id: string }
+        Returns: boolean
+      }
+      px_user_empresas: { Args: { _user_id: string }; Returns: string[] }
+      pxsales_apurar_comissao: {
+        Args: { p_proposta_id: string }
+        Returns: Json
+      }
+      pxsales_can: {
+        Args: { _acao: string; _empresa_id: string }
+        Returns: boolean
+      }
+      pxsales_converter_proposta_pxlog: {
+        Args: { p_proposta_id: string }
+        Returns: Json
+      }
+      pxsales_rate_limit: {
+        Args: {
+          p_chave: string
+          p_escopo: string
+          p_janela_seg: number
+          p_max: number
+        }
+        Returns: boolean
+      }
+      pxsales_responder_proposta_publica: {
+        Args: {
+          p_acao: string
+          p_mensagem?: string
+          p_nome?: string
+          p_token: string
+        }
+        Returns: Json
+      }
+      pxsales_set_status_comissao: {
+        Args: { p_id: string; p_motivo?: string; p_status: string }
+        Returns: Json
+      }
     }
     Enums: {
       app_role:

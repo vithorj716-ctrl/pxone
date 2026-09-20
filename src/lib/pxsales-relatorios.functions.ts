@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { assertPermissao, escopoEmpresas } from "./pxsales-guard";
 
 // PXSales — Etapas 8/9: indicadores do dashboard e relatórios comerciais.
 
@@ -40,15 +41,18 @@ export const getDashboardPxSales = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<DashboardPxSales> => {
     const sb = (context as any).supabase as any;
+    const userId = (context as any).userId as string;
+    await assertPermissao(sb, userId, "pxsales.dashboard.view");
+    const emp = await escopoEmpresas(sb, userId, null);
     const hoje = new Date().toISOString();
 
     const [leads, oportunidades, cotacoes, propostas, atividades, comissoes, clientes] = await Promise.all([
-      sb.from("pxsales_leads").select("id,etapa,potencial_mensal,created_at").limit(2000),
-      sb.from("pxsales_oportunidades").select("id,etapa,valor_estimado").limit(2000),
-      sb.from("pxsales_cotacoes").select("id,status,valor_total").limit(2000),
-      sb.from("pxsales_propostas").select("id,numero,empresa_nome,valor_total,status,created_at").order("created_at", { ascending: false }).limit(500),
-      sb.from("pxsales_atividades").select("id,assunto,tipo,prevista_para,concluida,cliente_id").order("prevista_para", { ascending: true }).limit(200),
-      sb.from("pxsales_comissoes").select("valor,status").limit(2000),
+      sb.from("pxsales_leads").select("id,etapa,potencial_mensal,created_at").in("empresa_id", emp).limit(2000),
+      sb.from("pxsales_oportunidades").select("id,etapa,valor_estimado").in("empresa_id", emp).limit(2000),
+      sb.from("pxsales_cotacoes").select("id,status,valor_total").in("empresa_id", emp).limit(2000),
+      sb.from("pxsales_propostas").select("id,numero,empresa_nome,valor_total,status,created_at").in("empresa_id", emp).order("created_at", { ascending: false }).limit(500),
+      sb.from("pxsales_atividades").select("id,assunto,tipo,prevista_para,concluida,cliente_id").in("empresa_id", emp).order("prevista_para", { ascending: true }).limit(200),
+      sb.from("pxsales_comissoes").select("valor,status").in("empresa_id", emp).limit(2000),
       sb.from("px_registry_clientes").select("id,ativo").limit(5000),
     ]);
 
@@ -122,13 +126,17 @@ export type RelatorioComercial = {
 
 export const getRelatorioComercial = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { de?: string; ate?: string } | undefined) => d ?? {})
+  .inputValidator((d: { de?: string; ate?: string; empresa_id?: string | null } | undefined) => d ?? {})
   .handler(async ({ data, context }): Promise<RelatorioComercial> => {
     const sb = (context as any).supabase as any;
+    const userId = (context as any).userId as string;
+    await assertPermissao(sb, userId, "pxsales.reports.view");
+    const emp = await escopoEmpresas(sb, userId, data.empresa_id);
 
     let q = sb
       .from("pxsales_propostas")
       .select("id,empresa_nome,valor_total,status,responsavel_id,created_at,motivo")
+      .in("empresa_id", emp)
       .order("created_at", { ascending: false })
       .limit(2000);
     if (data.de) q = q.gte("created_at", data.de);
@@ -136,7 +144,7 @@ export const getRelatorioComercial = createServerFn({ method: "POST" })
 
     const [{ data: props }, { data: coms }, { data: perfis }] = await Promise.all([
       q,
-      sb.from("pxsales_comissoes").select("responsavel_id,valor,status").limit(2000),
+      sb.from("pxsales_comissoes").select("responsavel_id,valor,status").in("empresa_id", emp).limit(2000),
       sb.from("px_usuarios_meta").select("user_id,nome,login").limit(500),
     ]);
 

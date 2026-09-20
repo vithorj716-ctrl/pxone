@@ -33,7 +33,7 @@ function PortalPage() {
   const fnEventos = useServerFn(listPortalEventos);
   const [detalhe, setDetalhe] = useState<string | null>(null);
 
-  const { data: links = [], isLoading } = useQuery({ queryKey: ["pxsales", "portal-links"], queryFn: () => fnLinks() });
+  const { data: links = [], isLoading } = useQuery({ queryKey: ["pxsales", "portal-links"], queryFn: () => fnLinks({ data: {} }) });
   const { data: eventos = [] } = useQuery({
     queryKey: ["pxsales", "portal-eventos", detalhe],
     queryFn: () => fnEventos({ data: { proposta_id: detalhe ?? undefined } }),

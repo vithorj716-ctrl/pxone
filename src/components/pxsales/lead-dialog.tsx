@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { useEmpresaAtiva } from "@/px-core/empresa-context";
 import { saveLead, listResponsaveis, listPipelineEtapas, ORIGENS_LEAD, type LeadRow } from "@/lib/pxsales-pipeline.functions";
 import { formatCnpj, onlyDigits } from "@/lib/cnpj";
 
@@ -51,6 +52,7 @@ export function LeadDialog({
   const [form, setForm] = useState<Record<string, any>>(vazio);
   const [saving, setSaving] = useState(false);
   const save = useServerFn(saveLead);
+  const { empresa } = useEmpresaAtiva();
   const qc = useQueryClient();
 
   const fnResp = useServerFn(listResponsaveis);
@@ -86,6 +88,7 @@ export function LeadDialog({
       await save({
         data: {
           id: lead?.id,
+          empresa_id: empresa?.id ?? null,
           empresa: form.empresa,
           cnpj: form.cnpj ? onlyDigits(form.cnpj) : null,
           nome_fantasia: form.nome_fantasia || null,

@@ -1,6 +1,18 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { onlyDigits } from "./cnpj";
+import { assertPermissao, auditar, faixa } from "./pxsales-guard";
+import { PXSALES_SISTEMA_KEY } from "@/pxsales/pxsales.permissions";
+
+/** Dados financeiros do cliente só aparecem para quem tem a permissão específica. */
+async function podeVerFinanceiro(sb: any, userId: string): Promise<boolean> {
+  const { data } = await sb.rpc("px_has_permission", {
+    _user_id: userId,
+    _sistema: PXSALES_SISTEMA_KEY,
+    _acao: "pxsales.clientes.financeiro.view",
+  });
+  return !!data;
+}
 
 // PXSales — leitura comercial sobre o cadastro único (PX Registry) e a operação real (PXLog).
 // Nenhuma base paralela de clientes é criada aqui.
@@ -30,11 +42,25 @@ export type SalesClienteRow = {
 export const listSalesClientes = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(
-    (d: { search?: string; categoria?: string; situacao?: "todos" | "ativos" | "inativos"; apenasCarteira?: boolean } | undefined) =>
-      d ?? {},
+    (
+      d:
+        | {
+            search?: string;
+            categoria?: string;
+            situacao?: "todos" | "ativos" | "inativos";
+            apenasCarteira?: boolean;
+            page?: number;
+            pageSize?: number;
+          }
+        | undefined,
+    ) => d ?? {},
   )
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
+    const userId = (context as any).userId as string;
+    await assertPermissao(sb, userId, "pxsales.clientes.view");
+    const financeiro = await podeVerFinanceiro(sb, userId);
+    const { from, to } = faixa((data as any).page, (data as any).pageSize ?? 200);
 
     let q = sb
       .from("px_registry_clientes")
@@ -42,7 +68,7 @@ export const listSalesClientes = createServerFn({ method: "POST" })
         "id,cnpj,razao_social,nome_fantasia,cidade,uf,categorias,situacao_cadastral,ativo,telefone,email,limite_credito,condicao_pagamento",
       )
       .order("razao_social", { ascending: true })
-      .limit(400);
+      .range(from, to);
 
     if (data.categoria) q = q.contains("categorias", [data.categoria]);
     if (data.situacao === "ativos") q = q.eq("ativo", true);
@@ -114,14 +140,14 @@ export const listSalesClientes = createServerFn({ method: "POST" })
         ativo: c.ativo !== false,
         telefone: c.telefone ?? null,
         email: c.email ?? null,
-        limite_credito: c.limite_credito ?? null,
+        limite_credito: financeiro ? c.limite_credito ?? null : null,
         condicao_pagamento: c.condicao_pagamento ?? null,
         vinculado_pxsales: vincSet.has(c.id),
         contatos: cContatos.get(c.id) ?? 0,
         enderecos: cEnderecos.get(c.id) ?? 0,
         minutas: op?.qtd ?? 0,
         ultima_minuta: op?.ultima ?? null,
-        faturamento_30d: op?.valor30 ?? 0,
+        faturamento_30d: financeiro ? op?.valor30 ?? 0 : 0,
       };
     });
   });
@@ -134,6 +160,9 @@ export const getSalesCliente360 = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
+    const userId = (context as any).userId as string;
+    await assertPermissao(sb, userId, "pxsales.clientes.view");
+    const financeiro = await podeVerFinanceiro(sb, userId);
 
     const { data: cliente, error } = await sb
       .from("px_registry_clientes")
@@ -196,9 +225,10 @@ export const getSalesCliente360 = createServerFn({ method: "POST" })
       cliente,
       contatos: contatos.data ?? [],
       enderecos: enderecos.data ?? [],
-      credito: credito.data ?? null,
-      saldo: saldo.data ?? null,
-      lancamentos: lancamentos.data ?? [],
+      credito: financeiro ? credito.data ?? null : null,
+      saldo: financeiro ? saldo.data ?? null : null,
+      lancamentos: financeiro ? lancamentos.data ?? [] : [],
+      financeiro_visivel: financeiro,
       vinculos: vinculos.data ?? [],
       historico: historico.data ?? [],
       minutas,
@@ -214,9 +244,10 @@ export const getSalesCliente360 = createServerFn({ method: "POST" })
 
 export const listSalesContatos = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { search?: string; setor?: string } | undefined) => d ?? {})
+  .inputValidator((d: { search?: string; setor?: string; page?: number; pageSize?: number } | undefined) => d ?? {})
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
+    await assertPermissao(sb, (context as any).userId, "pxsales.clientes.view");
 
     let q = sb
       .from("px_registry_contatos")
@@ -254,6 +285,7 @@ export const vincularClientePxSales = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const sb = supabase as any;
+    await assertPermissao(sb, userId, "pxsales.clientes.edit");
     if (data.vincular) {
       await sb
         .from("px_registry_vinculos")

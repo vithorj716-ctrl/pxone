@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 
-// PXSales — Etapa 6: acompanhamento público lendo os dados reais do PXLog (sem duplicar informação).
+// PXSales — acompanhamento público lendo os dados reais do PXLog (sem duplicar informação).
+// Exige número + documento do contratante e limita tentativas para impedir varredura.
 
 export type RastreioEvento = {
   tipo: string;
@@ -24,6 +25,7 @@ async function admin() {
 
 const soDigitos = (v: string) => (v ?? "").replace(/\D/g, "");
 
+
 /**
  * Consulta pública: exige o número do embarque E o CNPJ/CPF do cliente,
  * para que ninguém veja um embarque apenas chutando números.
@@ -36,6 +38,9 @@ export const rastrearEmbarque = createServerFn({ method: "POST" })
   })
   .handler(async ({ data }): Promise<RastreioResultado> => {
     const sb = await admin();
+    const { limitarTentativas } = await import("./pxsales-rate.server");
+    await limitarTentativas(sb, "rastreio", 20, 600);
+
     const numero = parseInt(String(data.numero).replace(/\D/g, ""), 10);
     if (!Number.isFinite(numero)) throw new Error("Número do embarque inválido.");
 
