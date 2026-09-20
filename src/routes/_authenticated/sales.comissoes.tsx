@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { useEmpresaAtiva } from "@/px-core/empresa-context";
 import {
   listComissaoRegras,
   saveComissaoRegra,
@@ -52,7 +53,7 @@ function ComissoesPage() {
   const [editar, setEditar] = useState<ComissaoRegra | null>(null);
   const [aberto, setAberto] = useState(false);
 
-  const { data: regras = [] } = useQuery({ queryKey: ["pxsales", "comissao-regras"], queryFn: () => fnRegras() });
+  const { data: regras = [] } = useQuery({ queryKey: ["pxsales", "comissao-regras"], queryFn: () => fnRegras({ data: {} }) });
   const { data: comissoes = [], isLoading } = useQuery({
     queryKey: ["pxsales", "comissoes", status],
     queryFn: () => fnComissoes({ data: { status: status || undefined } }),
@@ -223,6 +224,7 @@ function RegraDialog({
   onSaved: () => void;
 }) {
   const salvar = useServerFn(saveComissaoRegra);
+  const { empresa } = useEmpresaAtiva();
   const [form, setForm] = useState<any>({});
   const [salvando, setSalvando] = useState(false);
 
@@ -235,7 +237,9 @@ function RegraDialog({
       await salvar({
         data: {
           id: regra?.id,
+          empresa_id: empresa?.id ?? null,
           nome: v("nome"),
+          base: v("base", "proposta"),
           tipo: v("tipo", "percentual"),
           percentual: v("percentual", 0),
           valor_fixo: v("valor_fixo", 0),

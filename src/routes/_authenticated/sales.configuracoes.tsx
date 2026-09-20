@@ -30,7 +30,7 @@ function ConfiguracoesPage() {
   const { data: acesso } = useQuery({ queryKey: ["pxsales", "acesso"], queryFn: () => fnAcesso() });
   const { data: etapas = [] } = useQuery({ queryKey: ["pxsales", "etapas"], queryFn: () => fnEtapas() });
   const { data: equipe = [] } = useQuery({ queryKey: ["pxsales", "responsaveis"], queryFn: () => fnEquipe() });
-  const { data: regras = [] } = useQuery({ queryKey: ["pxsales", "comissao-regras"], queryFn: () => fnRegras() });
+  const { data: regras = [] } = useQuery({ queryKey: ["pxsales", "comissao-regras"], queryFn: () => fnRegras({ data: {} }) });
 
   const admin = !!acesso?.isAdmin;
 
