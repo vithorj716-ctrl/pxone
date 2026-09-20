@@ -102,7 +102,7 @@ export const listComissaoRegras = createServerFn({ method: "POST" })
 
 export const saveComissaoRegra = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: Partial<ComissaoRegra> & { id?: string; empresa_id?: string | null }) => {
+  .inputValidator((d: Partial<Omit<ComissaoRegra, "empresa_id">> & { id?: string; empresa_id?: string | null }) => {
     if (!d?.nome?.trim()) throw new Error("Informe o nome da regra.");
     if (d.base && !["proposta", "faturamento"].includes(d.base))
       throw new Error("Base de cálculo inválida.");
