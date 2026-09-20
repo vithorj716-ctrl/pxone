@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -159,9 +160,27 @@ function RootComponent() {
       <SystemProvider>
         <EmpresaProvider>
           <Outlet />
+          <NavigationFeedback />
           <Toaster theme="dark" position="top-right" />
         </EmpresaProvider>
       </SystemProvider>
     </QueryClientProvider>
+  );
+}
+
+function NavigationFeedback() {
+  const isNavigating = useRouterState({ select: (state) => state.status === "pending" });
+
+  return (
+    <div
+      className={`route-navigation-feedback ${isNavigating ? "is-active" : ""}`}
+      aria-hidden={!isNavigating}
+      aria-live="polite"
+    >
+      <div className="route-navigation-bar" />
+      <div className="route-navigation-veil">
+        <div className="route-navigation-spinner" />
+      </div>
+    </div>
   );
 }

@@ -4,9 +4,12 @@ import { supabase } from "@/integrations/supabase/client";
 // PX Platform — exige sessão. Sem auto-login: a tela /login é responsável.
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
+  staleTime: 30_000,
   beforeLoad: async ({ location }) => {
-    const { data } = await supabase.auth.getUser();
-    if (!data.user) {
+    // A sessão já é validada nas operações protegidas. Ler o estado local aqui
+    // evita uma chamada remota bloqueando cada clique do menu.
+    const { data } = await supabase.auth.getSession();
+    if (!data.session?.user) {
       throw redirect({ to: "/login" });
     }
     // Ao entrar diretamente em "/" (raiz) sem sistema escolhido, manda ao Launcher.
@@ -15,7 +18,7 @@ export const Route = createFileRoute("/_authenticated")({
       try { active = sessionStorage.getItem("px:active-system"); } catch {}
       if (!active) throw redirect({ to: "/launcher" });
     }
-    return { user: data.user };
+    return { user: data.session.user };
   },
   component: () => <Outlet />,
 });

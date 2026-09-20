@@ -235,7 +235,7 @@ export function PxSalesShell({ children, title, subtitle, headerActions }: Props
           </div>
         </header>
 
-        <div className="p-3 sm:p-5 lg:p-7 max-w-[1500px] mx-auto space-y-4 sm:space-y-5 pb-24 lg:pb-8 animate-fade-in">
+        <div key={pathname} className="p-3 sm:p-5 lg:p-7 max-w-[1500px] mx-auto space-y-4 sm:space-y-5 pb-24 lg:pb-8 animate-route-enter">
           {children}
         </div>
       </main>

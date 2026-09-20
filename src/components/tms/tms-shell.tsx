@@ -141,7 +141,7 @@ export function TmsShell({ children, title, subtitle, headerActions }: TmsShellP
             </button>
           </div>
         </header>
-        <div className="p-3 sm:p-5 lg:p-8 max-w-7xl mx-auto space-y-4 sm:space-y-6 animate-fade-in">{children}</div>
+        <div key={pathname} className="p-3 sm:p-5 lg:p-8 max-w-7xl mx-auto space-y-4 sm:space-y-6 animate-route-enter">{children}</div>
       </main>
     </div>
   );
