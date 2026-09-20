@@ -50,7 +50,7 @@ function AgendaPage() {
 
   async function marcar(id: string) {
     try {
-      await concluir({ data: { id } });
+      await concluir({ data: { id, concluida: true } });
       toast.success("Compromisso concluído.");
       qc.invalidateQueries({ queryKey: ["pxsales"] });
     } catch (e: any) {

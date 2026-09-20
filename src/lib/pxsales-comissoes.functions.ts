@@ -25,7 +25,7 @@ export type Comissao = {
   empresa_nome: string;
   responsavel_id: string | null;
   regra_id: string | null;
-  regra_snapshot: Record<string, unknown>;
+  regra_snapshot: Record<string, string | number | boolean | null>;
   base_valor: number;
   percentual: number;
   valor: number;
