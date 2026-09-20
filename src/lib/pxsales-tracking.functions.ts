@@ -25,7 +25,7 @@ async function admin() {
 
 const soDigitos = (v: string) => (v ?? "").replace(/\D/g, "");
 
-export function origemChamada(): string {
+export async function origemChamada(): Promise<string> {
   try {
     const h = (await import("@tanstack/react-start/server")).getRequest()?.headers;
     return (
