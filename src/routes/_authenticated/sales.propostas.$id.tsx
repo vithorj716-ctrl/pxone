@@ -104,7 +104,7 @@ function PropostaDetalhe() {
 
               <div className="mt-4 flex flex-wrap gap-2">
                 {data.minuta ? (
-                  <Link to="/tms/minutas" className="inline-flex">
+                  <Link to="/tms/minutas/$numero" params={{ numero: String(data.minuta.numero) }} className="inline-flex">
                     <Button variant="outline"><Truck className="size-4 mr-1.5" /> Embarque nº {data.minuta.numero} no PXLog</Button>
                   </Link>
                 ) : (
