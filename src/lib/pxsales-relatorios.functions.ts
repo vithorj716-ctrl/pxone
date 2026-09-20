@@ -137,10 +137,10 @@ export const getRelatorioComercial = createServerFn({ method: "POST" })
     const [{ data: props }, { data: coms }, { data: perfis }] = await Promise.all([
       q,
       sb.from("pxsales_comissoes").select("responsavel_id,valor,status").limit(2000),
-      sb.from("profiles").select("id,display_name").limit(500),
+      sb.from("px_usuarios_meta").select("user_id,nome,login").limit(500),
     ]);
 
-    const nomes = new Map((perfis ?? []).map((p: any) => [p.id, p.display_name as string]));
+    const nomes = new Map((perfis ?? []).map((p: any) => [p.user_id, (p.nome || p.login) as string]));
     const P = (props ?? []) as any[];
 
     const resp = new Map<string, { propostas: number; aceitas: number; valor: number; comissao: number }>();
