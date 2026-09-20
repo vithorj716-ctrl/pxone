@@ -41,6 +41,7 @@ import { Route as AuthenticatedSalesIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedFinancialIntelligenceIndexRouteImport } from './routes/_authenticated/financial-intelligence.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as PortalPropostaTokenRouteImport } from './routes/portal.proposta.$token'
+import { Route as PortalClienteTokenRouteImport } from './routes/portal.cliente.$token'
 import { Route as AuthenticatedTmsViagensRouteImport } from './routes/_authenticated/tms.viagens'
 import { Route as AuthenticatedTmsTrackingRouteImport } from './routes/_authenticated/tms.tracking'
 import { Route as AuthenticatedTmsTabelaFreteRouteImport } from './routes/_authenticated/tms.tabela-frete'
@@ -71,6 +72,7 @@ import { Route as AuthenticatedAdminPxApiRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminPerfisRouteImport } from './routes/_authenticated/admin.perfis'
 import { Route as AuthenticatedTmsSolicitacoesIndexRouteImport } from './routes/_authenticated/tms.solicitacoes.index'
 import { Route as AuthenticatedTmsLmIndexRouteImport } from './routes/_authenticated/tms.lm.index'
+import { Route as AuthenticatedSalesTabelasIndexRouteImport } from './routes/_authenticated/sales.tabelas.index'
 import { Route as AuthenticatedSalesPropostasIndexRouteImport } from './routes/_authenticated/sales.propostas.index'
 import { Route as AuthenticatedSalesCotacoesIndexRouteImport } from './routes/_authenticated/sales.cotacoes.index'
 import { Route as AuthenticatedSalesClientesIndexRouteImport } from './routes/_authenticated/sales.clientes.index'
@@ -95,6 +97,7 @@ import { Route as AuthenticatedTmsLmConfiguracoesRouteImport } from './routes/_a
 import { Route as AuthenticatedTmsLmComprovantesRouteImport } from './routes/_authenticated/tms.lm.comprovantes'
 import { Route as AuthenticatedTmsLmCarregamentoRouteImport } from './routes/_authenticated/tms.lm.carregamento'
 import { Route as AuthenticatedTmsEtiquetasMinutaRouteImport } from './routes/_authenticated/tms.etiquetas.$minuta'
+import { Route as AuthenticatedSalesTabelasIdRouteImport } from './routes/_authenticated/sales.tabelas.$id'
 import { Route as AuthenticatedSalesPropostasIdRouteImport } from './routes/_authenticated/sales.propostas.$id'
 import { Route as AuthenticatedSalesCotacoesIdRouteImport } from './routes/_authenticated/sales.cotacoes.$id'
 import { Route as AuthenticatedSalesClientesIdRouteImport } from './routes/_authenticated/sales.clientes.$id'
@@ -281,6 +284,11 @@ const PortalPropostaTokenRoute = PortalPropostaTokenRouteImport.update({
   path: '/portal/proposta/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PortalClienteTokenRoute = PortalClienteTokenRouteImport.update({
+  id: '/portal/cliente/$token',
+  path: '/portal/cliente/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedTmsViagensRoute = AuthenticatedTmsViagensRouteImport.update({
   id: '/tms/viagens',
   path: '/tms/viagens',
@@ -457,6 +465,12 @@ const AuthenticatedTmsLmIndexRoute = AuthenticatedTmsLmIndexRouteImport.update({
   path: '/tms/lm/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSalesTabelasIndexRoute =
+  AuthenticatedSalesTabelasIndexRouteImport.update({
+    id: '/sales/tabelas/',
+    path: '/sales/tabelas/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedSalesPropostasIndexRoute =
   AuthenticatedSalesPropostasIndexRouteImport.update({
     id: '/sales/propostas/',
@@ -591,6 +605,12 @@ const AuthenticatedTmsEtiquetasMinutaRoute =
   AuthenticatedTmsEtiquetasMinutaRouteImport.update({
     id: '/tms/etiquetas/$minuta',
     path: '/tms/etiquetas/$minuta',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSalesTabelasIdRoute =
+  AuthenticatedSalesTabelasIdRouteImport.update({
+    id: '/sales/tabelas/$id',
+    path: '/sales/tabelas/$id',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedSalesPropostasIdRoute =
@@ -776,6 +796,7 @@ export interface FileRoutesByFullPath {
   '/tms/tabela-frete': typeof AuthenticatedTmsTabelaFreteRoute
   '/tms/tracking': typeof AuthenticatedTmsTrackingRoute
   '/tms/viagens': typeof AuthenticatedTmsViagensRouteWithChildren
+  '/portal/cliente/$token': typeof PortalClienteTokenRoute
   '/portal/proposta/$token': typeof PortalPropostaTokenRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/financial-intelligence/': typeof AuthenticatedFinancialIntelligenceIndexRoute
@@ -785,6 +806,7 @@ export interface FileRoutesByFullPath {
   '/sales/clientes/$id': typeof AuthenticatedSalesClientesIdRoute
   '/sales/cotacoes/$id': typeof AuthenticatedSalesCotacoesIdRoute
   '/sales/propostas/$id': typeof AuthenticatedSalesPropostasIdRoute
+  '/sales/tabelas/$id': typeof AuthenticatedSalesTabelasIdRoute
   '/tms/etiquetas/$minuta': typeof AuthenticatedTmsEtiquetasMinutaRoute
   '/tms/lm/carregamento': typeof AuthenticatedTmsLmCarregamentoRoute
   '/tms/lm/comprovantes': typeof AuthenticatedTmsLmComprovantesRoute
@@ -809,6 +831,7 @@ export interface FileRoutesByFullPath {
   '/sales/clientes/': typeof AuthenticatedSalesClientesIndexRoute
   '/sales/cotacoes/': typeof AuthenticatedSalesCotacoesIndexRoute
   '/sales/propostas/': typeof AuthenticatedSalesPropostasIndexRoute
+  '/sales/tabelas/': typeof AuthenticatedSalesTabelasIndexRoute
   '/tms/lm/': typeof AuthenticatedTmsLmIndexRoute
   '/tms/solicitacoes/': typeof AuthenticatedTmsSolicitacoesIndexRoute
   '/tms/lm/motorista/$rotaId': typeof AuthenticatedTmsLmMotoristaRotaIdRoute
@@ -883,6 +906,7 @@ export interface FileRoutesByTo {
   '/tms/tabela-frete': typeof AuthenticatedTmsTabelaFreteRoute
   '/tms/tracking': typeof AuthenticatedTmsTrackingRoute
   '/tms/viagens': typeof AuthenticatedTmsViagensRouteWithChildren
+  '/portal/cliente/$token': typeof PortalClienteTokenRoute
   '/portal/proposta/$token': typeof PortalPropostaTokenRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/financial-intelligence': typeof AuthenticatedFinancialIntelligenceIndexRoute
@@ -892,6 +916,7 @@ export interface FileRoutesByTo {
   '/sales/clientes/$id': typeof AuthenticatedSalesClientesIdRoute
   '/sales/cotacoes/$id': typeof AuthenticatedSalesCotacoesIdRoute
   '/sales/propostas/$id': typeof AuthenticatedSalesPropostasIdRoute
+  '/sales/tabelas/$id': typeof AuthenticatedSalesTabelasIdRoute
   '/tms/etiquetas/$minuta': typeof AuthenticatedTmsEtiquetasMinutaRoute
   '/tms/lm/carregamento': typeof AuthenticatedTmsLmCarregamentoRoute
   '/tms/lm/comprovantes': typeof AuthenticatedTmsLmComprovantesRoute
@@ -916,6 +941,7 @@ export interface FileRoutesByTo {
   '/sales/clientes': typeof AuthenticatedSalesClientesIndexRoute
   '/sales/cotacoes': typeof AuthenticatedSalesCotacoesIndexRoute
   '/sales/propostas': typeof AuthenticatedSalesPropostasIndexRoute
+  '/sales/tabelas': typeof AuthenticatedSalesTabelasIndexRoute
   '/tms/lm': typeof AuthenticatedTmsLmIndexRoute
   '/tms/solicitacoes': typeof AuthenticatedTmsSolicitacoesIndexRoute
   '/tms/lm/motorista/$rotaId': typeof AuthenticatedTmsLmMotoristaRotaIdRoute
@@ -994,6 +1020,7 @@ export interface FileRoutesById {
   '/_authenticated/tms/tabela-frete': typeof AuthenticatedTmsTabelaFreteRoute
   '/_authenticated/tms/tracking': typeof AuthenticatedTmsTrackingRoute
   '/_authenticated/tms/viagens': typeof AuthenticatedTmsViagensRouteWithChildren
+  '/portal/cliente/$token': typeof PortalClienteTokenRoute
   '/portal/proposta/$token': typeof PortalPropostaTokenRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/financial-intelligence/': typeof AuthenticatedFinancialIntelligenceIndexRoute
@@ -1003,6 +1030,7 @@ export interface FileRoutesById {
   '/_authenticated/sales/clientes/$id': typeof AuthenticatedSalesClientesIdRoute
   '/_authenticated/sales/cotacoes/$id': typeof AuthenticatedSalesCotacoesIdRoute
   '/_authenticated/sales/propostas/$id': typeof AuthenticatedSalesPropostasIdRoute
+  '/_authenticated/sales/tabelas/$id': typeof AuthenticatedSalesTabelasIdRoute
   '/_authenticated/tms/etiquetas/$minuta': typeof AuthenticatedTmsEtiquetasMinutaRoute
   '/_authenticated/tms/lm/carregamento': typeof AuthenticatedTmsLmCarregamentoRoute
   '/_authenticated/tms/lm/comprovantes': typeof AuthenticatedTmsLmComprovantesRoute
@@ -1027,6 +1055,7 @@ export interface FileRoutesById {
   '/_authenticated/sales/clientes/': typeof AuthenticatedSalesClientesIndexRoute
   '/_authenticated/sales/cotacoes/': typeof AuthenticatedSalesCotacoesIndexRoute
   '/_authenticated/sales/propostas/': typeof AuthenticatedSalesPropostasIndexRoute
+  '/_authenticated/sales/tabelas/': typeof AuthenticatedSalesTabelasIndexRoute
   '/_authenticated/tms/lm/': typeof AuthenticatedTmsLmIndexRoute
   '/_authenticated/tms/solicitacoes/': typeof AuthenticatedTmsSolicitacoesIndexRoute
   '/_authenticated/tms/lm/motorista/$rotaId': typeof AuthenticatedTmsLmMotoristaRotaIdRoute
@@ -1105,6 +1134,7 @@ export interface FileRouteTypes {
     | '/tms/tabela-frete'
     | '/tms/tracking'
     | '/tms/viagens'
+    | '/portal/cliente/$token'
     | '/portal/proposta/$token'
     | '/admin/'
     | '/financial-intelligence/'
@@ -1114,6 +1144,7 @@ export interface FileRouteTypes {
     | '/sales/clientes/$id'
     | '/sales/cotacoes/$id'
     | '/sales/propostas/$id'
+    | '/sales/tabelas/$id'
     | '/tms/etiquetas/$minuta'
     | '/tms/lm/carregamento'
     | '/tms/lm/comprovantes'
@@ -1138,6 +1169,7 @@ export interface FileRouteTypes {
     | '/sales/clientes/'
     | '/sales/cotacoes/'
     | '/sales/propostas/'
+    | '/sales/tabelas/'
     | '/tms/lm/'
     | '/tms/solicitacoes/'
     | '/tms/lm/motorista/$rotaId'
@@ -1212,6 +1244,7 @@ export interface FileRouteTypes {
     | '/tms/tabela-frete'
     | '/tms/tracking'
     | '/tms/viagens'
+    | '/portal/cliente/$token'
     | '/portal/proposta/$token'
     | '/admin'
     | '/financial-intelligence'
@@ -1221,6 +1254,7 @@ export interface FileRouteTypes {
     | '/sales/clientes/$id'
     | '/sales/cotacoes/$id'
     | '/sales/propostas/$id'
+    | '/sales/tabelas/$id'
     | '/tms/etiquetas/$minuta'
     | '/tms/lm/carregamento'
     | '/tms/lm/comprovantes'
@@ -1245,6 +1279,7 @@ export interface FileRouteTypes {
     | '/sales/clientes'
     | '/sales/cotacoes'
     | '/sales/propostas'
+    | '/sales/tabelas'
     | '/tms/lm'
     | '/tms/solicitacoes'
     | '/tms/lm/motorista/$rotaId'
@@ -1322,6 +1357,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tms/tabela-frete'
     | '/_authenticated/tms/tracking'
     | '/_authenticated/tms/viagens'
+    | '/portal/cliente/$token'
     | '/portal/proposta/$token'
     | '/_authenticated/admin/'
     | '/_authenticated/financial-intelligence/'
@@ -1331,6 +1367,7 @@ export interface FileRouteTypes {
     | '/_authenticated/sales/clientes/$id'
     | '/_authenticated/sales/cotacoes/$id'
     | '/_authenticated/sales/propostas/$id'
+    | '/_authenticated/sales/tabelas/$id'
     | '/_authenticated/tms/etiquetas/$minuta'
     | '/_authenticated/tms/lm/carregamento'
     | '/_authenticated/tms/lm/comprovantes'
@@ -1355,6 +1392,7 @@ export interface FileRouteTypes {
     | '/_authenticated/sales/clientes/'
     | '/_authenticated/sales/cotacoes/'
     | '/_authenticated/sales/propostas/'
+    | '/_authenticated/sales/tabelas/'
     | '/_authenticated/tms/lm/'
     | '/_authenticated/tms/solicitacoes/'
     | '/_authenticated/tms/lm/motorista/$rotaId'
@@ -1383,6 +1421,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   RastreioRoute: typeof RastreioRoute
   SalesLoginRoute: typeof SalesLoginRoute
+  PortalClienteTokenRoute: typeof PortalClienteTokenRoute
   PortalPropostaTokenRoute: typeof PortalPropostaTokenRoute
   ApiPublicV1ClientesRoute: typeof ApiPublicV1ClientesRouteWithChildren
   ApiPublicV1EmpresasRoute: typeof ApiPublicV1EmpresasRouteWithChildren
@@ -1625,6 +1664,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalPropostaTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/portal/cliente/$token': {
+      id: '/portal/cliente/$token'
+      path: '/portal/cliente/$token'
+      fullPath: '/portal/cliente/$token'
+      preLoaderRoute: typeof PortalClienteTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/tms/viagens': {
       id: '/_authenticated/tms/viagens'
       path: '/tms/viagens'
@@ -1835,6 +1881,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTmsLmIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/sales/tabelas/': {
+      id: '/_authenticated/sales/tabelas/'
+      path: '/sales/tabelas'
+      fullPath: '/sales/tabelas/'
+      preLoaderRoute: typeof AuthenticatedSalesTabelasIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/sales/propostas/': {
       id: '/_authenticated/sales/propostas/'
       path: '/sales/propostas'
@@ -2001,6 +2054,13 @@ declare module '@tanstack/react-router' {
       path: '/tms/etiquetas/$minuta'
       fullPath: '/tms/etiquetas/$minuta'
       preLoaderRoute: typeof AuthenticatedTmsEtiquetasMinutaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/sales/tabelas/$id': {
+      id: '/_authenticated/sales/tabelas/$id'
+      path: '/sales/tabelas/$id'
+      fullPath: '/sales/tabelas/$id'
+      preLoaderRoute: typeof AuthenticatedSalesTabelasIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/sales/propostas/$id': {
@@ -2298,6 +2358,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSalesClientesIdRoute: typeof AuthenticatedSalesClientesIdRoute
   AuthenticatedSalesCotacoesIdRoute: typeof AuthenticatedSalesCotacoesIdRoute
   AuthenticatedSalesPropostasIdRoute: typeof AuthenticatedSalesPropostasIdRoute
+  AuthenticatedSalesTabelasIdRoute: typeof AuthenticatedSalesTabelasIdRoute
   AuthenticatedTmsEtiquetasMinutaRoute: typeof AuthenticatedTmsEtiquetasMinutaRoute
   AuthenticatedTmsLmCarregamentoRoute: typeof AuthenticatedTmsLmCarregamentoRoute
   AuthenticatedTmsLmComprovantesRoute: typeof AuthenticatedTmsLmComprovantesRoute
@@ -2312,6 +2373,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSalesClientesIndexRoute: typeof AuthenticatedSalesClientesIndexRoute
   AuthenticatedSalesCotacoesIndexRoute: typeof AuthenticatedSalesCotacoesIndexRoute
   AuthenticatedSalesPropostasIndexRoute: typeof AuthenticatedSalesPropostasIndexRoute
+  AuthenticatedSalesTabelasIndexRoute: typeof AuthenticatedSalesTabelasIndexRoute
   AuthenticatedTmsLmIndexRoute: typeof AuthenticatedTmsLmIndexRoute
   AuthenticatedTmsLmMotoristaRotaIdRoute: typeof AuthenticatedTmsLmMotoristaRotaIdRoute
 }
@@ -2372,6 +2434,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSalesClientesIdRoute: AuthenticatedSalesClientesIdRoute,
   AuthenticatedSalesCotacoesIdRoute: AuthenticatedSalesCotacoesIdRoute,
   AuthenticatedSalesPropostasIdRoute: AuthenticatedSalesPropostasIdRoute,
+  AuthenticatedSalesTabelasIdRoute: AuthenticatedSalesTabelasIdRoute,
   AuthenticatedTmsEtiquetasMinutaRoute: AuthenticatedTmsEtiquetasMinutaRoute,
   AuthenticatedTmsLmCarregamentoRoute: AuthenticatedTmsLmCarregamentoRoute,
   AuthenticatedTmsLmComprovantesRoute: AuthenticatedTmsLmComprovantesRoute,
@@ -2386,6 +2449,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSalesClientesIndexRoute: AuthenticatedSalesClientesIndexRoute,
   AuthenticatedSalesCotacoesIndexRoute: AuthenticatedSalesCotacoesIndexRoute,
   AuthenticatedSalesPropostasIndexRoute: AuthenticatedSalesPropostasIndexRoute,
+  AuthenticatedSalesTabelasIndexRoute: AuthenticatedSalesTabelasIndexRoute,
   AuthenticatedTmsLmIndexRoute: AuthenticatedTmsLmIndexRoute,
   AuthenticatedTmsLmMotoristaRotaIdRoute:
     AuthenticatedTmsLmMotoristaRotaIdRoute,
@@ -2489,6 +2553,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   RastreioRoute: RastreioRoute,
   SalesLoginRoute: SalesLoginRoute,
+  PortalClienteTokenRoute: PortalClienteTokenRoute,
   PortalPropostaTokenRoute: PortalPropostaTokenRoute,
   ApiPublicV1ClientesRoute: ApiPublicV1ClientesRouteWithChildren,
   ApiPublicV1EmpresasRoute: ApiPublicV1EmpresasRouteWithChildren,

@@ -5,7 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import {
   LayoutDashboard, Sparkles, Building2, Users, Target, FileSpreadsheet, FileSignature,
   CalendarClock, CalendarDays, Percent, Share2, Search, BarChart3, Settings,
-  Grid3x3, LogOut, Menu, X, Bell, ChevronDown, MoreHorizontal,
+  Grid3x3, LogOut, Menu, X, Bell, ChevronDown, MoreHorizontal, Table2,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSystem } from "@/px-platform/system-context";
@@ -23,6 +23,7 @@ export const PXSALES_NAV: NavItem[] = [
   { to: "/sales/clientes", label: "Empresas", icon: Building2, group: "Comercial" },
   { to: "/sales/contatos", label: "Contatos", icon: Users, group: "Comercial" },
   { to: "/sales/oportunidades", label: "Oportunidades", icon: Target, group: "Comercial" },
+  { to: "/sales/tabelas", label: "Tabelas comerciais", icon: Table2, group: "Negociação" },
   { to: "/sales/cotacoes", label: "Cotações", icon: FileSpreadsheet, group: "Negociação" },
   { to: "/sales/propostas", label: "Propostas", icon: FileSignature, group: "Negociação" },
   { to: "/sales/followups", label: "Follow-ups", icon: CalendarClock, group: "Negociação" },
