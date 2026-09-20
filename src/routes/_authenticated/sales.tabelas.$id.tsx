@@ -255,7 +255,7 @@ function TabelaDetalhe() {
 
   return (
     <PxSalesShell
-      title={t?.nome ?? "Tabela comercial"}
+      title={t?.tabela?.nome ?? "Tabela comercial"}
       subtitle="Escolha os componentes, configure cada regra e publique a versão"
       headerActions={
         <div className="flex gap-1.5">
@@ -567,8 +567,8 @@ function TabelaDetalhe() {
             )}
           </div>
 
-          {t?.tabela?.cliente_id || t?.cliente_id ? (
-            <PortalBox clienteId={t?.cliente_id ?? t?.tabela?.cliente_id} empresaId={t?.empresa_id ?? t?.tabela?.empresa_id} />
+          {t?.tabela?.cliente_id ? (
+            <PortalBox clienteId={t.tabela.cliente_id} empresaId={t.tabela.empresa_id} />
           ) : null}
         </div>
       </div>
