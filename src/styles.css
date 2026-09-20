@@ -192,18 +192,6 @@
 
 .is-active .route-navigation-bar { animation: navigationProgress 700ms ease-out both; }
 
-.route-navigation-veil {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  background: color-mix(in oklab, var(--color-background) 96%, transparent);
-  opacity: 0;
-  transition: opacity 100ms ease;
-}
-
-.is-active .route-navigation-veil { opacity: 1; }
-
 .route-navigation-spinner {
   width: 1.25rem;
   height: 1.25rem;

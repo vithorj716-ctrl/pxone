@@ -178,9 +178,6 @@ function NavigationFeedback() {
       aria-live="polite"
     >
       <div className="route-navigation-bar" />
-      <div className="route-navigation-veil">
-        <div className="route-navigation-spinner" />
-      </div>
     </div>
   );
 }
