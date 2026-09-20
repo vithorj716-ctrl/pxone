@@ -1888,6 +1888,377 @@ export type Database = {
           },
         ]
       }
+      pxsales_atividades: {
+        Row: {
+          assunto: string
+          cliente_id: string | null
+          concluida: boolean
+          concluida_em: string | null
+          created_at: string
+          created_by: string | null
+          descricao: string | null
+          id: string
+          lead_id: string | null
+          oportunidade_id: string | null
+          prevista_para: string | null
+          responsavel_id: string | null
+          resultado: string | null
+          tipo: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          assunto: string
+          cliente_id?: string | null
+          concluida?: boolean
+          concluida_em?: string | null
+          created_at?: string
+          created_by?: string | null
+          descricao?: string | null
+          id?: string
+          lead_id?: string | null
+          oportunidade_id?: string | null
+          prevista_para?: string | null
+          responsavel_id?: string | null
+          resultado?: string | null
+          tipo?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          assunto?: string
+          cliente_id?: string | null
+          concluida?: boolean
+          concluida_em?: string | null
+          created_at?: string
+          created_by?: string | null
+          descricao?: string | null
+          id?: string
+          lead_id?: string | null
+          oportunidade_id?: string | null
+          prevista_para?: string | null
+          responsavel_id?: string | null
+          resultado?: string | null
+          tipo?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pxsales_atividades_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "px_cliente_saldo"
+            referencedColumns: ["cliente_id"]
+          },
+          {
+            foreignKeyName: "pxsales_atividades_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "px_registry_clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pxsales_atividades_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "pxsales_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pxsales_atividades_oportunidade_id_fkey"
+            columns: ["oportunidade_id"]
+            isOneToOne: false
+            referencedRelation: "pxsales_oportunidades"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pxsales_leads: {
+        Row: {
+          cidade: string | null
+          cliente_id: string | null
+          cnpj: string | null
+          contato_cargo: string | null
+          contato_email: string | null
+          contato_nome: string | null
+          contato_telefone: string | null
+          convertido_em: string | null
+          created_at: string
+          created_by: string | null
+          empresa: string
+          etapa: string
+          id: string
+          motivo_perda: string | null
+          nome_fantasia: string | null
+          observacoes: string | null
+          origem: string
+          potencial_mensal: number | null
+          proxima_acao: string | null
+          proxima_acao_em: string | null
+          responsavel_id: string | null
+          segmento: string | null
+          status: string
+          temperatura: string
+          tipo_carga: string | null
+          uf: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          cidade?: string | null
+          cliente_id?: string | null
+          cnpj?: string | null
+          contato_cargo?: string | null
+          contato_email?: string | null
+          contato_nome?: string | null
+          contato_telefone?: string | null
+          convertido_em?: string | null
+          created_at?: string
+          created_by?: string | null
+          empresa: string
+          etapa?: string
+          id?: string
+          motivo_perda?: string | null
+          nome_fantasia?: string | null
+          observacoes?: string | null
+          origem?: string
+          potencial_mensal?: number | null
+          proxima_acao?: string | null
+          proxima_acao_em?: string | null
+          responsavel_id?: string | null
+          segmento?: string | null
+          status?: string
+          temperatura?: string
+          tipo_carga?: string | null
+          uf?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          cidade?: string | null
+          cliente_id?: string | null
+          cnpj?: string | null
+          contato_cargo?: string | null
+          contato_email?: string | null
+          contato_nome?: string | null
+          contato_telefone?: string | null
+          convertido_em?: string | null
+          created_at?: string
+          created_by?: string | null
+          empresa?: string
+          etapa?: string
+          id?: string
+          motivo_perda?: string | null
+          nome_fantasia?: string | null
+          observacoes?: string | null
+          origem?: string
+          potencial_mensal?: number | null
+          proxima_acao?: string | null
+          proxima_acao_em?: string | null
+          responsavel_id?: string | null
+          segmento?: string | null
+          status?: string
+          temperatura?: string
+          tipo_carga?: string | null
+          uf?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pxsales_leads_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "px_cliente_saldo"
+            referencedColumns: ["cliente_id"]
+          },
+          {
+            foreignKeyName: "pxsales_leads_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "px_registry_clientes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pxsales_oportunidade_historico: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          etapa_anterior: string | null
+          etapa_nova: string
+          id: string
+          observacao: string | null
+          oportunidade_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          etapa_anterior?: string | null
+          etapa_nova: string
+          id?: string
+          observacao?: string | null
+          oportunidade_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          etapa_anterior?: string | null
+          etapa_nova?: string
+          id?: string
+          observacao?: string | null
+          oportunidade_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pxsales_oportunidade_historico_oportunidade_id_fkey"
+            columns: ["oportunidade_id"]
+            isOneToOne: false
+            referencedRelation: "pxsales_oportunidades"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pxsales_oportunidades: {
+        Row: {
+          cliente_id: string | null
+          created_at: string
+          created_by: string | null
+          empresa_nome: string | null
+          etapa: string
+          fechada_em: string | null
+          frequencia_mensal: number | null
+          id: string
+          lead_id: string | null
+          margem_percentual: number | null
+          motivo_perda: string | null
+          observacoes: string | null
+          origem: string | null
+          previsao_fechamento: string | null
+          probabilidade: number
+          responsavel_id: string | null
+          status: string
+          tipo_operacao: string | null
+          titulo: string
+          updated_at: string
+          updated_by: string | null
+          valor_estimado: number
+        }
+        Insert: {
+          cliente_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          empresa_nome?: string | null
+          etapa?: string
+          fechada_em?: string | null
+          frequencia_mensal?: number | null
+          id?: string
+          lead_id?: string | null
+          margem_percentual?: number | null
+          motivo_perda?: string | null
+          observacoes?: string | null
+          origem?: string | null
+          previsao_fechamento?: string | null
+          probabilidade?: number
+          responsavel_id?: string | null
+          status?: string
+          tipo_operacao?: string | null
+          titulo: string
+          updated_at?: string
+          updated_by?: string | null
+          valor_estimado?: number
+        }
+        Update: {
+          cliente_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          empresa_nome?: string | null
+          etapa?: string
+          fechada_em?: string | null
+          frequencia_mensal?: number | null
+          id?: string
+          lead_id?: string | null
+          margem_percentual?: number | null
+          motivo_perda?: string | null
+          observacoes?: string | null
+          origem?: string | null
+          previsao_fechamento?: string | null
+          probabilidade?: number
+          responsavel_id?: string | null
+          status?: string
+          tipo_operacao?: string | null
+          titulo?: string
+          updated_at?: string
+          updated_by?: string | null
+          valor_estimado?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pxsales_oportunidades_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "px_cliente_saldo"
+            referencedColumns: ["cliente_id"]
+          },
+          {
+            foreignKeyName: "pxsales_oportunidades_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "px_registry_clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pxsales_oportunidades_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "pxsales_leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pxsales_pipeline_etapas: {
+        Row: {
+          ativo: boolean
+          chave: string
+          cor: string
+          created_at: string
+          created_by: string | null
+          id: string
+          label: string
+          ordem: number
+          tipo: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          ativo?: boolean
+          chave: string
+          cor?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          label: string
+          ordem?: number
+          tipo?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          ativo?: boolean
+          chave?: string
+          cor?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          label?: string
+          ordem?: number
+          tipo?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       risks: {
         Row: {
           categoria: string | null
