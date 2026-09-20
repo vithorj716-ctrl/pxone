@@ -13,6 +13,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as SalesLoginRouteImport } from './routes/sales.login'
 import { Route as AuthenticatedValuationRouteImport } from './routes/_authenticated/valuation'
 import { Route as AuthenticatedTimelineRouteImport } from './routes/_authenticated/timeline'
 import { Route as AuthenticatedRiskRouteImport } from './routes/_authenticated/risk'
@@ -116,6 +117,11 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const SalesLoginRoute = SalesLoginRouteImport.update({
+  id: '/sales/login',
+  path: '/sales/login',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedValuationRoute = AuthenticatedValuationRouteImport.update({
   id: '/valuation',
@@ -611,6 +617,7 @@ export interface FileRoutesByFullPath {
   '/risk': typeof AuthenticatedRiskRoute
   '/timeline': typeof AuthenticatedTimelineRoute
   '/valuation': typeof AuthenticatedValuationRoute
+  '/sales/login': typeof SalesLoginRoute
   '/admin/perfis': typeof AuthenticatedAdminPerfisRoute
   '/admin/px-api': typeof AuthenticatedAdminPxApiRouteWithChildren
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
@@ -698,6 +705,7 @@ export interface FileRoutesByTo {
   '/risk': typeof AuthenticatedRiskRoute
   '/timeline': typeof AuthenticatedTimelineRoute
   '/valuation': typeof AuthenticatedValuationRoute
+  '/sales/login': typeof SalesLoginRoute
   '/': typeof AuthenticatedIndexRoute
   '/admin/perfis': typeof AuthenticatedAdminPerfisRoute
   '/admin/px-api': typeof AuthenticatedAdminPxApiRouteWithChildren
@@ -788,6 +796,7 @@ export interface FileRoutesById {
   '/_authenticated/risk': typeof AuthenticatedRiskRoute
   '/_authenticated/timeline': typeof AuthenticatedTimelineRoute
   '/_authenticated/valuation': typeof AuthenticatedValuationRoute
+  '/sales/login': typeof SalesLoginRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/admin/perfis': typeof AuthenticatedAdminPerfisRoute
   '/_authenticated/admin/px-api': typeof AuthenticatedAdminPxApiRouteWithChildren
@@ -880,6 +889,7 @@ export interface FileRouteTypes {
     | '/risk'
     | '/timeline'
     | '/valuation'
+    | '/sales/login'
     | '/admin/perfis'
     | '/admin/px-api'
     | '/admin/usuarios'
@@ -967,6 +977,7 @@ export interface FileRouteTypes {
     | '/risk'
     | '/timeline'
     | '/valuation'
+    | '/sales/login'
     | '/'
     | '/admin/perfis'
     | '/admin/px-api'
@@ -1056,6 +1067,7 @@ export interface FileRouteTypes {
     | '/_authenticated/risk'
     | '/_authenticated/timeline'
     | '/_authenticated/valuation'
+    | '/sales/login'
     | '/_authenticated/'
     | '/_authenticated/admin/perfis'
     | '/_authenticated/admin/px-api'
@@ -1126,6 +1138,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   LoginRoute: typeof LoginRoute
+  SalesLoginRoute: typeof SalesLoginRoute
   ApiPublicV1ClientesRoute: typeof ApiPublicV1ClientesRouteWithChildren
   ApiPublicV1EmpresasRoute: typeof ApiPublicV1EmpresasRouteWithChildren
   ApiPublicV1FiliaisRoute: typeof ApiPublicV1FiliaisRoute
@@ -1170,6 +1183,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/sales/login': {
+      id: '/sales/login'
+      path: '/sales/login'
+      fullPath: '/sales/login'
+      preLoaderRoute: typeof SalesLoginRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/valuation': {
       id: '/_authenticated/valuation'
@@ -2055,6 +2075,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   LoginRoute: LoginRoute,
+  SalesLoginRoute: SalesLoginRoute,
   ApiPublicV1ClientesRoute: ApiPublicV1ClientesRouteWithChildren,
   ApiPublicV1EmpresasRoute: ApiPublicV1EmpresasRouteWithChildren,
   ApiPublicV1FiliaisRoute: ApiPublicV1FiliaisRoute,
