@@ -1,4 +1,4 @@
-import logoAsset from "@/assets/pxlog-logo.png.asset.json";
+import logoAsset from "@/assets/px-grupo-logo.png.asset.json";
 
 /** Logo institucional do Grupo PX — usada em toda a plataforma. */
 export function PxGrupoLogo({ className = "", height = 28 }: { className?: string; height?: number }) {
