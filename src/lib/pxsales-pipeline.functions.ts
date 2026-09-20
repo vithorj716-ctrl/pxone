@@ -294,13 +294,34 @@ export const converterLead = createServerFn({ method: "POST" })
 export const listOportunidades = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(
-    (d: { search?: string; responsavel_id?: string; meus?: boolean; incluirFechadas?: boolean } | undefined) => d ?? {},
+    (
+      d:
+        | {
+            search?: string;
+            responsavel_id?: string;
+            meus?: boolean;
+            incluirFechadas?: boolean;
+            empresa_id?: string | null;
+            page?: number;
+            pageSize?: number;
+          }
+        | undefined,
+    ) => d ?? {},
   )
   .handler(async ({ data, context }): Promise<OportunidadeRow[]> => {
     const sb = context.supabase as any;
     const userId = (context as any).userId as string;
+    await assertPermissao(sb, userId, "pxsales.oportunidades.view");
+    const empresas = await escopoEmpresas(sb, userId, data.empresa_id);
+    if (!empresas.length) return [];
+    const { from, to } = faixa(data.page, data.pageSize);
 
-    let q = sb.from("pxsales_oportunidades").select("*").order("updated_at", { ascending: false }).limit(500);
+    let q = sb
+      .from("pxsales_oportunidades")
+      .select("*")
+      .in("empresa_id", empresas)
+      .order("updated_at", { ascending: false })
+      .range(from, to);
     if (data.responsavel_id) q = q.eq("responsavel_id", data.responsavel_id);
     if (data.meus) q = q.eq("responsavel_id", userId);
     if (!data.incluirFechadas) q = q.eq("status", "aberta");
@@ -340,7 +361,8 @@ export const saveOportunidade = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
     const userId = (context as any).userId as string;
-    const { id, ...rest } = data;
+    await assertPermissao(sb, userId, "pxsales.oportunidades.edit");
+    const { id, empresa_id: _empresaEntrada, ...rest } = data;
     const num = (v: any) => (v === "" || v == null ? null : Number(v));
     const payload: Record<string, any> = {
       ...rest,
@@ -358,9 +380,10 @@ export const saveOportunidade = createServerFn({ method: "POST" })
       if (error) throw new Error(error.message);
       return { id };
     }
+    const empresaId = await resolveEmpresaId(sb, userId, rest.empresa_id);
     const { data: ins, error } = await sb
       .from("pxsales_oportunidades")
-      .insert({ ...payload, created_by: userId, responsavel_id: payload.responsavel_id ?? userId })
+      .insert({ ...payload, empresa_id: empresaId, created_by: userId, responsavel_id: payload.responsavel_id ?? userId })
       .select("id")
       .single();
     if (error) throw new Error(error.message);
@@ -379,6 +402,7 @@ export const moverOportunidade = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
     const userId = (context as any).userId as string;
+    await assertPermissao(sb, userId, "pxsales.oportunidades.edit");
 
     const { data: atual, error: e1 } = await sb
       .from("pxsales_oportunidades")
@@ -416,6 +440,7 @@ export const excluirOportunidade = createServerFn({ method: "POST" })
   .inputValidator((d: { id: string }) => d)
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
+    await assertPermissao(sb, (context as any).userId, "pxsales.oportunidades.edit");
     const { error } = await sb.from("pxsales_oportunidades").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
@@ -426,6 +451,7 @@ export const getOportunidadeHistorico = createServerFn({ method: "POST" })
   .inputValidator((d: { id: string }) => d)
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
+    await assertPermissao(sb, (context as any).userId, "pxsales.oportunidades.view");
     const { data: rows } = await sb
       .from("pxsales_oportunidade_historico")
       .select("*")
