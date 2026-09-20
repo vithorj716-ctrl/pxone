@@ -284,7 +284,7 @@ export const getPortalCliente = createServerFn({ method: "POST" })
         if (minutaIds.length) {
           const { data: ev } = await sb
             .from("tms_eventos")
-            .select("minuta_id,tipo,descricao,created_at")
+            .select("minuta_id,tipo,created_at")
             .in("minuta_id", minutaIds)
             .order("created_at", { ascending: true });
           eventos = ev ?? [];
