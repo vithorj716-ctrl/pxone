@@ -1,7 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { assertPermissao, auditar, escopoEmpresas, faixa } from "./pxsales-guard";
-import { limitarTentativas, origemChamada } from "./pxsales-tracking.functions";
 
 // PXSales — portal público da proposta (link com código aleatório, aceite/recusa/pedido de alteração).
 // A resposta do cliente acontece em uma única transação no banco (RPC), sem risco de duplo aceite.
@@ -158,7 +157,8 @@ export const getPropostaPublica = createServerFn({ method: "POST" })
   })
   .handler(async ({ data }): Promise<PropostaPublica> => {
     const sb = await admin();
-    await limitarTentativas(sb, "portal_leitura", await origemChamada(), 40, 600);
+    const { limitarTentativas } = await import("./pxsales-rate.server");
+    await limitarTentativas(sb, "portal_leitura", 40, 600);
 
     const { data: p } = await sb
       .from("pxsales_propostas")
@@ -219,7 +219,8 @@ export const responderPropostaPublica = createServerFn({ method: "POST" })
   })
   .handler(async ({ data }): Promise<{ status: string }> => {
     const sb = await admin();
-    await limitarTentativas(sb, "portal_resposta", await origemChamada(), 15, 600);
+    const { limitarTentativas } = await import("./pxsales-rate.server");
+    await limitarTentativas(sb, "portal_resposta", 15, 600);
 
     const { data: res, error } = await sb.rpc("pxsales_responder_proposta_publica", {
       p_token: data.token,
