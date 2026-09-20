@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as RastreioRouteImport } from './routes/rastreio'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
@@ -117,6 +118,11 @@ import { Route as ApiPublicV1ClientesIdContaCorrenteRouteImport } from './routes
 import { Route as ApiPublicV1ClientesIdEnderecosEnderecoIdRouteImport } from './routes/api/public/v1/clientes.$id.enderecos.$enderecoId'
 import { Route as ApiPublicV1ClientesIdContatosContatoIdRouteImport } from './routes/api/public/v1/clientes.$id.contatos.$contatoId'
 
+const RastreioRoute = RastreioRouteImport.update({
+  id: '/rastreio',
+  path: '/rastreio',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -719,6 +725,7 @@ export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/auth': typeof AuthRoute
   '/login': typeof LoginRoute
+  '/rastreio': typeof RastreioRoute
   '/ai-analyst': typeof AuthenticatedAiAnalystRoute
   '/aplicacoes': typeof AuthenticatedAplicacoesRoute
   '/business-plan': typeof AuthenticatedBusinessPlanRoute
@@ -826,6 +833,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/login': typeof LoginRoute
+  '/rastreio': typeof RastreioRoute
   '/ai-analyst': typeof AuthenticatedAiAnalystRoute
   '/aplicacoes': typeof AuthenticatedAplicacoesRoute
   '/business-plan': typeof AuthenticatedBusinessPlanRoute
@@ -934,6 +942,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/login': typeof LoginRoute
+  '/rastreio': typeof RastreioRoute
   '/_authenticated/ai-analyst': typeof AuthenticatedAiAnalystRoute
   '/_authenticated/aplicacoes': typeof AuthenticatedAplicacoesRoute
   '/_authenticated/business-plan': typeof AuthenticatedBusinessPlanRoute
@@ -1045,6 +1054,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/login'
+    | '/rastreio'
     | '/ai-analyst'
     | '/aplicacoes'
     | '/business-plan'
@@ -1152,6 +1162,7 @@ export interface FileRouteTypes {
   to:
     | '/auth'
     | '/login'
+    | '/rastreio'
     | '/ai-analyst'
     | '/aplicacoes'
     | '/business-plan'
@@ -1259,6 +1270,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/login'
+    | '/rastreio'
     | '/_authenticated/ai-analyst'
     | '/_authenticated/aplicacoes'
     | '/_authenticated/business-plan'
@@ -1369,6 +1381,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   LoginRoute: typeof LoginRoute
+  RastreioRoute: typeof RastreioRoute
   SalesLoginRoute: typeof SalesLoginRoute
   PortalPropostaTokenRoute: typeof PortalPropostaTokenRoute
   ApiPublicV1ClientesRoute: typeof ApiPublicV1ClientesRouteWithChildren
@@ -1388,6 +1401,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/rastreio': {
+      id: '/rastreio'
+      path: '/rastreio'
+      fullPath: '/rastreio'
+      preLoaderRoute: typeof RastreioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -2467,6 +2487,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   LoginRoute: LoginRoute,
+  RastreioRoute: RastreioRoute,
   SalesLoginRoute: SalesLoginRoute,
   PortalPropostaTokenRoute: PortalPropostaTokenRoute,
   ApiPublicV1ClientesRoute: ApiPublicV1ClientesRouteWithChildren,
