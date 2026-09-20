@@ -68,7 +68,7 @@ export const listSalesClientes = createServerFn({ method: "POST" })
         "id,cnpj,razao_social,nome_fantasia,cidade,uf,categorias,situacao_cadastral,ativo,telefone,email,limite_credito,condicao_pagamento",
       )
       .order("razao_social", { ascending: true })
-      .limit(400);
+      .range(from, to);
 
     if (data.categoria) q = q.contains("categorias", [data.categoria]);
     if (data.situacao === "ativos") q = q.eq("ativo", true);
