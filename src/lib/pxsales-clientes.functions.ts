@@ -42,8 +42,18 @@ export type SalesClienteRow = {
 export const listSalesClientes = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(
-    (d: { search?: string; categoria?: string; situacao?: "todos" | "ativos" | "inativos"; apenasCarteira?: boolean } | undefined) =>
-      d ?? {},
+    (
+      d:
+        | {
+            search?: string;
+            categoria?: string;
+            situacao?: "todos" | "ativos" | "inativos";
+            apenasCarteira?: boolean;
+            page?: number;
+            pageSize?: number;
+          }
+        | undefined,
+    ) => d ?? {},
   )
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
