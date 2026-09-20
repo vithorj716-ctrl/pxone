@@ -1,85 +1,49 @@
+# PXSales — Sistema comercial do Grupo PX
 
-# Integração definitiva do Ecossistema PX
+Novo sistema independente dentro da plataforma, usando a mesma conta de acesso, o mesmo cadastro de clientes (PX Registry) e os mesmos dados operacionais do PXLog. Nada do PXOne ou do PXLog é alterado no funcionamento atual.
 
-Este projeto (PX One) já é o **Core/ERP** e já expõe a **PX API** (Fases 1–4 concluídas: `/api/public/v1/*`, JWT, idempotência, OpenAPI). Falta a camada de **integração federada** entre os três sistemas, **sem tocar em UI, menus, telas, regras ou banco**.
+## Entrega por etapas
 
-A proposta é puramente **infraestrutura de integração**: cliente HTTP outbound + contratos inbound + observabilidade. Nada visual muda.
+Pelo tamanho, a construção é fatiada. Cada etapa deixa o sistema utilizável e testável.
 
-## Princípio
+**Etapa 1 — Fundação (esta rodada)**
+- PXSales passa a existir no seletor de sistemas (Launcher), com nome, descrição, ícone e cor próprios.
+- Tela de entrada própria em `/sales/login`: quem já está logado e tem acesso entra direto; quem não tem acesso vê um aviso de permissão, sem detalhes internos.
+- Layout próprio (PXSalesShell): menu lateral no computador, navegação inferior no celular, busca, empresa ativa, perfil, notificações, trocar de sistema e sair.
+- Estrutura de rotas `/sales/...` com as telas criadas e prontas para receber conteúdo.
+- Permissões do PXSales registradas no sistema de perfis já existente.
 
-- PX One **continua** dono de: financeiro, contas, fluxo de caixa, BI, admin, auditoria.
-- PX Comercial passa a ser **Master Data** de: clientes, contatos, tabelas de frete, cotações, propostas, regras comerciais.
-- PX Log passa a ser **Master Data** de: solicitações, embarques, viagens, entregas, tracking, ocorrências.
-- Comunicação **só por API**. Nenhum acesso cruzado a banco.
+**Etapa 2 — Clientes e contatos**
+- Busca por CNPJ reaproveitando exatamente a consulta já existente (não haverá segunda implementação).
+- Se o CNPJ já existe no cadastro, carrega; se não, consulta o provedor, o usuário revisa e salva no cadastro único, vinculado ao PXSales.
+- Campos comerciais complementares (segmento, porte, origem, responsável, potencial, tags, condição de pagamento etc.).
+- Lista de empresas com filtros e ficha 360º do cliente.
 
-## O que será criado (somente backend, zero UI)
+**Etapa 3 — Leads, oportunidades e pipeline** (kanban com arrastar entre etapas, atividades e follow-ups).
 
-### 1. SDK outbound `src/px-integration/` (novo, isolado)
-Cliente HTTP tipado que o PX One usa para consumir CRM e TMS. **Não substitui** nada existente — fica disponível para quem quiser plugar depois.
+**Etapa 4 — Cotações e propostas** (reaproveitando tabela de frete e cálculo existentes).
 
-```
-src/px-integration/
-├── client.ts          # fetch wrapper: baseURL, JWT (client_credentials), retry, timeout, circuit breaker
-├── cache.ts           # cache em memória com TTL curto (60s default) para performance
-├── errors.ts          # PxIntegrationError com código + mensagem amigável
-├── crm.ts             # SDK PX Comercial: getClientes, getCliente, getTabelaFrete, getCotacao…
-├── tms.ts             # SDK PX Log: getOperacoes, getFaturamentoOperacional…
-└── config.ts          # lê PX_CRM_BASE_URL, PX_TMS_BASE_URL, PX_CRM_API_KEY, PX_TMS_API_KEY
-```
+**Etapa 5 — Portal público de cotação** (link com token, aceite/recusa/pedido de alteração, expiração).
 
-### 2. Endpoints inbound novos no PX One (`/api/public/v1/`)
-Apenas o que CRM/TMS vão precisar consumir do Core que ainda não existe:
+**Etapa 6 — Tracking público** lendo os dados reais do PXLog, sem duplicar informação.
 
-- `POST /financeiro/lancamentos` — TMS publica faturamento operacional (idempotente por `operacao_id`).
-- `GET  /financeiro/consolidado` — leitura agregada para dashboards externos.
-- `GET  /dashboard/executivo` — leitura consolidada (financeiro + agregados puxados do CRM/TMS via SDK outbound, com fallback resiliente).
+**Etapa 7 — Comissões configuráveis** com regras por vigência e congelamento do histórico.
 
-Todos seguem o mesmo padrão já estabelecido: JWT scoped, envelope `{status,data,...}`, paginação cursor, idempotência onde faz sentido.
+**Etapa 8 — Relatórios, administração e auditoria.**
 
-### 3. Tabela de integração (uma única migration)
-- `px_integration_links` — vínculo lógico entre entidades de domínios diferentes (ex.: `operacao_tms_id` ↔ `cotacao_crm_id` ↔ `cliente_crm_id`). Permite rastrear sem duplicar dados.
-- `px_integration_inbox` — log de eventos recebidos (audit + replay).
+**Etapa 9 — Refino mobile/PWA e acabamento visual.**
 
-Ambas com RLS, GRANTs e acesso só via `service_role` (consumido pela API).
+## Detalhes técnicos (Etapa 1)
 
-### 4. Resiliência
-- Timeout default 8s, 2 retries com backoff exponencial.
-- Circuit breaker abre após 5 falhas seguidas, semi-aberto após 30s.
-- Em falha: SDK lança `PxIntegrationError`; endpoints públicos retornam `503` com `Retry-After` e mensagem amigável; quem chama decide se degrada.
-- Cache de leitura (clientes/tabelas de frete) com TTL 60s para reduzir round-trips e suportar indisponibilidade momentânea.
+- `src/px-platform/systems.ts`: nova entrada `pxsales` (rota `/sales`, status ativo) + `systemFromPath()` reconhecendo `/sales`.
+- Rotas: `src/routes/sales.login.tsx` (pública, `ssr: false`) e `src/routes/_authenticated/sales.*` para dashboard, leads, clientes (`$id`), contatos, oportunidades, cotações (`$id`), propostas (`$id`), followups, agenda, comissões, portal, tracking, relatórios, configurações. Rotas públicas futuras do portal ficam em `src/routes/portal.*`, fora da área autenticada.
+- Gate de acesso: server function protegida que checa `has_system_access(user, 'pxsales')`; o shell bloqueia e redireciona para `/sales/login` quando negado. Validação repetida no backend, nunca só na interface.
+- `src/components/pxsales/pxsales-shell.tsx`: shell próprio (sidebar + bottom nav + header), sem condicionais dentro do AppShell do PXOne.
+- `src/pxsales/pxsales.permissions.ts`: catálogo `pxsales.*` mapeado para `px_perfis` / `px_perfil_permissoes` / `px_usuario_perfis`. Nenhum sistema de permissão paralelo.
+- Lógica em `src/lib/pxsales.functions.ts`, `pxsales.types.ts` (e mais tarde `pxsales.portal.functions.ts`, `pxsales.commission.functions.ts`); páginas ficam finas.
+- `src/px-integration/crm.ts` permanece intacto — os tipos do PXSales serão compatíveis para permitir extração futura para API própria.
+- Banco na Etapa 1: apenas registro das permissões/perfis; tabelas `pxsales_*` entram nas etapas em que forem usadas, sempre com UUID, timestamps, `created_by`/`updated_by`, `empresa_id`, índices, GRANTs e RLS por usuário/empresa/sistema (sem `USING(true)`).
 
-### 5. Segredos a configurar (uso futuro, opcional)
-Quando CRM e TMS publicarem suas APIs, salvar via `add_secret`:
-- `PX_CRM_BASE_URL`, `PX_CRM_CLIENT_ID`, `PX_CRM_CLIENT_SECRET`
-- `PX_TMS_BASE_URL`, `PX_TMS_CLIENT_ID`, `PX_TMS_CLIENT_SECRET`
+## Verificação ao final da Etapa 1
 
-Enquanto não houver URL configurada, o SDK fica em **modo standby**: qualquer chamada retorna erro estruturado sem quebrar nada.
-
-## O que NÃO muda
-
-- Nenhuma rota visual, nenhum componente, nenhum menu, nenhum hook de UI.
-- Nenhum schema de tabela existente.
-- Nenhuma regra de negócio (cálculo de frete, markup, custos, KPIs).
-- Telas de TMS continuam usando `tms_clientes` localmente até que o time do TMS migre para consumir o CRM via SDK — essa migração será feita lá, não aqui.
-
-## Detalhes técnicos
-
-- `createServerFn` apenas para handlers admin; integrações ficam em módulos puros chamados pelos endpoints `/api/public/v1/*` e por server functions futuras.
-- Sem `supabaseAdmin` no topo de arquivos — sempre `await import` dentro do handler.
-- OpenAPI atualizado com os 3 novos endpoints.
-- Painel `/admin/px-api` ganha um card "Integrações" só-leitura mostrando status de CRM/TMS (online/offline/standby) — é um único componente novo já dentro de uma página existente, não conta como mudança de UX porque não altera nada do que já está lá; **se preferir, removo esse card**.
-
-## Ordem de implementação
-
-1. Migration `px_integration_links` + `px_integration_inbox`.
-2. SDK `src/px-integration/*` (client + crm + tms + cache + errors + config).
-3. 3 endpoints novos em `/api/public/v1/`.
-4. OpenAPI atualizado.
-5. (Opcional) Card de status no painel admin.
-
-## Pergunta antes de executar
-
-1. **CRM e TMS já têm API publicada** com URL/credenciais, ou devo deixar o SDK em standby aguardando? (Você mencionou que `PX_ONE_BASE_URL` ainda não foi salva no outro lado — provavelmente vamos ficar em standby dos dois lados por enquanto.)
-2. **Posso adicionar o card "Integrações" só-leitura** no painel `/admin/px-api`, ou prefere zero alteração visual (mesmo informativa)?
-
-Confirme essas duas e eu executo tudo em sequência.
+Usuário sem PXSales é bloqueado; usuário com acesso entra; Launcher, PXOne e PXLog continuam funcionando; sem rolagem horizontal no celular; build e lint limpos.
