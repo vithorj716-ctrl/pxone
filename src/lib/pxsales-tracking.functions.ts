@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
 
-// PXSales — Etapa 6: acompanhamento público lendo os dados reais do PXLog (sem duplicar informação).
+// PXSales — acompanhamento público lendo os dados reais do PXLog (sem duplicar informação).
+// Exige número + documento do contratante e limita tentativas para impedir varredura.
 
 export type RastreioEvento = {
   tipo: string;
@@ -24,6 +26,32 @@ async function admin() {
 
 const soDigitos = (v: string) => (v ?? "").replace(/\D/g, "");
 
+export function origemChamada(): string {
+  try {
+    const h = getRequest()?.headers;
+    return (
+      h?.get("cf-connecting-ip") ||
+      h?.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      h?.get("x-real-ip") ||
+      "anon"
+    );
+  } catch {
+    return "anon";
+  }
+}
+
+/** Limite de tentativas por origem; erro amigável quando estourado. */
+export async function limitarTentativas(sb: any, escopo: string, chave: string, max: number, janelaSeg: number) {
+  const { data, error } = await sb.rpc("pxsales_rate_limit", {
+    p_escopo: escopo,
+    p_chave: chave,
+    p_max: max,
+    p_janela_seg: janelaSeg,
+  });
+  if (error) return; // nunca derruba a consulta por falha do contador
+  if (data === false) throw new Error("Muitas tentativas. Aguarde alguns minutos e tente novamente.");
+}
+
 /**
  * Consulta pública: exige o número do embarque E o CNPJ/CPF do cliente,
  * para que ninguém veja um embarque apenas chutando números.
@@ -36,6 +64,8 @@ export const rastrearEmbarque = createServerFn({ method: "POST" })
   })
   .handler(async ({ data }): Promise<RastreioResultado> => {
     const sb = await admin();
+    await limitarTentativas(sb, "rastreio", origemChamada(), 20, 600);
+
     const numero = parseInt(String(data.numero).replace(/\D/g, ""), 10);
     if (!Number.isFinite(numero)) throw new Error("Número do embarque inválido.");
 

@@ -1,7 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { assertPermissao, auditar, escopoEmpresas, faixa } from "./pxsales-guard";
+import { limitarTentativas, origemChamada } from "./pxsales-tracking.functions";
 
-// PXSales — Etapa 5: portal público da proposta (link com código aleatório, aceite/recusa/pedido de alteração).
+// PXSales — portal público da proposta (link com código aleatório, aceite/recusa/pedido de alteração).
+// A resposta do cliente acontece em uma única transação no banco (RPC), sem risco de duplo aceite.
 
 export type PortalEvento = {
   id: string;
@@ -51,10 +54,11 @@ export const gerarLinkPortal = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<{ token: string; expira_em: string }> => {
     const sb = (context as any).supabase as any;
     const userId = (context as any).userId as string;
+    await assertPermissao(sb, userId, "pxsales.portal.manage");
 
     const { data: p, error } = await sb
       .from("pxsales_propostas")
-      .select("id,portal_token,portal_expira_em")
+      .select("id,portal_token,portal_expira_em,empresa_id")
       .eq("id", data.proposta_id)
       .maybeSingle();
     if (error) throw new Error(error.message);
@@ -70,6 +74,11 @@ export const gerarLinkPortal = createServerFn({ method: "POST" })
       .eq("id", data.proposta_id);
     if (e2) throw new Error(e2.message);
 
+    await auditar(sb, userId, "pxsales_propostas", data.proposta_id, "portal_link", {
+      regerado: !!data.regerar,
+      expira_em: expira,
+    });
+
     return { token, expira_em: expira };
   });
 
@@ -81,20 +90,28 @@ export const revogarLinkPortal = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }) => {
     const sb = (context as any).supabase as any;
+    const userId = (context as any).userId as string;
+    await assertPermissao(sb, userId, "pxsales.portal.manage");
+
     const { error } = await sb
       .from("pxsales_propostas")
-      .update({ portal_ativo: false, updated_by: (context as any).userId })
+      .update({ portal_ativo: false, updated_by: userId })
       .eq("id", data.proposta_id);
     if (error) throw new Error(error.message);
+    await auditar(sb, userId, "pxsales_propostas", data.proposta_id, "portal_revogado");
     return { ok: true };
   });
 
 export const listPortalEventos = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { proposta_id?: string } | undefined) => d ?? {})
+  .inputValidator((d: { proposta_id?: string; page?: number; pageSize?: number } | undefined) => d ?? {})
   .handler(async ({ data, context }): Promise<PortalEvento[]> => {
     const sb = (context as any).supabase as any;
-    let q = sb.from("pxsales_portal_eventos").select("*").order("created_at", { ascending: false }).limit(200);
+    const userId = (context as any).userId as string;
+    await assertPermissao(sb, userId, "pxsales.portal.manage");
+    const { from, to } = faixa(data.page, data.pageSize);
+
+    let q = sb.from("pxsales_portal_eventos").select("*").order("created_at", { ascending: false }).range(from, to);
     if (data.proposta_id) q = q.eq("proposta_id", data.proposta_id);
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
@@ -102,18 +119,28 @@ export const listPortalEventos = createServerFn({ method: "POST" })
   });
 
 /** Lista das propostas com link ativo/gerado, para a tela do Portal do Cliente. */
-export const listLinksPortal = createServerFn({ method: "GET" })
+export const listLinksPortal = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
+  .inputValidator((d: { empresa_id?: string | null; page?: number; pageSize?: number } | undefined) => d ?? {})
+  .handler(async ({ data, context }) => {
     const sb = (context as any).supabase as any;
-    const { data, error } = await sb
+    const userId = (context as any).userId as string;
+    await assertPermissao(sb, userId, "pxsales.portal.manage");
+    const empresas = await escopoEmpresas(sb, userId, data.empresa_id);
+    if (!empresas.length) return [] as any[];
+    const { from, to } = faixa(data.page, data.pageSize);
+
+    const { data: rows, error } = await sb
       .from("pxsales_propostas")
-      .select("id,numero,empresa_nome,titulo,valor_total,status,portal_token,portal_expira_em,portal_aberta_em,portal_ativo,created_at")
+      .select(
+        "id,numero,empresa_nome,titulo,valor_total,status,portal_token,portal_expira_em,portal_aberta_em,portal_ativo,created_at",
+      )
+      .in("empresa_id", empresas)
       .not("portal_token", "is", null)
       .order("created_at", { ascending: false })
-      .limit(200);
+      .range(from, to);
     if (error) throw new Error(error.message);
-    return (data ?? []) as any[];
+    return (rows ?? []) as any[];
   });
 
 /* ------------------------------ ÁREA PÚBLICA ------------------------------ */
@@ -126,11 +153,13 @@ async function admin() {
 /** Leitura pública da proposta pelo código do link. Só expõe o que o cliente precisa ver. */
 export const getPropostaPublica = createServerFn({ method: "POST" })
   .inputValidator((d: { token: string }) => {
-    if (!d?.token || d.token.length < 20) throw new Error("Link inválido.");
+    if (!d?.token || d.token.length < 20 || !/^[a-f0-9]+$/i.test(d.token)) throw new Error("Link inválido.");
     return d;
   })
   .handler(async ({ data }): Promise<PropostaPublica> => {
     const sb = await admin();
+    await limitarTentativas(sb, "portal_leitura", origemChamada(), 40, 600);
+
     const { data: p } = await sb
       .from("pxsales_propostas")
       .select("*")
@@ -138,8 +167,7 @@ export const getPropostaPublica = createServerFn({ method: "POST" })
       .maybeSingle();
     if (!p || p.portal_ativo === false) throw new Error("Este link não está mais disponível.");
 
-    const expirada =
-      !!p.portal_expira_em && new Date(p.portal_expira_em).getTime() < Date.now();
+    const expirada = !!p.portal_expira_em && new Date(p.portal_expira_em).getTime() < Date.now();
 
     const agora = new Date().toISOString();
     if (!p.portal_aberta_em) {
@@ -182,53 +210,23 @@ export const getPropostaPublica = createServerFn({ method: "POST" })
     };
   });
 
-/** Resposta do cliente no portal: aceitar, recusar ou pedir alteração. */
+/** Resposta do cliente no portal: aceitar, recusar ou pedir alteração — transação única no banco. */
 export const responderPropostaPublica = createServerFn({ method: "POST" })
   .inputValidator((d: { token: string; acao: "aceitar" | "recusar" | "alteracao"; mensagem?: string; nome?: string }) => {
-    if (!d?.token || d.token.length < 20) throw new Error("Link inválido.");
+    if (!d?.token || d.token.length < 20 || !/^[a-f0-9]+$/i.test(d.token)) throw new Error("Link inválido.");
     if (!["aceitar", "recusar", "alteracao"].includes(d?.acao)) throw new Error("Ação inválida.");
     return d;
   })
   .handler(async ({ data }): Promise<{ status: string }> => {
     const sb = await admin();
-    const { data: p } = await sb
-      .from("pxsales_propostas")
-      .select("id,status,portal_ativo,portal_expira_em")
-      .eq("portal_token", data.token)
-      .maybeSingle();
-    if (!p || p.portal_ativo === false) throw new Error("Este link não está mais disponível.");
-    if (p.portal_expira_em && new Date(p.portal_expira_em).getTime() < Date.now())
-      throw new Error("Este link expirou. Fale com seu contato comercial.");
-    if (["aceita", "recusada"].includes(p.status)) throw new Error("Esta proposta já foi respondida.");
+    await limitarTentativas(sb, "portal_resposta", origemChamada(), 15, 600);
 
-    const agora = new Date().toISOString();
-    const msg = (data.mensagem ?? "").slice(0, 1000) || null;
-    const quem = (data.nome ?? "").slice(0, 120) || null;
-    let status = p.status as string;
-
-    if (data.acao === "aceitar") {
-      status = "aceita";
-      await sb.from("pxsales_propostas").update({ status, aceita_em: agora, motivo: msg }).eq("id", p.id);
-    } else if (data.acao === "recusar") {
-      status = "recusada";
-      await sb.from("pxsales_propostas").update({ status, recusada_em: agora, motivo: msg }).eq("id", p.id);
-    } else {
-      status = "em_negociacao";
-      await sb.from("pxsales_propostas").update({ status, motivo: msg }).eq("id", p.id);
-    }
-
-    await sb.from("pxsales_proposta_historico").insert({
-      proposta_id: p.id,
-      status_anterior: p.status,
-      status_novo: status,
-      observacao: `Portal do cliente${quem ? ` — ${quem}` : ""}${msg ? `: ${msg}` : ""}`,
+    const { data: res, error } = await sb.rpc("pxsales_responder_proposta_publica", {
+      p_token: data.token,
+      p_acao: data.acao,
+      p_mensagem: data.mensagem ?? null,
+      p_nome: data.nome ?? null,
     });
-    await sb.from("pxsales_portal_eventos").insert({
-      proposta_id: p.id,
-      tipo: data.acao,
-      mensagem: msg,
-      payload: { nome: quem },
-    });
-
-    return { status };
+    if (error) throw new Error(error.message);
+    return { status: (res as any)?.status as string };
   });
