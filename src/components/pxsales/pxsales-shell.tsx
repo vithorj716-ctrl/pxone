@@ -67,7 +67,7 @@ export function PxSalesShell({ children, title, subtitle, headerActions }: Props
   }, [activeSystem, setActiveSystem]);
 
   useEffect(() => {
-    if (access?.allowed) void touch({ data: undefined as never }).catch(() => {});
+    if (access?.allowed) void Promise.resolve((touch as any)()).catch(() => {});
   }, [access?.allowed, touch]);
 
   useEffect(() => {
