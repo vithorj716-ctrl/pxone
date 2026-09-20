@@ -146,6 +146,9 @@ export const getSalesCliente360 = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
+    const userId = (context as any).userId as string;
+    await assertPermissao(sb, userId, "pxsales.clientes.view");
+    const financeiro = await podeVerFinanceiro(sb, userId);
 
     const { data: cliente, error } = await sb
       .from("px_registry_clientes")
@@ -208,9 +211,10 @@ export const getSalesCliente360 = createServerFn({ method: "POST" })
       cliente,
       contatos: contatos.data ?? [],
       enderecos: enderecos.data ?? [],
-      credito: credito.data ?? null,
-      saldo: saldo.data ?? null,
-      lancamentos: lancamentos.data ?? [],
+      credito: financeiro ? credito.data ?? null : null,
+      saldo: financeiro ? saldo.data ?? null : null,
+      lancamentos: financeiro ? lancamentos.data ?? [] : [],
+      financeiro_visivel: financeiro,
       vinculos: vinculos.data ?? [],
       historico: historico.data ?? [],
       minutas,
@@ -226,9 +230,10 @@ export const getSalesCliente360 = createServerFn({ method: "POST" })
 
 export const listSalesContatos = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { search?: string; setor?: string } | undefined) => d ?? {})
+  .inputValidator((d: { search?: string; setor?: string; page?: number; pageSize?: number } | undefined) => d ?? {})
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
+    await assertPermissao(sb, (context as any).userId, "pxsales.clientes.view");
 
     let q = sb
       .from("px_registry_contatos")
@@ -266,6 +271,7 @@ export const vincularClientePxSales = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const sb = supabase as any;
+    await assertPermissao(sb, userId, "pxsales.clientes.edit");
     if (data.vincular) {
       await sb
         .from("px_registry_vinculos")
