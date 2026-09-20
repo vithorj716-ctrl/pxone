@@ -15,7 +15,7 @@ export const CATEGORIAS_CLIENTE = [
   { value: "outros", label: "Outros" },
 ] as const;
 
-export type SistemaKey = "pxlog" | "pxone" | "pxmed" | "pxfarma";
+export type SistemaKey = "pxlog" | "pxone" | "pxmed" | "pxfarma" | "pxsales";
 
 export const lookupCnpj = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
