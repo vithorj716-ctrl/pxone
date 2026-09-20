@@ -249,16 +249,11 @@ function NovaTabelaDialog({ open, onOpenChange }: { open: boolean; onOpenChange:
             onChange={(e) => set("cliente_id", e.target.value)}
           >
             <option value="">Sem cliente específico (tabela geral)</option>
-            {(clientes as any)?.rows?.map?.((c: any) => (
+            {(clientes ?? []).map((c: any) => (
               <option key={c.id} value={c.id}>
                 {c.razao_social ?? c.nome_fantasia}
               </option>
-            )) ??
-              (clientes as any)?.map?.((c: any) => (
-                <option key={c.id} value={c.id}>
-                  {c.razao_social ?? c.nome_fantasia}
-                </option>
-              ))}
+            ))}
           </select>
           <div>
             <Label>Descrição</Label>
