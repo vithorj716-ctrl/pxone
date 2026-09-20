@@ -33,6 +33,15 @@ export const PX_SYSTEMS: PxSystem[] = [
     status: "ativo",
   },
   {
+    key: "pxsales",
+    nome: "PXSales",
+    descricao: "CRM e gestão comercial para operações logísticas.",
+    rota: "/sales",
+    icone: "Handshake",
+    cor: "#e11d48",
+    status: "ativo",
+  },
+  {
     key: "pxmed",
     nome: "PXMed",
     descricao: "Gestão para a área médica do Grupo PX.",
@@ -62,6 +71,7 @@ export function systemFromPath(pathname: string): string {
     return "platform";
   }
   if (pathname === "/tms" || pathname.startsWith("/tms/")) return "pxlog-tms";
+  if (pathname === "/sales" || pathname.startsWith("/sales/")) return "pxsales";
   if (pathname.startsWith("/pxmed")) return "pxmed";
   if (pathname.startsWith("/pxfarma")) return "pxfarma";
   return "pxone-erp";
