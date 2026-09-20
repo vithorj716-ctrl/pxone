@@ -63,7 +63,7 @@ export const rastrearEmbarque = createServerFn({ method: "POST" })
   })
   .handler(async ({ data }): Promise<RastreioResultado> => {
     const sb = await admin();
-    await limitarTentativas(sb, "rastreio", origemChamada(), 20, 600);
+    await limitarTentativas(sb, "rastreio", await origemChamada(), 20, 600);
 
     const numero = parseInt(String(data.numero).replace(/\D/g, ""), 10);
     if (!Number.isFinite(numero)) throw new Error("Número do embarque inválido.");

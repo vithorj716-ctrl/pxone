@@ -158,7 +158,7 @@ export const getPropostaPublica = createServerFn({ method: "POST" })
   })
   .handler(async ({ data }): Promise<PropostaPublica> => {
     const sb = await admin();
-    await limitarTentativas(sb, "portal_leitura", origemChamada(), 40, 600);
+    await limitarTentativas(sb, "portal_leitura", await origemChamada(), 40, 600);
 
     const { data: p } = await sb
       .from("pxsales_propostas")
@@ -219,7 +219,7 @@ export const responderPropostaPublica = createServerFn({ method: "POST" })
   })
   .handler(async ({ data }): Promise<{ status: string }> => {
     const sb = await admin();
-    await limitarTentativas(sb, "portal_resposta", origemChamada(), 15, 600);
+    await limitarTentativas(sb, "portal_resposta", await origemChamada(), 15, 600);
 
     const { data: res, error } = await sb.rpc("pxsales_responder_proposta_publica", {
       p_token: data.token,
