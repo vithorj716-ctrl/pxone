@@ -1,3 +1,4 @@
+import { PxGrupoLogo } from "@/components/px-logo";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";

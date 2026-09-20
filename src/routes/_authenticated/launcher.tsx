@@ -1,3 +1,4 @@
+import { PxGrupoLogo } from "@/components/px-logo";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import * as Icons from "lucide-react";
