@@ -130,7 +130,11 @@ export function nomePessoaValido(v: string | null | undefined): string | null {
   if (t.length < 3 || t.length > 60) return null;
   if (!/^[A-Za-zÀ-ÿ'´`.\s]+$/.test(t)) return null;
   if (PESSOA_INVALIDA.test(t)) return null;
-  return titulo(t);
+  const limpos = palavras.filter((w) => !/^(do|da|de|dos|das|o|a|com|para|sr|sra|dono|contato)\.?$/i.test(w));
+  if (!limpos.length) return null;
+  const nome = limpos.join(" ");
+  if (nome.length < 3) return null;
+  return titulo(nome);
 }
 
 export function ehCelular(telefone: string): boolean {

@@ -186,7 +186,9 @@ export function normalizarRegistro(r: RegistroXml): RegistroNormalizado {
     campos(r, "observacoes", "observacao", "obs", "anotacoes", "notas", "descricao", "resumo", "comentario").join(" | "),
   );
 
-  const contatos = montarContatos(nomesContato, telefones, emails, cargo, observacoes);
+  const contatos = montarContatos(nomesContato, telefones, emails, cargo, observacoes).filter(
+    (c) => c.telefone || c.email || (c.nome !== "Contato comercial" && c.nome !== "Contato adicional"),
+  );
 
   // ---- inteligência comercial
   const segmento = limpar(campo(r, "segmento", "ramo", "atividade")) ?? extrairSegmento(texto);
