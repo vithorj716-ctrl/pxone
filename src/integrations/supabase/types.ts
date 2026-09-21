@@ -5871,42 +5871,24 @@ export type Database = {
         }
         Returns: Json
       }
-      fin_emitir_recibo:
-        | {
-            Args: {
-              _beneficiario: string
-              _data?: string
-              _descricao: string
-              _documento: string
-              _empresa_id: string
-              _forma?: string
-              _movimento_id?: string
-              _origem_id?: string
-              _origem_tipo?: string
-              _reemissao_de?: string
-              _tipo: string
-              _valor: number
-            }
-            Returns: Json
-          }
-        | {
-            Args: {
-              _beneficiario: string
-              _data?: string
-              _descricao: string
-              _documento: string
-              _empresa_id: string
-              _forma?: string
-              _justificativa?: string
-              _movimento_id?: string
-              _origem_id?: string
-              _origem_tipo?: string
-              _reemissao_de?: string
-              _tipo: string
-              _valor: number
-            }
-            Returns: Json
-          }
+      fin_emitir_recibo: {
+        Args: {
+          _beneficiario: string
+          _data?: string
+          _descricao: string
+          _documento: string
+          _empresa_id: string
+          _forma?: string
+          _justificativa?: string
+          _movimento_id?: string
+          _origem_id?: string
+          _origem_tipo?: string
+          _reemissao_de?: string
+          _tipo: string
+          _valor: number
+        }
+        Returns: Json
+      }
       fin_estornar_movimento: {
         Args: { _motivo: string; _movimento_id: string }
         Returns: Json
