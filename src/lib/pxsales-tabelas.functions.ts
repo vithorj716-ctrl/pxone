@@ -224,6 +224,46 @@ export const setStatusTabela = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+/** Exclui definitivamente a tabela, suas versões, componentes e faixas. */
+export const deleteTabela = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { id: string }) => {
+    if (!d?.id) throw new Error("Tabela não informada.");
+    return d;
+  })
+  .handler(async ({ data, context }) => {
+    const sb = (context as any).supabase;
+    const userId = (context as any).userId as string;
+    await assertPermissao(sb, userId, "pxsales.tabelas.manage");
+
+    const { data: tabela } = await sb.from("pxsales_tabelas").select("id,nome").eq("id", data.id).maybeSingle();
+    if (!tabela) throw new Error("Tabela não encontrada.");
+
+    const { count } = await sb
+      .from("pxsales_cotacoes")
+      .select("id", { count: "exact", head: true })
+      .eq("tabela_id", data.id);
+    if ((count ?? 0) > 0)
+      throw new Error(
+        "Esta tabela já foi usada em cotações e não pode ser excluída. Arquive-a para tirá-la de uso.",
+      );
+
+    const { data: versoes } = await sb.from("pxsales_tabela_versoes").select("id").eq("tabela_id", data.id);
+    const versaoIds = (versoes ?? []).map((v: any) => v.id);
+    if (versaoIds.length) {
+      const { data: comps } = await sb.from("pxsales_tabela_componentes").select("id").in("versao_id", versaoIds);
+      const compIds = (comps ?? []).map((c: any) => c.id);
+      if (compIds.length) await sb.from("pxsales_tabela_faixas").delete().in("componente_id", compIds);
+      await sb.from("pxsales_tabela_componentes").delete().in("versao_id", versaoIds);
+      await sb.from("pxsales_tabela_versoes").delete().in("id", versaoIds);
+    }
+
+    const { error } = await sb.from("pxsales_tabelas").delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    await auditar(sb, userId, "pxsales_tabelas", data.id, "excluida", { nome: tabela.nome });
+    return { ok: true };
+  });
+
 export const duplicarTabela = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { id: string; nome?: string; cliente_id?: string | null }) => {

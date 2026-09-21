@@ -3,7 +3,17 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus, Search, Table2, Copy, Archive, Loader2 } from "lucide-react";
+import { Plus, Search, Table2, Copy, Archive, Loader2, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { PxSalesShell } from "@/components/pxsales/pxsales-shell";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -12,7 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useEmpresaAtiva } from "@/px-core/empresa-context";
-import { listTabelas, saveTabela, duplicarTabela, setStatusTabela } from "@/lib/pxsales-tabelas.functions";
+import { listTabelas, saveTabela, duplicarTabela, setStatusTabela, deleteTabela } from "@/lib/pxsales-tabelas.functions";
 import { listSalesClientes } from "@/lib/pxsales-clientes.functions";
 
 export const Route = createFileRoute("/_authenticated/sales/tabelas/")({
@@ -61,6 +71,24 @@ function TabelasPage() {
 
   const duplicar = useServerFn(duplicarTabela);
   const arquivar = useServerFn(setStatusTabela);
+  const excluir = useServerFn(deleteTabela);
+  const [aExcluir, setAExcluir] = useState<{ id: string; nome: string } | null>(null);
+  const [excluindo, setExcluindo] = useState(false);
+
+  async function onExcluir() {
+    if (!aExcluir) return;
+    setExcluindo(true);
+    try {
+      await excluir({ data: { id: aExcluir.id } });
+      toast.success("Tabela excluída.");
+      setAExcluir(null);
+      qc.invalidateQueries({ queryKey: ["pxsales", "tabelas"] });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Não foi possível excluir.");
+    } finally {
+      setExcluindo(false);
+    }
+  }
 
   async function onDuplicar(id: string) {
     try {
@@ -145,7 +173,10 @@ function TabelasPage() {
                 {t.portal_visivel ? " · visível no portal" : " · oculta no portal"}
               </div>
               {t.descricao && <div className="text-[11px] text-muted-foreground line-clamp-2">{t.descricao}</div>}
-              <div className="flex gap-1.5 mt-auto pt-2">
+              <div className="flex flex-wrap gap-1.5 mt-auto pt-2">
+                <Button size="sm" variant="secondary" onClick={() => navigate({ to: "/sales/tabelas/$id", params: { id: t.id } })}>
+                  Editar
+                </Button>
                 <Button size="sm" variant="secondary" onClick={() => onDuplicar(t.id)}>
                   <Copy className="size-3.5 mr-1" /> Duplicar
                 </Button>
@@ -154,11 +185,43 @@ function TabelasPage() {
                     <Archive className="size-3.5 mr-1" /> Arquivar
                   </Button>
                 )}
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="text-destructive hover:text-destructive"
+                  onClick={() => setAExcluir({ id: t.id, nome: t.nome })}
+                >
+                  <Trash2 className="size-3.5 mr-1" /> Excluir
+                </Button>
               </div>
             </div>
           ))}
         </div>
       )}
+
+      <AlertDialog open={!!aExcluir} onOpenChange={(v) => !v && setAExcluir(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir “{aExcluir?.nome}”?</AlertDialogTitle>
+            <AlertDialogDescription>
+              A tabela, suas versões e componentes serão apagados definitivamente. Se ela já tiver sido usada em
+              cotações, o sistema pedirá para arquivar em vez de excluir.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={excluindo}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                onExcluir();
+              }}
+              disabled={excluindo}
+            >
+              {excluindo && <Loader2 className="size-4 mr-1 animate-spin" />} Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <NovaTabelaDialog open={novaOpen} onOpenChange={setNovaOpen} />
     </PxSalesShell>
