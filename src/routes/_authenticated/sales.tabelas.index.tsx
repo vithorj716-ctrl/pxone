@@ -3,7 +3,17 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus, Search, Table2, Copy, Archive, Loader2 } from "lucide-react";
+import { Plus, Search, Table2, Copy, Archive, Loader2, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { PxSalesShell } from "@/components/pxsales/pxsales-shell";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
