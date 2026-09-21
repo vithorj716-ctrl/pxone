@@ -39,6 +39,7 @@ import { Route as AuthenticatedAiAnalystRouteImport } from './routes/_authentica
 import { Route as AuthenticatedTmsIndexRouteImport } from './routes/_authenticated/tms.index'
 import { Route as AuthenticatedSalesIndexRouteImport } from './routes/_authenticated/sales.index'
 import { Route as AuthenticatedFinancialIntelligenceIndexRouteImport } from './routes/_authenticated/financial-intelligence.index'
+import { Route as AuthenticatedFinanceiroIndexRouteImport } from './routes/_authenticated/financeiro.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as PortalPropostaTokenRouteImport } from './routes/portal.proposta.$token'
 import { Route as PortalClienteTokenRouteImport } from './routes/portal.cliente.$token'
@@ -273,6 +274,12 @@ const AuthenticatedFinancialIntelligenceIndexRoute =
     id: '/',
     path: '/',
     getParentRoute: () => AuthenticatedFinancialIntelligenceRoute,
+  } as any)
+const AuthenticatedFinanceiroIndexRoute =
+  AuthenticatedFinanceiroIndexRouteImport.update({
+    id: '/financeiro/',
+    path: '/financeiro/',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/admin/',
@@ -799,6 +806,7 @@ export interface FileRoutesByFullPath {
   '/portal/cliente/$token': typeof PortalClienteTokenRoute
   '/portal/proposta/$token': typeof PortalPropostaTokenRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/financeiro/': typeof AuthenticatedFinanceiroIndexRoute
   '/financial-intelligence/': typeof AuthenticatedFinancialIntelligenceIndexRoute
   '/sales/': typeof AuthenticatedSalesIndexRoute
   '/tms/': typeof AuthenticatedTmsIndexRoute
@@ -909,6 +917,7 @@ export interface FileRoutesByTo {
   '/portal/cliente/$token': typeof PortalClienteTokenRoute
   '/portal/proposta/$token': typeof PortalPropostaTokenRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/financeiro': typeof AuthenticatedFinanceiroIndexRoute
   '/financial-intelligence': typeof AuthenticatedFinancialIntelligenceIndexRoute
   '/sales': typeof AuthenticatedSalesIndexRoute
   '/tms': typeof AuthenticatedTmsIndexRoute
@@ -1023,6 +1032,7 @@ export interface FileRoutesById {
   '/portal/cliente/$token': typeof PortalClienteTokenRoute
   '/portal/proposta/$token': typeof PortalPropostaTokenRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/financeiro/': typeof AuthenticatedFinanceiroIndexRoute
   '/_authenticated/financial-intelligence/': typeof AuthenticatedFinancialIntelligenceIndexRoute
   '/_authenticated/sales/': typeof AuthenticatedSalesIndexRoute
   '/_authenticated/tms/': typeof AuthenticatedTmsIndexRoute
@@ -1137,6 +1147,7 @@ export interface FileRouteTypes {
     | '/portal/cliente/$token'
     | '/portal/proposta/$token'
     | '/admin/'
+    | '/financeiro/'
     | '/financial-intelligence/'
     | '/sales/'
     | '/tms/'
@@ -1247,6 +1258,7 @@ export interface FileRouteTypes {
     | '/portal/cliente/$token'
     | '/portal/proposta/$token'
     | '/admin'
+    | '/financeiro'
     | '/financial-intelligence'
     | '/sales'
     | '/tms'
@@ -1360,6 +1372,7 @@ export interface FileRouteTypes {
     | '/portal/cliente/$token'
     | '/portal/proposta/$token'
     | '/_authenticated/admin/'
+    | '/_authenticated/financeiro/'
     | '/_authenticated/financial-intelligence/'
     | '/_authenticated/sales/'
     | '/_authenticated/tms/'
@@ -1649,6 +1662,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/financial-intelligence/'
       preLoaderRoute: typeof AuthenticatedFinancialIntelligenceIndexRouteImport
       parentRoute: typeof AuthenticatedFinancialIntelligenceRoute
+    }
+    '/_authenticated/financeiro/': {
+      id: '/_authenticated/financeiro/'
+      path: '/financeiro'
+      fullPath: '/financeiro/'
+      preLoaderRoute: typeof AuthenticatedFinanceiroIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
@@ -2353,6 +2373,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedTmsTrackingRoute: typeof AuthenticatedTmsTrackingRoute
   AuthenticatedTmsViagensRoute: typeof AuthenticatedTmsViagensRouteWithChildren
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedFinanceiroIndexRoute: typeof AuthenticatedFinanceiroIndexRoute
   AuthenticatedSalesIndexRoute: typeof AuthenticatedSalesIndexRoute
   AuthenticatedTmsIndexRoute: typeof AuthenticatedTmsIndexRoute
   AuthenticatedSalesClientesIdRoute: typeof AuthenticatedSalesClientesIdRoute
@@ -2429,6 +2450,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedTmsTrackingRoute: AuthenticatedTmsTrackingRoute,
   AuthenticatedTmsViagensRoute: AuthenticatedTmsViagensRouteWithChildren,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  AuthenticatedFinanceiroIndexRoute: AuthenticatedFinanceiroIndexRoute,
   AuthenticatedSalesIndexRoute: AuthenticatedSalesIndexRoute,
   AuthenticatedTmsIndexRoute: AuthenticatedTmsIndexRoute,
   AuthenticatedSalesClientesIdRoute: AuthenticatedSalesClientesIdRoute,
