@@ -28,6 +28,8 @@ import {
   extrairUf,
   extrairValor,
   extrairVolumeMensal,
+  nomeEmpresaValido,
+  nomePessoaValido,
   hashTexto,
   limpar,
   paraNumero,
