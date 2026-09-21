@@ -165,8 +165,8 @@ export function normalizarRegistro(r: RegistroXml): RegistroNormalizado {
   const nomesContato = Array.from(
     new Set(
       [
-        ...campos(r, "contato", "contato_nome", "responsavel_contato").map((v) => titulo(v)),
-        extrairNomeContato(texto),
+        ...campos(r, "contato", "contato_nome", "responsavel_contato", "responsavel").map((v) => nomePessoaValido(v)),
+        nomePessoaValido(extrairNomeContato(texto)),
       ].filter((v): v is string => !!v && v.length > 2),
     ),
   );
