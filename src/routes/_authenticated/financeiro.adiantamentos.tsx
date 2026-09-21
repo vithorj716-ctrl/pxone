@@ -67,7 +67,7 @@ function Adiantamentos() {
     >
       <select value={status} onChange={(e) => setStatus(e.target.value)} className="input w-48 text-xs">
         <option value="">Todos os status</option>
-        {["solicitado", "aprovado", "pago", "acertado", "cancelado"].map((s) => <option key={s} value={s}>{s}</option>)}
+        {["solicitado", "aprovado", "parcialmente_pago", "pago", "parcialmente_acertado", "acertado", "cancelado", "estornado"].map((s) => <option key={s} value={s}>{s}</option>)}
       </select>
 
       <div className="rounded-xl ring-1 ring-border bg-surface/60 overflow-x-auto">
@@ -105,16 +105,24 @@ function Adiantamentos() {
                     <button onClick={() => mAcao.mutate({ id: a.id, acao: "aprovar", valor: Number(a.valor_solicitado) })}
                       className="text-[10px] px-2 py-1 rounded ring-1 ring-border">Aprovar</button>
                   )}
-                  {a.status === "aprovado" && (
-                    <button onClick={() => mAcao.mutate({ id: a.id, acao: "pagar", valor: Number(a.valor_aprovado ?? a.valor_solicitado), contaId: (cad?.contas ?? [])[0]?.id ?? null, idempotencyKey: `adto:${a.id}` })}
-                      className="text-[10px] px-2 py-1 rounded bg-emerald-600 text-white">Pagar</button>
-                  )}
-                  {a.status === "pago" && (
-                    <button onClick={() => {
-                      const v = window.prompt("Valor acertado:", String(a.valor_pago ?? 0));
-                      if (v) mAcao.mutate({ id: a.id, acao: "acertar", valor: Number(v) });
-                    }} className="text-[10px] px-2 py-1 rounded ring-1 ring-border">Acertar</button>
-                  )}
+                  {["aprovado", "parcialmente_pago"].includes(a.status) && (() => {
+                    const saldo = Number(a.valor_aprovado ?? a.valor_solicitado) - Number(a.valor_pago ?? 0);
+                    return (
+                      <button onClick={() => {
+                        const v = window.prompt(`Valor a pagar (saldo aprovado: ${brl(saldo)}):`, String(saldo));
+                        if (v) mAcao.mutate({ id: a.id, acao: "pagar", valor: Number(v), contaId: (cad?.contas ?? [])[0]?.id ?? null, idempotencyKey: `adto:${a.id}:${v}:${Date.now()}` });
+                      }} className="text-[10px] px-2 py-1 rounded bg-emerald-600 text-white">Pagar</button>
+                    );
+                  })()}
+                  {["pago", "parcialmente_pago", "parcialmente_acertado"].includes(a.status) && (() => {
+                    const saldo = Number(a.valor_pago ?? 0) - Number(a.valor_acertado ?? 0);
+                    return saldo > 0 ? (
+                      <button onClick={() => {
+                        const v = window.prompt(`Valor acertado (saldo: ${brl(saldo)}):`, String(saldo));
+                        if (v) mAcao.mutate({ id: a.id, acao: "acertar", valor: Number(v) });
+                      }} className="text-[10px] px-2 py-1 rounded ring-1 ring-border">Acertar</button>
+                    ) : null;
+                  })()}
                 </td>
               </tr>
             ))}
