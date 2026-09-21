@@ -56,7 +56,10 @@ function Folha() {
   });
   const mGerar = useMutation({
     mutationFn: () => gerar({ data: { periodoId: periodoId!, empresaId: empresa?.id ?? null } }),
-    onSuccess: (r: any) => { toast.success(`${r.criados} pagamento(s) gerado(s)`); invalidar(); },
+    onSuccess: (r: any) => {
+      toast.success(`${r.criados} pagamento(s) gerado(s)` + (r.existentes ? ` · ${r.existentes} já existia(m)` : ""));
+      invalidar();
+    },
     onError: (e: any) => toast.error(e.message),
   });
 

@@ -590,6 +590,7 @@ export type Database = {
           id: string
           nome: string
           saldo_inicial: number
+          saldo_inicial_data: string
           tipo: string
           updated_at: string
         }
@@ -604,6 +605,7 @@ export type Database = {
           id?: string
           nome: string
           saldo_inicial?: number
+          saldo_inicial_data?: string
           tipo?: string
           updated_at?: string
         }
@@ -618,6 +620,7 @@ export type Database = {
           id?: string
           nome?: string
           saldo_inicial?: number
+          saldo_inicial_data?: string
           tipo?: string
           updated_at?: string
         }
@@ -1371,17 +1374,23 @@ export type Database = {
       }
       fin_recibos: {
         Row: {
+          adiantamento_id: string | null
           beneficiario_documento: string | null
           beneficiario_nome: string
           cancelado_em: string | null
           cancelado_por: string | null
+          comissao_id: string | null
+          conta_pagar_id: string | null
+          conta_receber_id: string | null
           created_at: string
           created_by: string | null
           data: string
           descricao: string
           empresa_id: string
+          folha_item_id: string | null
           forma_pagamento: string | null
           id: string
+          justificativa: string | null
           movimento_id: string | null
           numero: number
           origem_id: string | null
@@ -1392,17 +1401,23 @@ export type Database = {
           via: number
         }
         Insert: {
+          adiantamento_id?: string | null
           beneficiario_documento?: string | null
           beneficiario_nome: string
           cancelado_em?: string | null
           cancelado_por?: string | null
+          comissao_id?: string | null
+          conta_pagar_id?: string | null
+          conta_receber_id?: string | null
           created_at?: string
           created_by?: string | null
           data?: string
           descricao: string
           empresa_id: string
+          folha_item_id?: string | null
           forma_pagamento?: string | null
           id?: string
+          justificativa?: string | null
           movimento_id?: string | null
           numero?: number
           origem_id?: string | null
@@ -1413,17 +1428,23 @@ export type Database = {
           via?: number
         }
         Update: {
+          adiantamento_id?: string | null
           beneficiario_documento?: string | null
           beneficiario_nome?: string
           cancelado_em?: string | null
           cancelado_por?: string | null
+          comissao_id?: string | null
+          conta_pagar_id?: string | null
+          conta_receber_id?: string | null
           created_at?: string
           created_by?: string | null
           data?: string
           descricao?: string
           empresa_id?: string
+          folha_item_id?: string | null
           forma_pagamento?: string | null
           id?: string
+          justificativa?: string | null
           movimento_id?: string | null
           numero?: number
           origem_id?: string | null
@@ -1435,10 +1456,45 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fin_recibos_adiantamento_id_fkey"
+            columns: ["adiantamento_id"]
+            isOneToOne: false
+            referencedRelation: "fin_adiantamentos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fin_recibos_comissao_id_fkey"
+            columns: ["comissao_id"]
+            isOneToOne: false
+            referencedRelation: "pxsales_comissoes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fin_recibos_conta_pagar_id_fkey"
+            columns: ["conta_pagar_id"]
+            isOneToOne: false
+            referencedRelation: "fin_contas_pagar"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fin_recibos_conta_receber_id_fkey"
+            columns: ["conta_receber_id"]
+            isOneToOne: false
+            referencedRelation: "fin_contas_receber"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "fin_recibos_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
             referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fin_recibos_folha_item_id_fkey"
+            columns: ["folha_item_id"]
+            isOneToOne: false
+            referencedRelation: "fin_folha_itens"
             referencedColumns: ["id"]
           },
           {
@@ -5806,6 +5862,15 @@ export type Database = {
         Args: { _entidade: string; _id: string; _motivo: string }
         Returns: Json
       }
+      fin_conciliar: {
+        Args: {
+          _id: string
+          _movimento_id: string
+          _observacao?: string
+          _status: string
+        }
+        Returns: Json
+      }
       fin_emitir_recibo: {
         Args: {
           _beneficiario: string
@@ -5814,6 +5879,7 @@ export type Database = {
           _documento: string
           _empresa_id: string
           _forma?: string
+          _justificativa?: string
           _movimento_id?: string
           _origem_id?: string
           _origem_tipo?: string
@@ -5834,6 +5900,10 @@ export type Database = {
           _minuta_id: string
           _vencimento?: string
         }
+        Returns: Json
+      }
+      fin_gerar_pagamentos_folha: {
+        Args: { _periodo_id: string; _vencimento?: string }
         Returns: Json
       }
       fin_hist: {
@@ -5883,6 +5953,10 @@ export type Database = {
           _observacao?: string
           _valor: number
         }
+        Returns: Json
+      }
+      fin_saldos: {
+        Args: { _ate?: string; _de?: string; _empresa_ids: string[] }
         Returns: Json
       }
       financeiro_can: {

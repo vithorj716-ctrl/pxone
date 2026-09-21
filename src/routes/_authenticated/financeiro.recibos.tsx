@@ -73,14 +73,16 @@ function Recibos() {
               <tr key={r.id} className="border-b border-border/40">
                 <td className="p-2">{r.numero}</td>
                 <td className="p-2">{dataBr(r.data)}</td>
-                <td className="p-2">{r.beneficiario}</td>
+                <td className="p-2">{r.beneficiario_nome}</td>
                 <td className="p-2">{r.descricao}</td>
                 <td className="p-2 text-right tabular-nums">{brl(r.valor)}</td>
                 <td className="p-2 text-right">
                   <button className="text-[10px] px-2 py-1 rounded ring-1 ring-border"
                     onClick={() => setForm({
-                      tipo: r.tipo, beneficiario: r.beneficiario, documento: r.documento,
+                      tipo: r.tipo, beneficiario: r.beneficiario_nome, documento: r.beneficiario_documento,
                       descricao: r.descricao, valor: Number(r.valor), data: new Date().toISOString().slice(0, 10),
+                      forma: r.forma_pagamento, movimentoId: r.movimento_id ?? null,
+                      justificativa: "Reemissão de via do recibo nº " + r.numero,
                       reemissaoDe: r.id,
                     })}>Reemitir</button>
                 </td>
@@ -96,8 +98,8 @@ function Recibos() {
           <div className="relative w-full sm:w-[400px] h-full overflow-y-auto thin-scroll border-l border-border p-4 space-y-2 text-xs" style={{ background: "#0f0f12" }}>
             <h2 className="text-sm font-semibold">{form.reemissaoDe ? "Reemitir recibo" : "Emitir recibo"}</h2>
             <select className="input w-full" value={form.tipo ?? "pagamento"} onChange={(e) => setForm({ ...form, tipo: e.target.value })}>
-              <option value="pagamento">pagamento</option>
-              <option value="recebimento">recebimento</option>
+              {["pagamento", "recebimento", "adiantamento", "acerto", "comissao", "folha", "prestacao_servico", "outro"]
+                .map((t) => <option key={t} value={t}>{t}</option>)}
             </select>
             <input className="input w-full" placeholder="Beneficiário" value={form.beneficiario ?? ""}
               onChange={(e) => setForm({ ...form, beneficiario: e.target.value })} />
@@ -110,6 +112,10 @@ function Recibos() {
             <input className="input w-full" type="date" value={form.data ?? ""} onChange={(e) => setForm({ ...form, data: e.target.value })} />
             <input className="input w-full" placeholder="Forma de pagamento" value={form.forma ?? ""}
               onChange={(e) => setForm({ ...form, forma: e.target.value })} />
+            <textarea className="input w-full" rows={2}
+              placeholder="Justificativa (obrigatória quando não há pagamento/recebimento vinculado)"
+              value={form.justificativa ?? ""}
+              onChange={(e) => setForm({ ...form, justificativa: e.target.value })} />
             <button disabled={mEmitir.isPending} onClick={() => mEmitir.mutate(form)}
               className="px-3 py-2 rounded-md bg-emerald-600 text-white disabled:opacity-50">Emitir</button>
           </div>

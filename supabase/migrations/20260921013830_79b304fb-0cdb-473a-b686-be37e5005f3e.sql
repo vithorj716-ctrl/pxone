@@ -1,0 +1,3 @@
+DROP FUNCTION IF EXISTS public.fin_emitir_recibo(uuid, text, text, text, text, numeric, date, text, text, uuid, uuid, uuid);
+REVOKE ALL ON FUNCTION public.fin_emitir_recibo(uuid, text, text, text, text, numeric, date, text, text, uuid, uuid, uuid, text) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.fin_emitir_recibo(uuid, text, text, text, text, numeric, date, text, text, uuid, uuid, uuid, text) TO authenticated;

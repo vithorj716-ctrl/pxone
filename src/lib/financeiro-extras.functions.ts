@@ -150,28 +150,14 @@ export const finGerarPagamentosFolha = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const sb = context.supabase as Sb;
     await assertPermissao(sb, context.userId, "financeiro.folha.approve");
-    const empresa_id = await resolveEmpresaId(sb, context.userId, data.empresaId);
-    const { data: itens } = await sb.from("fin_folha_itens")
-      .select("*, fin_pessoas(nome)").eq("periodo_id", data.periodoId).eq("empresa_id", empresa_id);
-    const pendentes = ((itens ?? []) as any[]).filter((i) => !i.conta_pagar_id && i.status !== "cancelado" && Number(i.valor_liquido) > 0);
-    let criados = 0;
-    for (const item of pendentes) {
-      const { data: cp, error } = await sb.from("fin_contas_pagar").insert({
-        empresa_id, fornecedor_id: item.pessoa_id,
-        fornecedor_nome: item.fin_pessoas?.nome ?? "Colaborador",
-        descricao: `Folha/pagamento — ${item.fin_pessoas?.nome ?? ""}`,
-        valor: item.valor_liquido, vencimento: data.vencimento ?? new Date().toISOString().slice(0, 10),
-        origem: "folha", origem_tipo: "folha_item", origem_id: item.id, status: "aberto",
-        created_by: context.userId,
-      }).select("id").maybeSingle();
-      if (error) throw new Error(error.message);
-      await sb.from("fin_folha_itens").update({ conta_pagar_id: cp.id, status: "aprovado" }).eq("id", item.id);
-      criados++;
-    }
-    await sb.from("fin_folha_periodos").update({ status: "aprovada", aprovado_por: context.userId, aprovado_em: new Date().toISOString() })
-      .eq("id", data.periodoId);
-    await auditar(sb, context.userId, "fin_folha_periodos", data.periodoId, "gerar_pagamentos", { criados });
-    return { criados };
+    // Tudo em uma única transação no banco: ou gera todos os títulos ou nenhum.
+    const { data: res, error } = await sb.rpc("fin_gerar_pagamentos_folha", {
+      _periodo_id: data.periodoId, _vencimento: data.vencimento ?? null,
+    });
+    if (error) throw new Error(error.message);
+    const out = (res ?? {}) as { criados?: number; existentes?: number };
+    await auditar(sb, context.userId, "fin_folha_periodos", data.periodoId, "gerar_pagamentos", out);
+    return { criados: out.criados ?? 0, existentes: out.existentes ?? 0 };
   });
 
 // ---------------- Recibos ----------------
@@ -193,10 +179,14 @@ export const finListarRecibos = createServerFn({ method: "POST" })
 
 export const finEmitirRecibo = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((i: { empresaId?: string | null; tipo?: string; beneficiario: string; documento?: string | null; descricao: string; valor: number; data?: string | null; forma?: string | null; origemTipo?: string | null; origemId?: string | null; movimentoId?: string | null; reemissaoDe?: string | null }) => {
-    if (!i?.beneficiario?.trim()) throw new Error("Informe o beneficiário.");
+  .inputValidator((i: { empresaId?: string | null; tipo?: string; beneficiario?: string | null; documento?: string | null; descricao: string; valor?: number | null; data?: string | null; forma?: string | null; origemTipo?: string | null; origemId?: string | null; movimentoId?: string | null; reemissaoDe?: string | null; justificativa?: string | null }) => {
     if (!i?.descricao?.trim()) throw new Error("Informe a descrição.");
-    if (!(Number(i.valor) > 0)) throw new Error("Informe um valor maior que zero.");
+    if (!i?.movimentoId) {
+      // Recibo manual: precisa de beneficiário, valor e justificativa.
+      if (!i?.beneficiario?.trim()) throw new Error("Informe o beneficiário.");
+      if (!(Number(i.valor) > 0)) throw new Error("Informe um valor maior que zero.");
+      if (!i?.justificativa?.trim()) throw new Error("Recibo sem movimento financeiro exige justificativa.");
+    }
     return i;
   })
   .handler(async ({ data, context }) => {
@@ -204,11 +194,11 @@ export const finEmitirRecibo = createServerFn({ method: "POST" })
     await assertPermissao(sb, context.userId, "financeiro.recibos.generate");
     const empresa_id = await resolveEmpresaId(sb, context.userId, data.empresaId);
     const { data: res, error } = await sb.rpc("fin_emitir_recibo", {
-      _empresa_id: empresa_id, _tipo: data.tipo ?? "pagamento", _beneficiario: data.beneficiario,
-      _documento: data.documento ?? null, _descricao: data.descricao, _valor: data.valor,
+      _empresa_id: empresa_id, _tipo: data.tipo ?? "pagamento", _beneficiario: data.beneficiario ?? null,
+      _documento: data.documento ?? null, _descricao: data.descricao, _valor: data.valor ?? null,
       _data: data.data ?? null, _forma: data.forma ?? null, _origem_tipo: data.origemTipo ?? null,
       _origem_id: data.origemId ?? null, _movimento_id: data.movimentoId ?? null,
-      _reemissao_de: data.reemissaoDe ?? null,
+      _reemissao_de: data.reemissaoDe ?? null, _justificativa: data.justificativa ?? null,
     });
     if (error) throw new Error(error.message);
     await auditar(sb, context.userId, "fin_recibos", String((res as any)?.recibo_id ?? ""), "emissao", { valor: data.valor });
@@ -325,16 +315,29 @@ export const finSalvarConciliacao = createServerFn({ method: "POST" })
     const sb = context.supabase as Sb;
     await assertPermissao(sb, context.userId, "financeiro.conciliacao.manage");
     const empresa_id = await resolveEmpresaId(sb, context.userId, data.empresaId);
-    const payload: Record<string, any> = { ...data.payload, empresa_id };
-    if (payload.status === "conciliado") {
-      payload.conciliado_por = context.userId;
-      payload.conciliado_em = new Date().toISOString();
+    const p: Record<string, any> = { ...data.payload };
+    const status = String(p.status ?? "nao_conciliado");
+    const movimentoId = (p.movimento_id ?? null) as string | null;
+    delete p.movimento_id; delete p.status; delete p.conciliado_por; delete p.conciliado_em;
+    delete p.id; delete p.created_at; delete p.updated_at;
+
+    let rowId = data.id ?? null;
+    if (!rowId) {
+      const { data: row, error } = await sb.from("fin_conciliacao")
+        .insert({ ...p, empresa_id, status: "nao_conciliado" }).select("*").maybeSingle();
+      if (error) throw new Error(error.message);
+      rowId = row?.id ?? null;
+    } else {
+      const { error } = await sb.from("fin_conciliacao").update(p).eq("id", rowId).eq("empresa_id", empresa_id);
+      if (error) throw new Error(error.message);
     }
-    const { data: row, error } = data.id
-      ? await sb.from("fin_conciliacao").update(payload).eq("id", data.id).eq("empresa_id", empresa_id).select("*").maybeSingle()
-      : await sb.from("fin_conciliacao").insert(payload).select("*").maybeSingle();
-    if (error) throw new Error(error.message);
-    await auditar(sb, context.userId, "fin_conciliacao", row?.id ?? "", data.id ? "update" : "create", payload);
+    // Vínculo/status passam pela RPC: registra quem conciliou e não altera o movimento.
+    const { error: rpcErr } = await sb.rpc("fin_conciliar", {
+      _id: rowId, _movimento_id: movimentoId, _status: status, _observacao: p.observacao ?? null,
+    });
+    if (rpcErr) throw new Error(rpcErr.message);
+    await auditar(sb, context.userId, "fin_conciliacao", rowId ?? "", data.id ? "update" : "create", { status, movimentoId });
+    const { data: row } = await sb.from("fin_conciliacao").select("*").eq("id", rowId).maybeSingle();
     return row;
   });
 
