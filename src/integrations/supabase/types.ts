@@ -3684,6 +3684,182 @@ export type Database = {
           },
         ]
       }
+      pxsales_importacao_itens: {
+        Row: {
+          acao: string
+          campos: Json
+          cliente_id: string | null
+          cnpj: string | null
+          cnpjs: string[]
+          conflitos: Json
+          created_at: string
+          empresa_id: string
+          empresa_nome: string | null
+          enriquecido: boolean
+          id: string
+          importacao_id: string
+          lead_id: string | null
+          mensagem: string | null
+          registro_hash: string
+          status: string
+          updated_at: string
+          xml_id: string
+          xml_ids: string[]
+        }
+        Insert: {
+          acao?: string
+          campos?: Json
+          cliente_id?: string | null
+          cnpj?: string | null
+          cnpjs?: string[]
+          conflitos?: Json
+          created_at?: string
+          empresa_id: string
+          empresa_nome?: string | null
+          enriquecido?: boolean
+          id?: string
+          importacao_id: string
+          lead_id?: string | null
+          mensagem?: string | null
+          registro_hash: string
+          status?: string
+          updated_at?: string
+          xml_id: string
+          xml_ids?: string[]
+        }
+        Update: {
+          acao?: string
+          campos?: Json
+          cliente_id?: string | null
+          cnpj?: string | null
+          cnpjs?: string[]
+          conflitos?: Json
+          created_at?: string
+          empresa_id?: string
+          empresa_nome?: string | null
+          enriquecido?: boolean
+          id?: string
+          importacao_id?: string
+          lead_id?: string | null
+          mensagem?: string | null
+          registro_hash?: string
+          status?: string
+          updated_at?: string
+          xml_id?: string
+          xml_ids?: string[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pxsales_importacao_itens_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "px_cliente_saldo"
+            referencedColumns: ["cliente_id"]
+          },
+          {
+            foreignKeyName: "pxsales_importacao_itens_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "px_registry_clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pxsales_importacao_itens_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pxsales_importacao_itens_importacao_id_fkey"
+            columns: ["importacao_id"]
+            isOneToOne: false
+            referencedRelation: "pxsales_importacoes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pxsales_importacao_itens_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "pxsales_leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pxsales_importacoes: {
+        Row: {
+          arquivo_hash: string
+          arquivo_nome: string
+          atualizados: number
+          created_at: string
+          created_by: string | null
+          criados: number
+          empresa_id: string
+          erros: number
+          id: string
+          ignorados: number
+          leads: number
+          metadados: Json
+          observacao: string | null
+          origem: string | null
+          revisao: number
+          status: string
+          total_registros: number
+          updated_at: string
+          versao: string | null
+        }
+        Insert: {
+          arquivo_hash: string
+          arquivo_nome: string
+          atualizados?: number
+          created_at?: string
+          created_by?: string | null
+          criados?: number
+          empresa_id: string
+          erros?: number
+          id?: string
+          ignorados?: number
+          leads?: number
+          metadados?: Json
+          observacao?: string | null
+          origem?: string | null
+          revisao?: number
+          status?: string
+          total_registros?: number
+          updated_at?: string
+          versao?: string | null
+        }
+        Update: {
+          arquivo_hash?: string
+          arquivo_nome?: string
+          atualizados?: number
+          created_at?: string
+          created_by?: string | null
+          criados?: number
+          empresa_id?: string
+          erros?: number
+          id?: string
+          ignorados?: number
+          leads?: number
+          metadados?: Json
+          observacao?: string | null
+          origem?: string | null
+          revisao?: number
+          status?: string
+          total_registros?: number
+          updated_at?: string
+          versao?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pxsales_importacoes_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pxsales_leads: {
         Row: {
           cidade: string | null

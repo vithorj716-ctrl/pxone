@@ -113,6 +113,7 @@ import { Route as AuthenticatedTmsEtiquetasMinutaRouteImport } from './routes/_a
 import { Route as AuthenticatedSalesTabelasIdRouteImport } from './routes/_authenticated/sales.tabelas.$id'
 import { Route as AuthenticatedSalesPropostasIdRouteImport } from './routes/_authenticated/sales.propostas.$id'
 import { Route as AuthenticatedSalesCotacoesIdRouteImport } from './routes/_authenticated/sales.cotacoes.$id'
+import { Route as AuthenticatedSalesClientesImportarRouteImport } from './routes/_authenticated/sales.clientes.importar'
 import { Route as AuthenticatedSalesClientesIdRouteImport } from './routes/_authenticated/sales.clientes.$id'
 import { Route as AuthenticatedAdminPxApiDocsRouteImport } from './routes/_authenticated/admin.px-api.docs'
 import { Route as ApiPublicV1UsuariosIdRouteImport } from './routes/api/public/v1/usuarios.$id'
@@ -716,6 +717,12 @@ const AuthenticatedSalesCotacoesIdRoute =
     path: '/sales/cotacoes/$id',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedSalesClientesImportarRoute =
+  AuthenticatedSalesClientesImportarRouteImport.update({
+    id: '/sales/clientes/importar',
+    path: '/sales/clientes/importar',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedSalesClientesIdRoute =
   AuthenticatedSalesClientesIdRouteImport.update({
     id: '/sales/clientes/$id',
@@ -908,6 +915,7 @@ export interface FileRoutesByFullPath {
   '/tms/': typeof AuthenticatedTmsIndexRoute
   '/admin/px-api/docs': typeof AuthenticatedAdminPxApiDocsRoute
   '/sales/clientes/$id': typeof AuthenticatedSalesClientesIdRoute
+  '/sales/clientes/importar': typeof AuthenticatedSalesClientesImportarRoute
   '/sales/cotacoes/$id': typeof AuthenticatedSalesCotacoesIdRoute
   '/sales/propostas/$id': typeof AuthenticatedSalesPropostasIdRoute
   '/sales/tabelas/$id': typeof AuthenticatedSalesTabelasIdRoute
@@ -1031,6 +1039,7 @@ export interface FileRoutesByTo {
   '/tms': typeof AuthenticatedTmsIndexRoute
   '/admin/px-api/docs': typeof AuthenticatedAdminPxApiDocsRoute
   '/sales/clientes/$id': typeof AuthenticatedSalesClientesIdRoute
+  '/sales/clientes/importar': typeof AuthenticatedSalesClientesImportarRoute
   '/sales/cotacoes/$id': typeof AuthenticatedSalesCotacoesIdRoute
   '/sales/propostas/$id': typeof AuthenticatedSalesPropostasIdRoute
   '/sales/tabelas/$id': typeof AuthenticatedSalesTabelasIdRoute
@@ -1158,6 +1167,7 @@ export interface FileRoutesById {
   '/_authenticated/tms/': typeof AuthenticatedTmsIndexRoute
   '/_authenticated/admin/px-api/docs': typeof AuthenticatedAdminPxApiDocsRoute
   '/_authenticated/sales/clientes/$id': typeof AuthenticatedSalesClientesIdRoute
+  '/_authenticated/sales/clientes/importar': typeof AuthenticatedSalesClientesImportarRoute
   '/_authenticated/sales/cotacoes/$id': typeof AuthenticatedSalesCotacoesIdRoute
   '/_authenticated/sales/propostas/$id': typeof AuthenticatedSalesPropostasIdRoute
   '/_authenticated/sales/tabelas/$id': typeof AuthenticatedSalesTabelasIdRoute
@@ -1285,6 +1295,7 @@ export interface FileRouteTypes {
     | '/tms/'
     | '/admin/px-api/docs'
     | '/sales/clientes/$id'
+    | '/sales/clientes/importar'
     | '/sales/cotacoes/$id'
     | '/sales/propostas/$id'
     | '/sales/tabelas/$id'
@@ -1408,6 +1419,7 @@ export interface FileRouteTypes {
     | '/tms'
     | '/admin/px-api/docs'
     | '/sales/clientes/$id'
+    | '/sales/clientes/importar'
     | '/sales/cotacoes/$id'
     | '/sales/propostas/$id'
     | '/sales/tabelas/$id'
@@ -1534,6 +1546,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tms/'
     | '/_authenticated/admin/px-api/docs'
     | '/_authenticated/sales/clientes/$id'
+    | '/_authenticated/sales/clientes/importar'
     | '/_authenticated/sales/cotacoes/$id'
     | '/_authenticated/sales/propostas/$id'
     | '/_authenticated/sales/tabelas/$id'
@@ -2337,6 +2350,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSalesCotacoesIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/sales/clientes/importar': {
+      id: '/_authenticated/sales/clientes/importar'
+      path: '/sales/clientes/importar'
+      fullPath: '/sales/clientes/importar'
+      preLoaderRoute: typeof AuthenticatedSalesClientesImportarRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/sales/clientes/$id': {
       id: '/_authenticated/sales/clientes/$id'
       path: '/sales/clientes/$id'
@@ -2629,6 +2649,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSalesIndexRoute: typeof AuthenticatedSalesIndexRoute
   AuthenticatedTmsIndexRoute: typeof AuthenticatedTmsIndexRoute
   AuthenticatedSalesClientesIdRoute: typeof AuthenticatedSalesClientesIdRoute
+  AuthenticatedSalesClientesImportarRoute: typeof AuthenticatedSalesClientesImportarRoute
   AuthenticatedSalesCotacoesIdRoute: typeof AuthenticatedSalesCotacoesIdRoute
   AuthenticatedSalesPropostasIdRoute: typeof AuthenticatedSalesPropostasIdRoute
   AuthenticatedSalesTabelasIdRoute: typeof AuthenticatedSalesTabelasIdRoute
@@ -2724,6 +2745,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSalesIndexRoute: AuthenticatedSalesIndexRoute,
   AuthenticatedTmsIndexRoute: AuthenticatedTmsIndexRoute,
   AuthenticatedSalesClientesIdRoute: AuthenticatedSalesClientesIdRoute,
+  AuthenticatedSalesClientesImportarRoute:
+    AuthenticatedSalesClientesImportarRoute,
   AuthenticatedSalesCotacoesIdRoute: AuthenticatedSalesCotacoesIdRoute,
   AuthenticatedSalesPropostasIdRoute: AuthenticatedSalesPropostasIdRoute,
   AuthenticatedSalesTabelasIdRoute: AuthenticatedSalesTabelasIdRoute,
