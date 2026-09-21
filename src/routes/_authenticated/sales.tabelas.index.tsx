@@ -71,6 +71,24 @@ function TabelasPage() {
 
   const duplicar = useServerFn(duplicarTabela);
   const arquivar = useServerFn(setStatusTabela);
+  const excluir = useServerFn(deleteTabela);
+  const [aExcluir, setAExcluir] = useState<{ id: string; nome: string } | null>(null);
+  const [excluindo, setExcluindo] = useState(false);
+
+  async function onExcluir() {
+    if (!aExcluir) return;
+    setExcluindo(true);
+    try {
+      await excluir({ data: { id: aExcluir.id } });
+      toast.success("Tabela excluída.");
+      setAExcluir(null);
+      qc.invalidateQueries({ queryKey: ["pxsales", "tabelas"] });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Não foi possível excluir.");
+    } finally {
+      setExcluindo(false);
+    }
+  }
 
   async function onDuplicar(id: string) {
     try {
