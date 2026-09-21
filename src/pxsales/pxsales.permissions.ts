@@ -13,6 +13,7 @@ export const PXSALES_PERMISSIONS = [
   { acao: "pxsales.clientes.view", grupo: "Clientes", label: "Ver clientes" },
   { acao: "pxsales.clientes.edit", grupo: "Clientes", label: "Editar clientes" },
   { acao: "pxsales.clientes.financeiro.view", grupo: "Clientes", label: "Ver dados financeiros do cliente" },
+  { acao: "pxsales.clientes.import", grupo: "Clientes", label: "Importar clientes em massa" },
   { acao: "pxsales.oportunidades.view", grupo: "Oportunidades", label: "Ver oportunidades" },
   { acao: "pxsales.oportunidades.edit", grupo: "Oportunidades", label: "Editar oportunidades" },
   { acao: "pxsales.tabelas.view", grupo: "Tabelas comerciais", label: "Ver tabelas comerciais" },
