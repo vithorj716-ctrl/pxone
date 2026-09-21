@@ -100,12 +100,21 @@ export function extrairUf(texto: string): string | null {
   return null;
 }
 
+/** Remove palavras de ligação antes do nome da cidade ("entrega em Campinas" -> "Campinas"). */
+function apenasCidade(v: string): string {
+  const palavras = v.trim().split(/\s+/);
+  while (palavras.length > 1 && /^(de|em|na|no|para|entrega|coleta|cliente|fica|a|o|da|do)$/i.test(palavras[0] ?? "")) {
+    palavras.shift();
+  }
+  return palavras.slice(-3).join(" ");
+}
+
 /** "São Paulo/SP", "Cidade - SP", "Cidade, SP" */
 export function extrairCidadeUf(texto: string): { cidade: string | null; uf: string | null } {
   const m = texto.match(/([A-Za-zÀ-ÿ'´`^~.\s]{3,40})\s*[/\-,]\s*([A-Za-z]{2})\b/);
   if (m) {
     const uf = semAcento(m[2] ?? "").toUpperCase();
-    if (UFS.includes(uf)) return { cidade: titulo(m[1] ?? ""), uf };
+    if (UFS.includes(uf)) return { cidade: titulo(apenasCidade(m[1] ?? "")), uf };
   }
   return { cidade: null, uf: extrairUf(texto) };
 }
@@ -134,7 +143,7 @@ export function extrairPrazoPagamento(texto: string): number | null {
     const n = Number(m[1]);
     if (n > 0 && n <= 365) return n;
   }
-  if (/\b(?:[àa]\s*vista|pagamento\s+imediato)\b/i.test(texto)) return 0;
+  if (/(?:[àa]\s*vista|pagamento\s+imediato)/i.test(texto)) return 0;
   return null;
 }
 
@@ -212,7 +221,7 @@ export function extrairVolumeMensal(texto: string): string | null {
   return m?.[0] ? limpar(m[0]) : null;
 }
 
-const QUENTE = /fechou|fechado|aprovad|vamos\s+come[çc]ar|urgente|assinar|iniciar\s+opera|quer\s+cota[çc]/i;
+const QUENTE = /fechou|fechado|fechar|fechamos|aprovad|vamos\s+come[çc]ar|urgente|assinar|iniciar\s+opera|quer\s+cota[çc]/i;
 const FRIO = /sem\s+interesse|n[ãa]o\s+tem\s+interesse|contrato\s+fechado\s+com|retornar\s+(?:ano|semestre)|n[ãa]o\s+atende/i;
 
 export function classificarTemperatura(texto: string): "frio" | "morno" | "quente" | null {
