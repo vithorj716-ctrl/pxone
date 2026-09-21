@@ -35,14 +35,19 @@ export const finVisaoGeral = createServerFn({ method: "POST" })
     const hoje = new Date().toISOString().slice(0, 10);
     const limite = new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10);
 
-    const [cp, cr, mov, contas, adto] = await Promise.all([
+    const de90 = new Date(Date.now() - 90 * 86400000).toISOString().slice(0, 10);
+
+    const [cp, cr, mov, saldos, adto] = await Promise.all([
       sb.from("fin_contas_pagar").select("valor, valor_pago, vencimento, status").in("empresa_id", empresas),
       sb.from("fin_contas_receber").select("valor, valor_recebido, vencimento, status").in("empresa_id", empresas),
       sb.from("fin_movimentos").select("tipo, valor, data, estornado_em").in("empresa_id", empresas)
-        .is("estornado_em", null).gte("data", new Date(Date.now() - 90 * 86400000).toISOString().slice(0, 10)),
-      sb.from("fin_contas").select("id, nome, saldo_inicial, ativo").in("empresa_id", empresas),
+        .is("estornado_em", null).gte("data", de90),
+      // Saldo atual = saldo de abertura + TODOS os movimentos já lançados (não apenas 90 dias).
+      sb.rpc("fin_saldos", { _empresa_ids: empresas, _de: de90, _ate: hoje }),
       sb.from("fin_adiantamentos").select("valor_pago, valor_acertado, status").in("empresa_id", empresas),
     ]);
+    if (saldos.error) throw new Error(saldos.error.message);
+    const saldoInfo = (saldos.data ?? {}) as any;
 
     const pagar = (cp.data ?? []) as any[];
     const receber = (cr.data ?? []) as any[];
@@ -54,7 +59,6 @@ export const finVisaoGeral = createServerFn({ method: "POST" })
 
     const pagamentosRealizados = movs.filter((m) => m.tipo === "pagamento").reduce((a, b) => a + num(b.valor), 0);
     const recebimentosRealizados = movs.filter((m) => m.tipo === "recebimento").reduce((a, b) => a + num(b.valor), 0);
-    const saldoInicial = ((contas.data ?? []) as any[]).reduce((a, b) => a + num(b.saldo_inicial), 0);
 
     // Fluxo previsto por dia (próximos 30 dias)
     const fluxo: { dia: string; entradas: number; saidas: number }[] = [];
