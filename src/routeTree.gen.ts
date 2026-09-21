@@ -39,6 +39,7 @@ import { Route as AuthenticatedAiAnalystRouteImport } from './routes/_authentica
 import { Route as AuthenticatedTmsIndexRouteImport } from './routes/_authenticated/tms.index'
 import { Route as AuthenticatedSalesIndexRouteImport } from './routes/_authenticated/sales.index'
 import { Route as AuthenticatedFinancialIntelligenceIndexRouteImport } from './routes/_authenticated/financial-intelligence.index'
+import { Route as AuthenticatedFinanceiroIndexRouteImport } from './routes/_authenticated/financeiro.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as PortalPropostaTokenRouteImport } from './routes/portal.proposta.$token'
 import { Route as PortalClienteTokenRouteImport } from './routes/portal.cliente.$token'
@@ -67,6 +68,18 @@ import { Route as AuthenticatedRegistryClientesRouteImport } from './routes/_aut
 import { Route as AuthenticatedFinancialIntelligenceDreRouteImport } from './routes/_authenticated/financial-intelligence.dre'
 import { Route as AuthenticatedFinancialIntelligenceDfcRouteImport } from './routes/_authenticated/financial-intelligence.dfc'
 import { Route as AuthenticatedFinancialIntelligenceBreakEvenRouteImport } from './routes/_authenticated/financial-intelligence.break-even'
+import { Route as AuthenticatedFinanceiroRelatoriosRouteImport } from './routes/_authenticated/financeiro.relatorios'
+import { Route as AuthenticatedFinanceiroRecibosRouteImport } from './routes/_authenticated/financeiro.recibos'
+import { Route as AuthenticatedFinanceiroReceberRouteImport } from './routes/_authenticated/financeiro.receber'
+import { Route as AuthenticatedFinanceiroPessoasRouteImport } from './routes/_authenticated/financeiro.pessoas'
+import { Route as AuthenticatedFinanceiroPagarRouteImport } from './routes/_authenticated/financeiro.pagar'
+import { Route as AuthenticatedFinanceiroMovimentosRouteImport } from './routes/_authenticated/financeiro.movimentos'
+import { Route as AuthenticatedFinanceiroFolhaRouteImport } from './routes/_authenticated/financeiro.folha'
+import { Route as AuthenticatedFinanceiroFaturamentoRouteImport } from './routes/_authenticated/financeiro.faturamento'
+import { Route as AuthenticatedFinanceiroConfiguracoesRouteImport } from './routes/_authenticated/financeiro.configuracoes'
+import { Route as AuthenticatedFinanceiroConciliacaoRouteImport } from './routes/_authenticated/financeiro.conciliacao'
+import { Route as AuthenticatedFinanceiroComissoesRouteImport } from './routes/_authenticated/financeiro.comissoes'
+import { Route as AuthenticatedFinanceiroAdiantamentosRouteImport } from './routes/_authenticated/financeiro.adiantamentos'
 import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin.usuarios'
 import { Route as AuthenticatedAdminPxApiRouteImport } from './routes/_authenticated/admin.px-api'
 import { Route as AuthenticatedAdminPerfisRouteImport } from './routes/_authenticated/admin.perfis'
@@ -274,6 +287,12 @@ const AuthenticatedFinancialIntelligenceIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedFinancialIntelligenceRoute,
   } as any)
+const AuthenticatedFinanceiroIndexRoute =
+  AuthenticatedFinanceiroIndexRouteImport.update({
+    id: '/financeiro/',
+    path: '/financeiro/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
@@ -436,6 +455,78 @@ const AuthenticatedFinancialIntelligenceBreakEvenRoute =
     id: '/break-even',
     path: '/break-even',
     getParentRoute: () => AuthenticatedFinancialIntelligenceRoute,
+  } as any)
+const AuthenticatedFinanceiroRelatoriosRoute =
+  AuthenticatedFinanceiroRelatoriosRouteImport.update({
+    id: '/financeiro/relatorios',
+    path: '/financeiro/relatorios',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFinanceiroRecibosRoute =
+  AuthenticatedFinanceiroRecibosRouteImport.update({
+    id: '/financeiro/recibos',
+    path: '/financeiro/recibos',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFinanceiroReceberRoute =
+  AuthenticatedFinanceiroReceberRouteImport.update({
+    id: '/financeiro/receber',
+    path: '/financeiro/receber',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFinanceiroPessoasRoute =
+  AuthenticatedFinanceiroPessoasRouteImport.update({
+    id: '/financeiro/pessoas',
+    path: '/financeiro/pessoas',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFinanceiroPagarRoute =
+  AuthenticatedFinanceiroPagarRouteImport.update({
+    id: '/financeiro/pagar',
+    path: '/financeiro/pagar',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFinanceiroMovimentosRoute =
+  AuthenticatedFinanceiroMovimentosRouteImport.update({
+    id: '/financeiro/movimentos',
+    path: '/financeiro/movimentos',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFinanceiroFolhaRoute =
+  AuthenticatedFinanceiroFolhaRouteImport.update({
+    id: '/financeiro/folha',
+    path: '/financeiro/folha',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFinanceiroFaturamentoRoute =
+  AuthenticatedFinanceiroFaturamentoRouteImport.update({
+    id: '/financeiro/faturamento',
+    path: '/financeiro/faturamento',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFinanceiroConfiguracoesRoute =
+  AuthenticatedFinanceiroConfiguracoesRouteImport.update({
+    id: '/financeiro/configuracoes',
+    path: '/financeiro/configuracoes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFinanceiroConciliacaoRoute =
+  AuthenticatedFinanceiroConciliacaoRouteImport.update({
+    id: '/financeiro/conciliacao',
+    path: '/financeiro/conciliacao',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFinanceiroComissoesRoute =
+  AuthenticatedFinanceiroComissoesRouteImport.update({
+    id: '/financeiro/comissoes',
+    path: '/financeiro/comissoes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFinanceiroAdiantamentosRoute =
+  AuthenticatedFinanceiroAdiantamentosRouteImport.update({
+    id: '/financeiro/adiantamentos',
+    path: '/financeiro/adiantamentos',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedAdminUsuariosRoute =
   AuthenticatedAdminUsuariosRouteImport.update({
@@ -771,6 +862,18 @@ export interface FileRoutesByFullPath {
   '/admin/perfis': typeof AuthenticatedAdminPerfisRoute
   '/admin/px-api': typeof AuthenticatedAdminPxApiRouteWithChildren
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
+  '/financeiro/adiantamentos': typeof AuthenticatedFinanceiroAdiantamentosRoute
+  '/financeiro/comissoes': typeof AuthenticatedFinanceiroComissoesRoute
+  '/financeiro/conciliacao': typeof AuthenticatedFinanceiroConciliacaoRoute
+  '/financeiro/configuracoes': typeof AuthenticatedFinanceiroConfiguracoesRoute
+  '/financeiro/faturamento': typeof AuthenticatedFinanceiroFaturamentoRoute
+  '/financeiro/folha': typeof AuthenticatedFinanceiroFolhaRoute
+  '/financeiro/movimentos': typeof AuthenticatedFinanceiroMovimentosRoute
+  '/financeiro/pagar': typeof AuthenticatedFinanceiroPagarRoute
+  '/financeiro/pessoas': typeof AuthenticatedFinanceiroPessoasRoute
+  '/financeiro/receber': typeof AuthenticatedFinanceiroReceberRoute
+  '/financeiro/recibos': typeof AuthenticatedFinanceiroRecibosRoute
+  '/financeiro/relatorios': typeof AuthenticatedFinanceiroRelatoriosRoute
   '/financial-intelligence/break-even': typeof AuthenticatedFinancialIntelligenceBreakEvenRoute
   '/financial-intelligence/dfc': typeof AuthenticatedFinancialIntelligenceDfcRoute
   '/financial-intelligence/dre': typeof AuthenticatedFinancialIntelligenceDreRoute
@@ -799,6 +902,7 @@ export interface FileRoutesByFullPath {
   '/portal/cliente/$token': typeof PortalClienteTokenRoute
   '/portal/proposta/$token': typeof PortalPropostaTokenRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/financeiro/': typeof AuthenticatedFinanceiroIndexRoute
   '/financial-intelligence/': typeof AuthenticatedFinancialIntelligenceIndexRoute
   '/sales/': typeof AuthenticatedSalesIndexRoute
   '/tms/': typeof AuthenticatedTmsIndexRoute
@@ -882,6 +986,18 @@ export interface FileRoutesByTo {
   '/admin/perfis': typeof AuthenticatedAdminPerfisRoute
   '/admin/px-api': typeof AuthenticatedAdminPxApiRouteWithChildren
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
+  '/financeiro/adiantamentos': typeof AuthenticatedFinanceiroAdiantamentosRoute
+  '/financeiro/comissoes': typeof AuthenticatedFinanceiroComissoesRoute
+  '/financeiro/conciliacao': typeof AuthenticatedFinanceiroConciliacaoRoute
+  '/financeiro/configuracoes': typeof AuthenticatedFinanceiroConfiguracoesRoute
+  '/financeiro/faturamento': typeof AuthenticatedFinanceiroFaturamentoRoute
+  '/financeiro/folha': typeof AuthenticatedFinanceiroFolhaRoute
+  '/financeiro/movimentos': typeof AuthenticatedFinanceiroMovimentosRoute
+  '/financeiro/pagar': typeof AuthenticatedFinanceiroPagarRoute
+  '/financeiro/pessoas': typeof AuthenticatedFinanceiroPessoasRoute
+  '/financeiro/receber': typeof AuthenticatedFinanceiroReceberRoute
+  '/financeiro/recibos': typeof AuthenticatedFinanceiroRecibosRoute
+  '/financeiro/relatorios': typeof AuthenticatedFinanceiroRelatoriosRoute
   '/financial-intelligence/break-even': typeof AuthenticatedFinancialIntelligenceBreakEvenRoute
   '/financial-intelligence/dfc': typeof AuthenticatedFinancialIntelligenceDfcRoute
   '/financial-intelligence/dre': typeof AuthenticatedFinancialIntelligenceDreRoute
@@ -909,6 +1025,7 @@ export interface FileRoutesByTo {
   '/portal/cliente/$token': typeof PortalClienteTokenRoute
   '/portal/proposta/$token': typeof PortalPropostaTokenRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/financeiro': typeof AuthenticatedFinanceiroIndexRoute
   '/financial-intelligence': typeof AuthenticatedFinancialIntelligenceIndexRoute
   '/sales': typeof AuthenticatedSalesIndexRoute
   '/tms': typeof AuthenticatedTmsIndexRoute
@@ -995,6 +1112,18 @@ export interface FileRoutesById {
   '/_authenticated/admin/perfis': typeof AuthenticatedAdminPerfisRoute
   '/_authenticated/admin/px-api': typeof AuthenticatedAdminPxApiRouteWithChildren
   '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
+  '/_authenticated/financeiro/adiantamentos': typeof AuthenticatedFinanceiroAdiantamentosRoute
+  '/_authenticated/financeiro/comissoes': typeof AuthenticatedFinanceiroComissoesRoute
+  '/_authenticated/financeiro/conciliacao': typeof AuthenticatedFinanceiroConciliacaoRoute
+  '/_authenticated/financeiro/configuracoes': typeof AuthenticatedFinanceiroConfiguracoesRoute
+  '/_authenticated/financeiro/faturamento': typeof AuthenticatedFinanceiroFaturamentoRoute
+  '/_authenticated/financeiro/folha': typeof AuthenticatedFinanceiroFolhaRoute
+  '/_authenticated/financeiro/movimentos': typeof AuthenticatedFinanceiroMovimentosRoute
+  '/_authenticated/financeiro/pagar': typeof AuthenticatedFinanceiroPagarRoute
+  '/_authenticated/financeiro/pessoas': typeof AuthenticatedFinanceiroPessoasRoute
+  '/_authenticated/financeiro/receber': typeof AuthenticatedFinanceiroReceberRoute
+  '/_authenticated/financeiro/recibos': typeof AuthenticatedFinanceiroRecibosRoute
+  '/_authenticated/financeiro/relatorios': typeof AuthenticatedFinanceiroRelatoriosRoute
   '/_authenticated/financial-intelligence/break-even': typeof AuthenticatedFinancialIntelligenceBreakEvenRoute
   '/_authenticated/financial-intelligence/dfc': typeof AuthenticatedFinancialIntelligenceDfcRoute
   '/_authenticated/financial-intelligence/dre': typeof AuthenticatedFinancialIntelligenceDreRoute
@@ -1023,6 +1152,7 @@ export interface FileRoutesById {
   '/portal/cliente/$token': typeof PortalClienteTokenRoute
   '/portal/proposta/$token': typeof PortalPropostaTokenRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/financeiro/': typeof AuthenticatedFinanceiroIndexRoute
   '/_authenticated/financial-intelligence/': typeof AuthenticatedFinancialIntelligenceIndexRoute
   '/_authenticated/sales/': typeof AuthenticatedSalesIndexRoute
   '/_authenticated/tms/': typeof AuthenticatedTmsIndexRoute
@@ -1109,6 +1239,18 @@ export interface FileRouteTypes {
     | '/admin/perfis'
     | '/admin/px-api'
     | '/admin/usuarios'
+    | '/financeiro/adiantamentos'
+    | '/financeiro/comissoes'
+    | '/financeiro/conciliacao'
+    | '/financeiro/configuracoes'
+    | '/financeiro/faturamento'
+    | '/financeiro/folha'
+    | '/financeiro/movimentos'
+    | '/financeiro/pagar'
+    | '/financeiro/pessoas'
+    | '/financeiro/receber'
+    | '/financeiro/recibos'
+    | '/financeiro/relatorios'
     | '/financial-intelligence/break-even'
     | '/financial-intelligence/dfc'
     | '/financial-intelligence/dre'
@@ -1137,6 +1279,7 @@ export interface FileRouteTypes {
     | '/portal/cliente/$token'
     | '/portal/proposta/$token'
     | '/admin/'
+    | '/financeiro/'
     | '/financial-intelligence/'
     | '/sales/'
     | '/tms/'
@@ -1220,6 +1363,18 @@ export interface FileRouteTypes {
     | '/admin/perfis'
     | '/admin/px-api'
     | '/admin/usuarios'
+    | '/financeiro/adiantamentos'
+    | '/financeiro/comissoes'
+    | '/financeiro/conciliacao'
+    | '/financeiro/configuracoes'
+    | '/financeiro/faturamento'
+    | '/financeiro/folha'
+    | '/financeiro/movimentos'
+    | '/financeiro/pagar'
+    | '/financeiro/pessoas'
+    | '/financeiro/receber'
+    | '/financeiro/recibos'
+    | '/financeiro/relatorios'
     | '/financial-intelligence/break-even'
     | '/financial-intelligence/dfc'
     | '/financial-intelligence/dre'
@@ -1247,6 +1402,7 @@ export interface FileRouteTypes {
     | '/portal/cliente/$token'
     | '/portal/proposta/$token'
     | '/admin'
+    | '/financeiro'
     | '/financial-intelligence'
     | '/sales'
     | '/tms'
@@ -1332,6 +1488,18 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/perfis'
     | '/_authenticated/admin/px-api'
     | '/_authenticated/admin/usuarios'
+    | '/_authenticated/financeiro/adiantamentos'
+    | '/_authenticated/financeiro/comissoes'
+    | '/_authenticated/financeiro/conciliacao'
+    | '/_authenticated/financeiro/configuracoes'
+    | '/_authenticated/financeiro/faturamento'
+    | '/_authenticated/financeiro/folha'
+    | '/_authenticated/financeiro/movimentos'
+    | '/_authenticated/financeiro/pagar'
+    | '/_authenticated/financeiro/pessoas'
+    | '/_authenticated/financeiro/receber'
+    | '/_authenticated/financeiro/recibos'
+    | '/_authenticated/financeiro/relatorios'
     | '/_authenticated/financial-intelligence/break-even'
     | '/_authenticated/financial-intelligence/dfc'
     | '/_authenticated/financial-intelligence/dre'
@@ -1360,6 +1528,7 @@ export interface FileRouteTypes {
     | '/portal/cliente/$token'
     | '/portal/proposta/$token'
     | '/_authenticated/admin/'
+    | '/_authenticated/financeiro/'
     | '/_authenticated/financial-intelligence/'
     | '/_authenticated/sales/'
     | '/_authenticated/tms/'
@@ -1650,6 +1819,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFinancialIntelligenceIndexRouteImport
       parentRoute: typeof AuthenticatedFinancialIntelligenceRoute
     }
+    '/_authenticated/financeiro/': {
+      id: '/_authenticated/financeiro/'
+      path: '/financeiro'
+      fullPath: '/financeiro/'
+      preLoaderRoute: typeof AuthenticatedFinanceiroIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
       path: '/admin'
@@ -1845,6 +2021,90 @@ declare module '@tanstack/react-router' {
       fullPath: '/financial-intelligence/break-even'
       preLoaderRoute: typeof AuthenticatedFinancialIntelligenceBreakEvenRouteImport
       parentRoute: typeof AuthenticatedFinancialIntelligenceRoute
+    }
+    '/_authenticated/financeiro/relatorios': {
+      id: '/_authenticated/financeiro/relatorios'
+      path: '/financeiro/relatorios'
+      fullPath: '/financeiro/relatorios'
+      preLoaderRoute: typeof AuthenticatedFinanceiroRelatoriosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/financeiro/recibos': {
+      id: '/_authenticated/financeiro/recibos'
+      path: '/financeiro/recibos'
+      fullPath: '/financeiro/recibos'
+      preLoaderRoute: typeof AuthenticatedFinanceiroRecibosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/financeiro/receber': {
+      id: '/_authenticated/financeiro/receber'
+      path: '/financeiro/receber'
+      fullPath: '/financeiro/receber'
+      preLoaderRoute: typeof AuthenticatedFinanceiroReceberRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/financeiro/pessoas': {
+      id: '/_authenticated/financeiro/pessoas'
+      path: '/financeiro/pessoas'
+      fullPath: '/financeiro/pessoas'
+      preLoaderRoute: typeof AuthenticatedFinanceiroPessoasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/financeiro/pagar': {
+      id: '/_authenticated/financeiro/pagar'
+      path: '/financeiro/pagar'
+      fullPath: '/financeiro/pagar'
+      preLoaderRoute: typeof AuthenticatedFinanceiroPagarRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/financeiro/movimentos': {
+      id: '/_authenticated/financeiro/movimentos'
+      path: '/financeiro/movimentos'
+      fullPath: '/financeiro/movimentos'
+      preLoaderRoute: typeof AuthenticatedFinanceiroMovimentosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/financeiro/folha': {
+      id: '/_authenticated/financeiro/folha'
+      path: '/financeiro/folha'
+      fullPath: '/financeiro/folha'
+      preLoaderRoute: typeof AuthenticatedFinanceiroFolhaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/financeiro/faturamento': {
+      id: '/_authenticated/financeiro/faturamento'
+      path: '/financeiro/faturamento'
+      fullPath: '/financeiro/faturamento'
+      preLoaderRoute: typeof AuthenticatedFinanceiroFaturamentoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/financeiro/configuracoes': {
+      id: '/_authenticated/financeiro/configuracoes'
+      path: '/financeiro/configuracoes'
+      fullPath: '/financeiro/configuracoes'
+      preLoaderRoute: typeof AuthenticatedFinanceiroConfiguracoesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/financeiro/conciliacao': {
+      id: '/_authenticated/financeiro/conciliacao'
+      path: '/financeiro/conciliacao'
+      fullPath: '/financeiro/conciliacao'
+      preLoaderRoute: typeof AuthenticatedFinanceiroConciliacaoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/financeiro/comissoes': {
+      id: '/_authenticated/financeiro/comissoes'
+      path: '/financeiro/comissoes'
+      fullPath: '/financeiro/comissoes'
+      preLoaderRoute: typeof AuthenticatedFinanceiroComissoesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/financeiro/adiantamentos': {
+      id: '/_authenticated/financeiro/adiantamentos'
+      path: '/financeiro/adiantamentos'
+      fullPath: '/financeiro/adiantamentos'
+      preLoaderRoute: typeof AuthenticatedFinanceiroAdiantamentosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/usuarios': {
       id: '/_authenticated/admin/usuarios'
@@ -2330,6 +2590,18 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminPerfisRoute: typeof AuthenticatedAdminPerfisRoute
   AuthenticatedAdminPxApiRoute: typeof AuthenticatedAdminPxApiRouteWithChildren
   AuthenticatedAdminUsuariosRoute: typeof AuthenticatedAdminUsuariosRoute
+  AuthenticatedFinanceiroAdiantamentosRoute: typeof AuthenticatedFinanceiroAdiantamentosRoute
+  AuthenticatedFinanceiroComissoesRoute: typeof AuthenticatedFinanceiroComissoesRoute
+  AuthenticatedFinanceiroConciliacaoRoute: typeof AuthenticatedFinanceiroConciliacaoRoute
+  AuthenticatedFinanceiroConfiguracoesRoute: typeof AuthenticatedFinanceiroConfiguracoesRoute
+  AuthenticatedFinanceiroFaturamentoRoute: typeof AuthenticatedFinanceiroFaturamentoRoute
+  AuthenticatedFinanceiroFolhaRoute: typeof AuthenticatedFinanceiroFolhaRoute
+  AuthenticatedFinanceiroMovimentosRoute: typeof AuthenticatedFinanceiroMovimentosRoute
+  AuthenticatedFinanceiroPagarRoute: typeof AuthenticatedFinanceiroPagarRoute
+  AuthenticatedFinanceiroPessoasRoute: typeof AuthenticatedFinanceiroPessoasRoute
+  AuthenticatedFinanceiroReceberRoute: typeof AuthenticatedFinanceiroReceberRoute
+  AuthenticatedFinanceiroRecibosRoute: typeof AuthenticatedFinanceiroRecibosRoute
+  AuthenticatedFinanceiroRelatoriosRoute: typeof AuthenticatedFinanceiroRelatoriosRoute
   AuthenticatedRegistryClientesRoute: typeof AuthenticatedRegistryClientesRoute
   AuthenticatedSalesAgendaRoute: typeof AuthenticatedSalesAgendaRoute
   AuthenticatedSalesComissoesRoute: typeof AuthenticatedSalesComissoesRoute
@@ -2353,6 +2625,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedTmsTrackingRoute: typeof AuthenticatedTmsTrackingRoute
   AuthenticatedTmsViagensRoute: typeof AuthenticatedTmsViagensRouteWithChildren
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedFinanceiroIndexRoute: typeof AuthenticatedFinanceiroIndexRoute
   AuthenticatedSalesIndexRoute: typeof AuthenticatedSalesIndexRoute
   AuthenticatedTmsIndexRoute: typeof AuthenticatedTmsIndexRoute
   AuthenticatedSalesClientesIdRoute: typeof AuthenticatedSalesClientesIdRoute
@@ -2405,6 +2678,24 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminPerfisRoute: AuthenticatedAdminPerfisRoute,
   AuthenticatedAdminPxApiRoute: AuthenticatedAdminPxApiRouteWithChildren,
   AuthenticatedAdminUsuariosRoute: AuthenticatedAdminUsuariosRoute,
+  AuthenticatedFinanceiroAdiantamentosRoute:
+    AuthenticatedFinanceiroAdiantamentosRoute,
+  AuthenticatedFinanceiroComissoesRoute: AuthenticatedFinanceiroComissoesRoute,
+  AuthenticatedFinanceiroConciliacaoRoute:
+    AuthenticatedFinanceiroConciliacaoRoute,
+  AuthenticatedFinanceiroConfiguracoesRoute:
+    AuthenticatedFinanceiroConfiguracoesRoute,
+  AuthenticatedFinanceiroFaturamentoRoute:
+    AuthenticatedFinanceiroFaturamentoRoute,
+  AuthenticatedFinanceiroFolhaRoute: AuthenticatedFinanceiroFolhaRoute,
+  AuthenticatedFinanceiroMovimentosRoute:
+    AuthenticatedFinanceiroMovimentosRoute,
+  AuthenticatedFinanceiroPagarRoute: AuthenticatedFinanceiroPagarRoute,
+  AuthenticatedFinanceiroPessoasRoute: AuthenticatedFinanceiroPessoasRoute,
+  AuthenticatedFinanceiroReceberRoute: AuthenticatedFinanceiroReceberRoute,
+  AuthenticatedFinanceiroRecibosRoute: AuthenticatedFinanceiroRecibosRoute,
+  AuthenticatedFinanceiroRelatoriosRoute:
+    AuthenticatedFinanceiroRelatoriosRoute,
   AuthenticatedRegistryClientesRoute: AuthenticatedRegistryClientesRoute,
   AuthenticatedSalesAgendaRoute: AuthenticatedSalesAgendaRoute,
   AuthenticatedSalesComissoesRoute: AuthenticatedSalesComissoesRoute,
@@ -2429,6 +2720,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedTmsTrackingRoute: AuthenticatedTmsTrackingRoute,
   AuthenticatedTmsViagensRoute: AuthenticatedTmsViagensRouteWithChildren,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  AuthenticatedFinanceiroIndexRoute: AuthenticatedFinanceiroIndexRoute,
   AuthenticatedSalesIndexRoute: AuthenticatedSalesIndexRoute,
   AuthenticatedTmsIndexRoute: AuthenticatedTmsIndexRoute,
   AuthenticatedSalesClientesIdRoute: AuthenticatedSalesClientesIdRoute,
