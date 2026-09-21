@@ -31,9 +31,20 @@ export function SystemProvider({ children }: { children: ReactNode }) {
       const { data } = await supabase
         .from("px_usuario_sistemas")
         .select("sistema_key")
-        .eq("ativo", true);
-      const keys = (data ?? []).map((r: any) => r.sistema_key as string);
-      // Diretor Geral: se nada listado mas tem role executiva, libera tudo ativo (fallback defensivo)
+        .eq("ativo", true)
+        .eq("user_id", userData.user.id);
+      let keys = (data ?? []).map((r: any) => r.sistema_key as string);
+      if (keys.length === 0) {
+        // Fallback defensivo: roles executivas acessam todos os sistemas ativos
+        const { data: roles } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", userData.user.id);
+        const isExec = (roles ?? []).some((r: any) =>
+          ["master_admin", "socio", "diretor"].includes(r.role),
+        );
+        if (isExec) keys = PX_SYSTEMS.filter((s) => s.status === "ativo").map((s) => s.key);
+      }
       setAllowedKeys(keys);
     } finally {
       setLoading(false);
@@ -46,7 +57,14 @@ export function SystemProvider({ children }: { children: ReactNode }) {
       if (saved) setActiveKeyState(saved);
     } catch {}
     void refresh();
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "USER_UPDATED") {
+        void refresh();
+      }
+    });
+    return () => sub.subscription.unsubscribe();
   }, [refresh]);
+
 
   const setActiveSystem = useCallback((key: string | null) => {
     setActiveKeyState(key);
