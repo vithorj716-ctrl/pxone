@@ -22,7 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useEmpresaAtiva } from "@/px-core/empresa-context";
-import { listTabelas, saveTabela, duplicarTabela, setStatusTabela } from "@/lib/pxsales-tabelas.functions";
+import { listTabelas, saveTabela, duplicarTabela, setStatusTabela, deleteTabela } from "@/lib/pxsales-tabelas.functions";
 import { listSalesClientes } from "@/lib/pxsales-clientes.functions";
 
 export const Route = createFileRoute("/_authenticated/sales/tabelas/")({
