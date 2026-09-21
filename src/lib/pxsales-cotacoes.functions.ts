@@ -194,6 +194,7 @@ export const saveCotacao = createServerFn({ method: "POST" })
     await assertPermissao(sb, userId, data.id ? "pxsales.cotacoes.edit" : "pxsales.cotacoes.create");
 
     let tabela: TabelaFrete | null = null;
+    let regrasTabela: any[] = [];
     if (data.tabela_frete_id) {
       const { data: t } = await sb
         .from("tms_tabela_frete")
@@ -201,6 +202,13 @@ export const saveCotacao = createServerFn({ method: "POST" })
         .eq("id", data.tabela_frete_id)
         .maybeSingle();
       tabela = (t ?? null) as TabelaFrete | null;
+      const { data: rg } = await sb
+        .from("tms_tabela_regras")
+        .select("*")
+        .eq("tabela_id", data.tabela_frete_id)
+        .eq("ativo", true)
+        .order("ordem", { ascending: true });
+      regrasTabela = (rg ?? []) as any[];
     }
 
     const calc = calcularFrete(tabela, {
@@ -212,7 +220,8 @@ export const saveCotacao = createServerFn({ method: "POST" })
       advalorem_percentual: n(data.advalorem_percentual),
       taxas_extras: n(data.taxas_extras),
       desconto_percentual: n(data.desconto_percentual),
-    });
+      qtd_volumes: i(data.qtd_volumes, 1),
+    }, regrasTabela);
 
     const payload: Record<string, any> = {
       cliente_id: data.cliente_id || null,

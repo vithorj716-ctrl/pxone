@@ -45,8 +45,27 @@ export const Route = createFileRoute("/api/public/v1/tabelas-frete")({
               requestId: ctx.requestId, details: error.message,
             });
           }
+
+          // Regras comerciais estruturadas de cada tabela (compatível: campos legados seguem no item).
+          const ids = (data ?? []).map((t: any) => t.id);
+          let regrasPorTabela: Record<string, any[]> = {};
+          if (ids.length) {
+            const { data: regras } = await (ctx.supabase as any)
+              .from("tms_tabela_regras")
+              .select("*")
+              .in("tabela_id", ids)
+              .order("ordem", { ascending: true });
+            regrasPorTabela = (regras ?? []).reduce((acc: Record<string, any[]>, r: any) => {
+              (acc[r.tabela_id] ||= []).push(r);
+              return acc;
+            }, {});
+          }
+
           return pxOk(
-            { items: data ?? [], meta: makeMeta(page, pageSize, count ?? 0) },
+            {
+              items: (data ?? []).map((t: any) => ({ ...t, regras: regrasPorTabela[t.id] ?? [] })),
+              meta: makeMeta(page, pageSize, count ?? 0),
+            },
             { requestId: ctx.requestId },
           );
         }),
