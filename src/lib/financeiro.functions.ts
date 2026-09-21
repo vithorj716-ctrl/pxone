@@ -72,7 +72,10 @@ export const finVisaoGeral = createServerFn({ method: "POST" })
     }
 
     return {
-      saldo: saldoInicial + recebimentosRealizados - pagamentosRealizados,
+      // saldo histórico real (abertura + todo o histórico), vindo do banco
+      saldo: num(saldoInfo.saldo_consolidado),
+      saldoContas: num(saldoInfo.saldo_contas),
+      saldoSemConta: num(saldoInfo.saldo_sem_conta),
       aPagar: abertoP.reduce((a, b) => a + saldoP(b), 0),
       aReceber: abertoR.reduce((a, b) => a + saldoR(b), 0),
       pagarHoje: abertoP.filter((r) => r.vencimento === hoje).reduce((a, b) => a + saldoP(b), 0),
@@ -84,9 +87,9 @@ export const finVisaoGeral = createServerFn({ method: "POST" })
       pagamentosRealizados,
       recebimentosRealizados,
       adiantamentosAbertos: ((adto.data ?? []) as any[])
-        .filter((a) => ["aprovado", "pago", "parcialmente_acertado"].includes(a.status))
+        .filter((a) => ["pago", "parcialmente_pago", "parcialmente_acertado"].includes(a.status))
         .reduce((a, b) => a + (num(b.valor_pago) - num(b.valor_acertado)), 0),
-      contas: (contas.data ?? []) as any[],
+      contas: (saldoInfo.contas ?? []) as any[],
       fluxo,
     };
   });
