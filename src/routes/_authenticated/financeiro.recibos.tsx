@@ -112,6 +112,10 @@ function Recibos() {
             <input className="input w-full" type="date" value={form.data ?? ""} onChange={(e) => setForm({ ...form, data: e.target.value })} />
             <input className="input w-full" placeholder="Forma de pagamento" value={form.forma ?? ""}
               onChange={(e) => setForm({ ...form, forma: e.target.value })} />
+            <textarea className="input w-full" rows={2}
+              placeholder="Justificativa (obrigatória quando não há pagamento/recebimento vinculado)"
+              value={form.justificativa ?? ""}
+              onChange={(e) => setForm({ ...form, justificativa: e.target.value })} />
             <button disabled={mEmitir.isPending} onClick={() => mEmitir.mutate(form)}
               className="px-3 py-2 rounded-md bg-emerald-600 text-white disabled:opacity-50">Emitir</button>
           </div>

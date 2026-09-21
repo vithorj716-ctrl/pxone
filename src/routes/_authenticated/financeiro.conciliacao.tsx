@@ -51,7 +51,7 @@ function Conciliacao() {
       title="Conciliação"
       subtitle="Extrato x movimentos"
       actions={
-        <button onClick={() => setForm({ payload: { data: new Date().toISOString().slice(0, 10), status: "pendente" } })}
+        <button onClick={() => setForm({ payload: { data: new Date().toISOString().slice(0, 10), status: "nao_conciliado" } })}
           className="text-xs px-2.5 py-1.5 rounded-md bg-emerald-600 text-white">Novo lançamento</button>
       }
     >
@@ -78,7 +78,7 @@ function Conciliacao() {
                 <td className="p-2">{r.descricao ?? "—"}</td>
                 <td className="p-2 text-right tabular-nums">{brl(r.valor)}</td>
                 <td className="p-2">{r.movimento_id ? r.movimento_id.slice(0, 8) : "—"}</td>
-                <td className="p-2"><FinStatus status={r.status ?? "pendente"} /></td>
+                <td className="p-2"><FinStatus status={r.status ?? "nao_conciliado"} /></td>
               </tr>
             ))}
           </tbody>
@@ -108,9 +108,9 @@ function Conciliacao() {
                 <option key={m.id} value={m.id}>{dataBr(m.data)} — {m.tipo} — {brl(m.valor)}</option>
               ))}
             </select>
-            <select className="input w-full" value={form.payload.status ?? "pendente"}
+            <select className="input w-full" value={form.payload.status ?? "nao_conciliado"}
               onChange={(e) => setForm({ ...form, payload: { ...form.payload, status: e.target.value } })}>
-              {["pendente", "conciliado", "divergente"].map((s) => <option key={s} value={s}>{s}</option>)}
+              {["nao_conciliado", "conciliado", "divergente", "ignorado"].map((s) => <option key={s} value={s}>{s}</option>)}
             </select>
             <button disabled={mSalvar.isPending} onClick={() => mSalvar.mutate(form)}
               className="px-3 py-2 rounded-md bg-emerald-600 text-white disabled:opacity-50">Salvar</button>
