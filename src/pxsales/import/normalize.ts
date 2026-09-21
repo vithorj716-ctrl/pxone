@@ -110,9 +110,16 @@ export function normalizarRegistro(r: RegistroXml): RegistroNormalizado {
   const cnpjBrutoInvalido = campos(r, "cnpj").some((v) => onlyDigits(v).length === 14 && !isValidCnpj(v));
   if (!cnpj && cnpjBrutoInvalido) avisos.push("CNPJ informado no arquivo é inválido.");
 
-  const razao =
-    limpar(campo(r, "razao_social", "razaosocial", "empresa", "nome_empresa", "cliente", "nome")) ?? null;
-  const fantasia = limpar(campo(r, "nome_fantasia", "fantasia", "apelido")) ?? null;
+  const razaoBruta = limpar(campo(r, "razao_social", "razaosocial", "empresa", "nome_empresa", "cliente", "nome"));
+  const razao = nomeEmpresaValido(razaoBruta);
+  if (razaoBruta && !razao) {
+    avisos.push(
+      cnpj
+        ? "Nome da empresa no arquivo não é utilizável — será usado o nome oficial da Receita."
+        : "Nome da empresa no arquivo não é utilizável — revise antes de importar.",
+    );
+  }
+  const fantasia = nomeEmpresaValido(campo(r, "nome_fantasia", "fantasia", "apelido"));
 
   // ---- localização
   const cidadeCampo = limpar(campo(r, "cidade", "municipio"));
