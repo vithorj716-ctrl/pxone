@@ -60,20 +60,76 @@ export function extrairCep(texto: string): string | null {
   return d.length === 8 ? d : null;
 }
 
+/**
+ * Remove trechos que geram números falsos: coordenadas, links de mapa,
+ * carimbos de data/hora do WhatsApp, CNPJ/CPF e CEP.
+ */
+export function limparRuido(texto: string): string {
+  return (texto || "")
+    .replace(/https?:\/\/\S+/gi, " ")
+    .replace(/-?\d{1,3}\.\d{4,}\s*,?\s*-?\d{1,3}\.\d{4,}/g, " ")
+    .replace(/-?\d{1,3}\.\d{4,}/g, " ")
+    .replace(/\[[^\]]{0,40}\d{1,2}:\d{2}(?::\d{2})?[^\]]{0,10}\]/g, " ")
+    .replace(/\b\d{1,2}\/\d{1,2}\/\d{2,4},?\s*\d{1,2}:\d{2}(?::\d{2})?\s*(?:AM|PM)?/gi, " ")
+    .replace(/\b\d{2}[.\s]?\d{3}[.\s]?\d{3}[/\s]?\d{4}[-\s]?\d{2}\b/g, " ")
+    .replace(/\b\d{14}\b/g, " ")
+    .replace(/\b\d{3}\.\d{3}\.\d{3}-\d{2}\b/g, " ")
+    .replace(/\b\d{5}-\d{3}\b/g, " ");
+}
+
 /** Telefones brasileiros (fixo e celular), normalizados para dígitos com DDD. */
 export function extrairTelefones(texto: string): string[] {
   const out: string[] = [];
-  const re = /(?:\+?55\s*)?(?:\(?\d{2}\)?[\s.-]?)?(?:9\s?)?\d{4}[\s.-]?\d{4}\b/g;
-  for (const m of texto.matchAll(re)) {
+  const limpo = limparRuido(texto);
+  const re = /(?:\+?55[\s.-]?)?(?:\(?\d{2}\)?[\s.-]?)?(?:9[\s.-]?)?\d{4}[\s.-]?\d{4}\b/g;
+  for (const m of limpo.matchAll(re)) {
     let d = onlyDigits(m[0]);
     if (d.startsWith("55") && d.length > 11) d = d.slice(2);
     if (d.length !== 10 && d.length !== 11) continue;
     const ddd = Number(d.slice(0, 2));
     if (ddd < 11 || ddd > 99) continue;
     if (/^(\d)\1+$/.test(d)) continue;
+    // celular: 11 dígitos começando com 9 após o DDD; fixo: 10 dígitos com prefixo 2..5
+    if (d.length === 11 && d.charAt(2) !== "9") continue;
+    if (d.length === 10 && !/[2-5]/.test(d.charAt(2))) continue;
     if (!out.includes(d)) out.push(d);
   }
   return out;
+}
+
+const NOME_INVALIDO = [
+  /^(bom\s+dia|boa\s+tarde|boa\s+noite|ol[áa]|oi)\b/i,
+  /imagem\s+ocultada|[áa]udio\s+ocultad|figurinha|encaminhad/i,
+  /^[>\-•*]/,
+  /@/,
+  /:\s*$/,
+  /^(visita|prospec|localiza|cadastr|cliente\s+envia|nesse\s+padr|pra\s+eu|o\s+mesmo|e\s+entrega|empresa\s+ir[áa])/i,
+  /\b(irá|ira|vai|foi|fez|ligar|retornar|enviar|transportar|responsável|responsavel|fechada|teste)\b/i,
+];
+
+/** Um nome de empresa aproveitável (descarta saudações, frases e ruído do WhatsApp). */
+export function nomeEmpresaValido(v: string | null | undefined): string | null {
+  const t = limpar(v);
+  if (!t) return null;
+  if (t.length < 3 || t.length > 90) return null;
+  if (t.split(/\s+/).length > 7) return null;
+  if (!/[A-Za-zÀ-ÿ]{3}/.test(t)) return null;
+  for (const re of NOME_INVALIDO) if (re.test(t)) return null;
+  return t.replace(/^empresa\s+/i, "").trim() || null;
+}
+
+const PESSOA_INVALIDA = /\b(parte|cota[çc]|envios?|entrega|pedido|whats|telefone|email|e-mail|cnpj|empresa|cliente|respons[áa]vel)\b/i;
+
+/** Um nome de pessoa aproveitável vindo de campos como <responsavel>. */
+export function nomePessoaValido(v: string | null | undefined): string | null {
+  const t = limpar(v);
+  if (!t) return null;
+  const palavras = t.split(/\s+/);
+  if (palavras.length > 4) return null;
+  if (t.length < 3 || t.length > 60) return null;
+  if (!/^[A-Za-zÀ-ÿ'´`.\s]+$/.test(t)) return null;
+  if (PESSOA_INVALIDA.test(t)) return null;
+  return titulo(t);
 }
 
 export function ehCelular(telefone: string): boolean {
