@@ -150,28 +150,14 @@ export const finGerarPagamentosFolha = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const sb = context.supabase as Sb;
     await assertPermissao(sb, context.userId, "financeiro.folha.approve");
-    const empresa_id = await resolveEmpresaId(sb, context.userId, data.empresaId);
-    const { data: itens } = await sb.from("fin_folha_itens")
-      .select("*, fin_pessoas(nome)").eq("periodo_id", data.periodoId).eq("empresa_id", empresa_id);
-    const pendentes = ((itens ?? []) as any[]).filter((i) => !i.conta_pagar_id && i.status !== "cancelado" && Number(i.valor_liquido) > 0);
-    let criados = 0;
-    for (const item of pendentes) {
-      const { data: cp, error } = await sb.from("fin_contas_pagar").insert({
-        empresa_id, fornecedor_id: item.pessoa_id,
-        fornecedor_nome: item.fin_pessoas?.nome ?? "Colaborador",
-        descricao: `Folha/pagamento — ${item.fin_pessoas?.nome ?? ""}`,
-        valor: item.valor_liquido, vencimento: data.vencimento ?? new Date().toISOString().slice(0, 10),
-        origem: "folha", origem_tipo: "folha_item", origem_id: item.id, status: "aberto",
-        created_by: context.userId,
-      }).select("id").maybeSingle();
-      if (error) throw new Error(error.message);
-      await sb.from("fin_folha_itens").update({ conta_pagar_id: cp.id, status: "aprovado" }).eq("id", item.id);
-      criados++;
-    }
-    await sb.from("fin_folha_periodos").update({ status: "aprovada", aprovado_por: context.userId, aprovado_em: new Date().toISOString() })
-      .eq("id", data.periodoId);
-    await auditar(sb, context.userId, "fin_folha_periodos", data.periodoId, "gerar_pagamentos", { criados });
-    return { criados };
+    // Tudo em uma única transação no banco: ou gera todos os títulos ou nenhum.
+    const { data: res, error } = await sb.rpc("fin_gerar_pagamentos_folha", {
+      _periodo_id: data.periodoId, _vencimento: data.vencimento ?? null,
+    });
+    if (error) throw new Error(error.message);
+    const out = (res ?? {}) as { criados?: number; existentes?: number };
+    await auditar(sb, context.userId, "fin_folha_periodos", data.periodoId, "gerar_pagamentos", out);
+    return { criados: out.criados ?? 0, existentes: out.existentes ?? 0 };
   });
 
 // ---------------- Recibos ----------------
