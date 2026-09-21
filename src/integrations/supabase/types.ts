@@ -5790,6 +5790,101 @@ export type Database = {
       }
     }
     Functions: {
+      fin_acertar_adiantamento: {
+        Args: { _id: string; _observacao?: string; _valor: number }
+        Returns: Json
+      }
+      fin_agendar_comissao: {
+        Args: { _comissao_id: string; _vencimento?: string }
+        Returns: Json
+      }
+      fin_aprovar_adiantamento: {
+        Args: { _id: string; _valor_aprovado: number }
+        Returns: Json
+      }
+      fin_cancelar_titulo: {
+        Args: { _entidade: string; _id: string; _motivo: string }
+        Returns: Json
+      }
+      fin_emitir_recibo: {
+        Args: {
+          _beneficiario: string
+          _data?: string
+          _descricao: string
+          _documento: string
+          _empresa_id: string
+          _forma?: string
+          _movimento_id?: string
+          _origem_id?: string
+          _origem_tipo?: string
+          _reemissao_de?: string
+          _tipo: string
+          _valor: number
+        }
+        Returns: Json
+      }
+      fin_estornar_movimento: {
+        Args: { _motivo: string; _movimento_id: string }
+        Returns: Json
+      }
+      fin_faturar_minuta: {
+        Args: {
+          _conta_id?: string
+          _empresa_id?: string
+          _minuta_id: string
+          _vencimento?: string
+        }
+        Returns: Json
+      }
+      fin_hist: {
+        Args: {
+          _acao: string
+          _de: Json
+          _empresa: string
+          _entidade: string
+          _id: string
+          _para: Json
+        }
+        Returns: undefined
+      }
+      fin_marcar_vencidos: { Args: { _empresa_id: string }; Returns: Json }
+      fin_pagar_adiantamento: {
+        Args: {
+          _conta_id?: string
+          _data?: string
+          _forma?: string
+          _id: string
+          _idempotency_key?: string
+          _valor?: number
+        }
+        Returns: Json
+      }
+      fin_registrar_pagamento: {
+        Args: {
+          _conta_id?: string
+          _conta_pagar_id: string
+          _data?: string
+          _documento?: string
+          _forma?: string
+          _idempotency_key?: string
+          _observacao?: string
+          _valor: number
+        }
+        Returns: Json
+      }
+      fin_registrar_recebimento: {
+        Args: {
+          _conta_id?: string
+          _conta_receber_id: string
+          _data?: string
+          _documento?: string
+          _forma?: string
+          _idempotency_key?: string
+          _observacao?: string
+          _valor: number
+        }
+        Returns: Json
+      }
       financeiro_can: {
         Args: { _acao: string; _empresa_id: string }
         Returns: boolean
