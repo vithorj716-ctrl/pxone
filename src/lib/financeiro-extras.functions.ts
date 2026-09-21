@@ -315,16 +315,29 @@ export const finSalvarConciliacao = createServerFn({ method: "POST" })
     const sb = context.supabase as Sb;
     await assertPermissao(sb, context.userId, "financeiro.conciliacao.manage");
     const empresa_id = await resolveEmpresaId(sb, context.userId, data.empresaId);
-    const payload: Record<string, any> = { ...data.payload, empresa_id };
-    if (payload.status === "conciliado") {
-      payload.conciliado_por = context.userId;
-      payload.conciliado_em = new Date().toISOString();
+    const p: Record<string, any> = { ...data.payload };
+    const status = String(p.status ?? "nao_conciliado");
+    const movimentoId = (p.movimento_id ?? null) as string | null;
+    delete p.movimento_id; delete p.status; delete p.conciliado_por; delete p.conciliado_em;
+    delete p.id; delete p.created_at; delete p.updated_at;
+
+    let rowId = data.id ?? null;
+    if (!rowId) {
+      const { data: row, error } = await sb.from("fin_conciliacao")
+        .insert({ ...p, empresa_id, status: "nao_conciliado" }).select("*").maybeSingle();
+      if (error) throw new Error(error.message);
+      rowId = row?.id ?? null;
+    } else {
+      const { error } = await sb.from("fin_conciliacao").update(p).eq("id", rowId).eq("empresa_id", empresa_id);
+      if (error) throw new Error(error.message);
     }
-    const { data: row, error } = data.id
-      ? await sb.from("fin_conciliacao").update(payload).eq("id", data.id).eq("empresa_id", empresa_id).select("*").maybeSingle()
-      : await sb.from("fin_conciliacao").insert(payload).select("*").maybeSingle();
-    if (error) throw new Error(error.message);
-    await auditar(sb, context.userId, "fin_conciliacao", row?.id ?? "", data.id ? "update" : "create", payload);
+    // Vínculo/status passam pela RPC: registra quem conciliou e não altera o movimento.
+    const { error: rpcErr } = await sb.rpc("fin_conciliar", {
+      _id: rowId, _movimento_id: movimentoId, _status: status, _observacao: p.observacao ?? null,
+    });
+    if (rpcErr) throw new Error(rpcErr.message);
+    await auditar(sb, context.userId, "fin_conciliacao", rowId ?? "", data.id ? "update" : "create", { status, movimentoId });
+    const { data: row } = await sb.from("fin_conciliacao").select("*").eq("id", rowId).maybeSingle();
     return row;
   });
 
