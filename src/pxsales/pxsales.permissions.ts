@@ -58,6 +58,7 @@ export const PXSALES_PAPEIS = [
       "pxsales.leads.edit",
       "pxsales.clientes.view",
       "pxsales.clientes.edit",
+      "pxsales.clientes.import",
       "pxsales.oportunidades.view",
       "pxsales.oportunidades.edit",
       "pxsales.tabelas.view",

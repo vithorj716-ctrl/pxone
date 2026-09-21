@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Building2, Plus, Search, Star, Users, MapPin, Loader2 } from "lucide-react";
+import { Building2, Plus, Search, Star, Users, MapPin, Loader2, FileUp } from "lucide-react";
 import { toast } from "sonner";
 import { PxSalesShell } from "@/components/pxsales/pxsales-shell";
 import { Input } from "@/components/ui/input";
@@ -76,9 +76,14 @@ function SalesClientesPage() {
       title="Empresas"
       subtitle="Carteira comercial"
       headerActions={
-        <Button size="sm" onClick={() => { setEditing(null); setOpen(true); }}>
-          <Plus className="size-4 mr-1.5" /> Nova empresa
-        </Button>
+        <div className="flex gap-2">
+          <Button asChild size="sm" variant="outline">
+            <Link to="/sales/clientes/importar"><FileUp className="size-4 mr-1.5" /> Importar XML</Link>
+          </Button>
+          <Button size="sm" onClick={() => { setEditing(null); setOpen(true); }}>
+            <Plus className="size-4 mr-1.5" /> Nova empresa
+          </Button>
+        </div>
       }
     >
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
