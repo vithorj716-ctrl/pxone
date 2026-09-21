@@ -179,10 +179,14 @@ export const finListarRecibos = createServerFn({ method: "POST" })
 
 export const finEmitirRecibo = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((i: { empresaId?: string | null; tipo?: string; beneficiario: string; documento?: string | null; descricao: string; valor: number; data?: string | null; forma?: string | null; origemTipo?: string | null; origemId?: string | null; movimentoId?: string | null; reemissaoDe?: string | null }) => {
-    if (!i?.beneficiario?.trim()) throw new Error("Informe o beneficiário.");
+  .inputValidator((i: { empresaId?: string | null; tipo?: string; beneficiario?: string | null; documento?: string | null; descricao: string; valor?: number | null; data?: string | null; forma?: string | null; origemTipo?: string | null; origemId?: string | null; movimentoId?: string | null; reemissaoDe?: string | null; justificativa?: string | null }) => {
     if (!i?.descricao?.trim()) throw new Error("Informe a descrição.");
-    if (!(Number(i.valor) > 0)) throw new Error("Informe um valor maior que zero.");
+    if (!i?.movimentoId) {
+      // Recibo manual: precisa de beneficiário, valor e justificativa.
+      if (!i?.beneficiario?.trim()) throw new Error("Informe o beneficiário.");
+      if (!(Number(i.valor) > 0)) throw new Error("Informe um valor maior que zero.");
+      if (!i?.justificativa?.trim()) throw new Error("Recibo sem movimento financeiro exige justificativa.");
+    }
     return i;
   })
   .handler(async ({ data, context }) => {
@@ -190,11 +194,11 @@ export const finEmitirRecibo = createServerFn({ method: "POST" })
     await assertPermissao(sb, context.userId, "financeiro.recibos.generate");
     const empresa_id = await resolveEmpresaId(sb, context.userId, data.empresaId);
     const { data: res, error } = await sb.rpc("fin_emitir_recibo", {
-      _empresa_id: empresa_id, _tipo: data.tipo ?? "pagamento", _beneficiario: data.beneficiario,
-      _documento: data.documento ?? null, _descricao: data.descricao, _valor: data.valor,
+      _empresa_id: empresa_id, _tipo: data.tipo ?? "pagamento", _beneficiario: data.beneficiario ?? null,
+      _documento: data.documento ?? null, _descricao: data.descricao, _valor: data.valor ?? null,
       _data: data.data ?? null, _forma: data.forma ?? null, _origem_tipo: data.origemTipo ?? null,
       _origem_id: data.origemId ?? null, _movimento_id: data.movimentoId ?? null,
-      _reemissao_de: data.reemissaoDe ?? null,
+      _reemissao_de: data.reemissaoDe ?? null, _justificativa: data.justificativa ?? null,
     });
     if (error) throw new Error(error.message);
     await auditar(sb, context.userId, "fin_recibos", String((res as any)?.recibo_id ?? ""), "emissao", { valor: data.valor });
