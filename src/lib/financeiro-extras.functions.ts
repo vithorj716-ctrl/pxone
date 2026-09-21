@@ -36,7 +36,7 @@ export const finSalvarAdiantamento = createServerFn({ method: "POST" })
     const sb = context.supabase as Sb;
     await assertPermissao(sb, context.userId, "financeiro.adiantamentos.manage");
     const empresa_id = await resolveEmpresaId(sb, context.userId, data.empresaId);
-    const payload = { ...data.payload, empresa_id };
+    const payload: Record<string, any> = { ...data.payload, empresa_id };
     delete payload.valor_pago; delete payload.valor_acertado; delete payload.status;
     const { data: row, error } = data.id
       ? await sb.from("fin_adiantamentos").update(payload).eq("id", data.id).eq("empresa_id", empresa_id).select("*").maybeSingle()
@@ -325,7 +325,7 @@ export const finSalvarConciliacao = createServerFn({ method: "POST" })
     const sb = context.supabase as Sb;
     await assertPermissao(sb, context.userId, "financeiro.conciliacao.manage");
     const empresa_id = await resolveEmpresaId(sb, context.userId, data.empresaId);
-    const payload = { ...data.payload, empresa_id };
+    const payload: Record<string, any> = { ...data.payload, empresa_id };
     if (payload.status === "conciliado") {
       payload.conciliado_por = context.userId;
       payload.conciliado_em = new Date().toISOString();
