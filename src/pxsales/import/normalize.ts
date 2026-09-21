@@ -28,6 +28,8 @@ import {
   extrairUf,
   extrairValor,
   extrairVolumeMensal,
+  nomeEmpresaValido,
+  nomePessoaValido,
   hashTexto,
   limpar,
   paraNumero,
@@ -110,9 +112,16 @@ export function normalizarRegistro(r: RegistroXml): RegistroNormalizado {
   const cnpjBrutoInvalido = campos(r, "cnpj").some((v) => onlyDigits(v).length === 14 && !isValidCnpj(v));
   if (!cnpj && cnpjBrutoInvalido) avisos.push("CNPJ informado no arquivo é inválido.");
 
-  const razao =
-    limpar(campo(r, "razao_social", "razaosocial", "empresa", "nome_empresa", "cliente", "nome")) ?? null;
-  const fantasia = limpar(campo(r, "nome_fantasia", "fantasia", "apelido")) ?? null;
+  const razaoBruta = limpar(campo(r, "razao_social", "razaosocial", "empresa", "nome_empresa", "cliente", "nome"));
+  const razao = nomeEmpresaValido(razaoBruta);
+  if (razaoBruta && !razao) {
+    avisos.push(
+      cnpj
+        ? "Nome da empresa no arquivo não é utilizável — será usado o nome oficial da Receita."
+        : "Nome da empresa no arquivo não é utilizável — revise antes de importar.",
+    );
+  }
+  const fantasia = nomeEmpresaValido(campo(r, "nome_fantasia", "fantasia", "apelido"));
 
   // ---- localização
   const cidadeCampo = limpar(campo(r, "cidade", "municipio"));
@@ -142,12 +151,20 @@ export function normalizarRegistro(r: RegistroXml): RegistroNormalizado {
       : null;
 
   // ---- contatos
+  // dígitos de latitude/longitude/mapa não são telefone, mesmo quando o arquivo os traz nessa tag
+  const digitosGeo = campos(r, "latitude", "longitude", "maps_url", "localizacao", "coordenadas")
+    .join(" ")
+    .replace(/\D+/g, "");
+  const ehGeo = (t: string) => digitosGeo.includes(t) || digitosGeo.includes(t.slice(0, 9));
+
   const telefones = Array.from(
     new Set([
       ...campos(r, "telefone", "telefones", "fone", "celular", "whatsapp", "whats").flatMap((v) => extrairTelefones(v)),
       ...extrairTelefones(texto),
     ]),
-  ).slice(0, 8);
+  )
+    .filter((t) => !ehGeo(t))
+    .slice(0, 8);
   const emails = Array.from(
     new Set([
       ...campos(r, "email", "e_mail", "emails").flatMap((v) => extrairEmails(v)),
@@ -158,8 +175,8 @@ export function normalizarRegistro(r: RegistroXml): RegistroNormalizado {
   const nomesContato = Array.from(
     new Set(
       [
-        ...campos(r, "contato", "contato_nome", "responsavel_contato").map((v) => titulo(v)),
-        extrairNomeContato(texto),
+        ...campos(r, "contato", "contato_nome", "responsavel_contato", "responsavel").map((v) => nomePessoaValido(v)),
+        nomePessoaValido(extrairNomeContato(texto)),
       ].filter((v): v is string => !!v && v.length > 2),
     ),
   );
@@ -169,7 +186,9 @@ export function normalizarRegistro(r: RegistroXml): RegistroNormalizado {
     campos(r, "observacoes", "observacao", "obs", "anotacoes", "notas", "descricao", "resumo", "comentario").join(" | "),
   );
 
-  const contatos = montarContatos(nomesContato, telefones, emails, cargo, observacoes);
+  const contatos = montarContatos(nomesContato, telefones, emails, cargo, observacoes).filter(
+    (c) => c.telefone || c.email || (c.nome !== "Contato comercial" && c.nome !== "Contato adicional"),
+  );
 
   // ---- inteligência comercial
   const segmento = limpar(campo(r, "segmento", "ramo", "atividade")) ?? extrairSegmento(texto);
