@@ -151,12 +151,20 @@ export function normalizarRegistro(r: RegistroXml): RegistroNormalizado {
       : null;
 
   // ---- contatos
+  // dígitos de latitude/longitude/mapa não são telefone, mesmo quando o arquivo os traz nessa tag
+  const digitosGeo = campos(r, "latitude", "longitude", "maps_url", "localizacao", "coordenadas")
+    .join(" ")
+    .replace(/\D+/g, "");
+  const ehGeo = (t: string) => digitosGeo.includes(t) || digitosGeo.includes(t.slice(0, 9));
+
   const telefones = Array.from(
     new Set([
       ...campos(r, "telefone", "telefones", "fone", "celular", "whatsapp", "whats").flatMap((v) => extrairTelefones(v)),
       ...extrairTelefones(texto),
     ]),
-  ).slice(0, 8);
+  )
+    .filter((t) => !ehGeo(t))
+    .slice(0, 8);
   const emails = Array.from(
     new Set([
       ...campos(r, "email", "e_mail", "emails").flatMap((v) => extrairEmails(v)),

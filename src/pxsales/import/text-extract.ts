@@ -118,14 +118,15 @@ export function nomeEmpresaValido(v: string | null | undefined): string | null {
   return t.replace(/^empresa\s+/i, "").trim() || null;
 }
 
-const PESSOA_INVALIDA = /\b(parte|cota[çc]|envios?|entrega|pedido|whats|telefone|email|e-mail|cnpj|empresa|cliente|respons[áa]vel)\b/i;
+const PESSOA_INVALIDA =
+  /\b(parte|cota[çc]\w*|envios?|entrega|pedido|whats|telefone|email|e-mail|cnpj|empresa|cliente|respons[áa]ve(?:l|is)|estava|esteve|tive|ligar|ligou|atualmente|adicionou|futuras?|momento|almo[çc]o|vindo|pessoa|compras|qual|dele|dela|nome|sistema|transporte|comercial|grupo|hoje|amanh[ãa])\b/i;
 
 /** Um nome de pessoa aproveitável vindo de campos como <responsavel>. */
 export function nomePessoaValido(v: string | null | undefined): string | null {
   const t = limpar(v);
   if (!t) return null;
   const palavras = t.split(/\s+/);
-  if (palavras.length > 4) return null;
+  if (palavras.length > 3) return null;
   if (t.length < 3 || t.length > 60) return null;
   if (!/^[A-Za-zÀ-ÿ'´`.\s]+$/.test(t)) return null;
   if (PESSOA_INVALIDA.test(t)) return null;
