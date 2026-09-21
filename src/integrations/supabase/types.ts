@@ -5583,6 +5583,81 @@ export type Database = {
           },
         ]
       }
+      tms_rotas: {
+        Row: {
+          ativo: boolean
+          codigo: string
+          created_at: string
+          destino_cidade: string | null
+          destino_uf: string | null
+          distancia_km: number | null
+          id: string
+          nome: string
+          origem_cidade: string | null
+          origem_uf: string | null
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          codigo: string
+          created_at?: string
+          destino_cidade?: string | null
+          destino_uf?: string | null
+          distancia_km?: number | null
+          id?: string
+          nome: string
+          origem_cidade?: string | null
+          origem_uf?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          codigo?: string
+          created_at?: string
+          destino_cidade?: string | null
+          destino_uf?: string | null
+          distancia_km?: number | null
+          id?: string
+          nome?: string
+          origem_cidade?: string | null
+          origem_uf?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      tms_servicos: {
+        Row: {
+          ativo: boolean
+          codigo: string
+          created_at: string
+          descricao: string | null
+          id: string
+          nome: string
+          unidade: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          codigo: string
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          nome: string
+          unidade?: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          codigo?: string
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          nome?: string
+          unidade?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       tms_tabela_frete: {
         Row: {
           ativo: boolean
@@ -5656,6 +5731,97 @@ export type Database = {
             columns: ["cliente_id"]
             isOneToOne: false
             referencedRelation: "tms_clientes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tms_tabela_regras: {
+        Row: {
+          ativo: boolean
+          base_calculo: string
+          config: Json
+          created_at: string
+          faixa_campo: string | null
+          faixa_max: number | null
+          faixa_min: number | null
+          id: string
+          modo: string
+          nome: string
+          ordem: number
+          rota_id: string | null
+          servico_id: string | null
+          tabela_id: string
+          tipo: string
+          unidade: string | null
+          updated_at: string
+          valor: number | null
+          valor_maximo: number | null
+          valor_minimo: number | null
+        }
+        Insert: {
+          ativo?: boolean
+          base_calculo?: string
+          config?: Json
+          created_at?: string
+          faixa_campo?: string | null
+          faixa_max?: number | null
+          faixa_min?: number | null
+          id?: string
+          modo: string
+          nome: string
+          ordem?: number
+          rota_id?: string | null
+          servico_id?: string | null
+          tabela_id: string
+          tipo?: string
+          unidade?: string | null
+          updated_at?: string
+          valor?: number | null
+          valor_maximo?: number | null
+          valor_minimo?: number | null
+        }
+        Update: {
+          ativo?: boolean
+          base_calculo?: string
+          config?: Json
+          created_at?: string
+          faixa_campo?: string | null
+          faixa_max?: number | null
+          faixa_min?: number | null
+          id?: string
+          modo?: string
+          nome?: string
+          ordem?: number
+          rota_id?: string | null
+          servico_id?: string | null
+          tabela_id?: string
+          tipo?: string
+          unidade?: string | null
+          updated_at?: string
+          valor?: number | null
+          valor_maximo?: number | null
+          valor_minimo?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tms_tabela_regras_rota_id_fkey"
+            columns: ["rota_id"]
+            isOneToOne: false
+            referencedRelation: "tms_rotas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tms_tabela_regras_servico_id_fkey"
+            columns: ["servico_id"]
+            isOneToOne: false
+            referencedRelation: "tms_servicos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tms_tabela_regras_tabela_id_fkey"
+            columns: ["tabela_id"]
+            isOneToOne: false
+            referencedRelation: "tms_tabela_frete"
             referencedColumns: ["id"]
           },
         ]

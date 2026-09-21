@@ -24,6 +24,7 @@ export type EntradaFrete = {
   advalorem_percentual: number;
   taxas_extras: number;
   desconto_percentual: number;
+  qtd_volumes: number;
 };
 
 export type ComposicaoFrete = {
@@ -50,7 +51,13 @@ const num = (v: unknown) => {
 
 const r2 = (n: number) => Math.round(n * 100) / 100;
 
-export function calcularFrete(tabela: TabelaFrete | null, entrada: Partial<EntradaFrete>): ComposicaoFrete {
+import { calcularTabelaFrete, type RegraComercial } from "@/pxlog/regra-engine";
+
+export function calcularFrete(
+  tabela: TabelaFrete | null,
+  entrada: Partial<EntradaFrete>,
+  regras?: RegraComercial[] | null,
+): ComposicaoFrete {
   const peso = num(entrada.peso);
   const cubagem = num(entrada.cubagem);
   const pesoCubado = r2(cubagem * FATOR_CUBAGEM);
@@ -59,6 +66,38 @@ export function calcularFrete(tabela: TabelaFrete | null, entrada: Partial<Entra
   const kg = num(tabela?.valor_kg);
   const m3 = num(tabela?.valor_m3);
   const tipo = tabela?.tipo_cobranca ?? "peso";
+
+  // Quando a tabela possui regras comerciais estruturadas, o motor único define a base.
+  if (regras && regras.length) {
+    const eng = calcularTabelaFrete(regras, {
+      peso, peso_taxado: pesoTaxado, cubagem,
+      volumes: num(entrada.qtd_volumes ?? 1),
+      valor_nota: num(entrada.valor_mercadoria),
+    });
+    const pedagioM = num(entrada.pedagio);
+    const mercM = num(entrada.valor_mercadoria);
+    const grisM = r2((mercM * num(entrada.gris_percentual)) / 100);
+    const advM = r2((mercM * num(entrada.advalorem_percentual)) / 100);
+    const taxasM = num(entrada.taxas_extras);
+    const sub = r2(eng.total + pedagioM + grisM + advM + taxasM);
+    const desc = r2((sub * num(entrada.desconto_percentual)) / 100);
+    return {
+      peso_cubado: pesoCubado,
+      peso_taxado: pesoTaxado,
+      valor_base: eng.frete_base,
+      valor_coleta: 0,
+      valor_entrega: 0,
+      pedagio: pedagioM,
+      gris: grisM,
+      advalorem: advM,
+      taxas_extras: r2(taxasM + eng.adicionais),
+      subtotal: sub,
+      desconto: desc,
+      valor_total: r2(Math.max(0, sub - desc)),
+      aplicou_minimo: eng.minimo_aplicado !== null,
+      prazo_dias: tabela?.prazo_dias ?? 1,
+    };
+  }
 
   let base = 0;
   if (tipo === "cubagem") base = m3 * cubagem;

@@ -17,6 +17,17 @@ export function calcPesoTaxado(peso_real: number, peso_cubado: number) {
   return Math.max(Number(peso_real || 0), Number(peso_cubado || 0));
 }
 
+// Motor comercial único — toda tela/serviço calcula por aqui.
+export {
+  calcularTabelaFrete,
+  regrasLegado,
+  escolherTabela,
+  type RegraComercial,
+  type ContextoFrete,
+  type ResultadoFrete,
+} from "@/pxlog/regra-engine";
+import { calcularTabelaFrete, regrasLegado, escolherTabela, type ContextoFrete, type RegraComercial } from "@/pxlog/regra-engine";
+
 export type RegraFrete = {
   cliente_id?: string | null;
   origem?: string | null;
@@ -34,41 +45,47 @@ export type RegraFrete = {
   prazo_dias: number;
 };
 
+/** Tabela comercial: cabeçalho legado + regras estruturadas (quando já cadastradas). */
+export type TabelaComercial = RegraFrete & { id?: string; nome?: string; ativo?: boolean; regras?: RegraComercial[] };
+
+/** Regras efetivas da tabela: as estruturadas quando existirem, senão a conversão do legado. */
+export function regrasDaTabela(tabela: TabelaComercial | null | undefined): RegraComercial[] {
+  if (!tabela) return [];
+  if (tabela.regras && tabela.regras.length) return tabela.regras;
+  return regrasLegado(tabela as unknown as Record<string, unknown>);
+}
+
 export function escolherRegra(opts: {
-  regras: RegraFrete[];
+  regras: TabelaComercial[];
   cliente_id?: string | null;
   origem?: string | null;
   destino?: string | null;
   peso_taxado: number;
   cubagem: number;
 }) {
-  const candidatas = opts.regras.filter((r) => {
-    if (r.cliente_id && opts.cliente_id && r.cliente_id !== opts.cliente_id) return false;
-    if (r.origem && opts.origem && r.origem.toLowerCase() !== opts.origem.toLowerCase()) return false;
-    if (r.destino && opts.destino && r.destino.toLowerCase() !== opts.destino.toLowerCase()) return false;
-    if (r.faixa_peso_min != null && opts.peso_taxado < r.faixa_peso_min) return false;
-    if (r.faixa_peso_max != null && opts.peso_taxado > r.faixa_peso_max) return false;
-    if (r.faixa_cubagem_min != null && opts.cubagem < r.faixa_cubagem_min) return false;
-    if (r.faixa_cubagem_max != null && opts.cubagem > r.faixa_cubagem_max) return false;
-    return true;
+  return escolherTabela(opts.regras as any[], {
+    cliente_id: opts.cliente_id,
+    origem: opts.origem,
+    destino: opts.destino,
+    peso_taxado: opts.peso_taxado,
+    cubagem: opts.cubagem,
   });
-  // prioriza regra mais específica
-  candidatas.sort((a, b) => {
-    const score = (r: RegraFrete) =>
-      (r.cliente_id ? 4 : 0) + (r.origem ? 2 : 0) + (r.destino ? 2 : 0) + (r.faixa_peso_max != null ? 1 : 0);
-    return score(b) - score(a);
-  });
-  return candidatas[0] ?? null;
 }
 
-export function calcValorFrete(regra: RegraFrete | null, peso_taxado: number, cubagem: number) {
-  if (!regra) return 0;
-  let valor = 0;
-  if (regra.tipo_cobranca === "peso") valor = peso_taxado * regra.valor_kg;
-  else if (regra.tipo_cobranca === "cubagem") valor = cubagem * regra.valor_m3;
-  else valor = peso_taxado * regra.valor_kg + cubagem * regra.valor_m3;
-  valor += Number(regra.valor_coleta || 0) + Number(regra.valor_entrega || 0);
-  return Math.max(valor, Number(regra.valor_minimo || 0));
+/** Cálculo detalhado pelo motor único. */
+export function calcularFreteDaTabela(tabela: TabelaComercial | null, ctx: ContextoFrete) {
+  return calcularTabelaFrete(regrasDaTabela(tabela), ctx);
+}
+
+/** Compatibilidade: valor total do frete pela mesma engine. */
+export function calcValorFrete(
+  tabela: TabelaComercial | null,
+  peso_taxado: number,
+  cubagem: number,
+  extra: Partial<ContextoFrete> = {},
+) {
+  if (!tabela) return 0;
+  return calcularFreteDaTabela(tabela, { peso_taxado, peso: peso_taxado, cubagem, ...extra }).total;
 }
 
 /** Código único do volume — usado como QR/barras. */

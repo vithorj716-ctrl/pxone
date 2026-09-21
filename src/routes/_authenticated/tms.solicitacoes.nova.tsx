@@ -4,7 +4,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { TmsShell } from "@/components/tms/tms-shell";
 import { supabase } from "@/integrations/supabase/client";
 import { useEmpresaAtiva } from "@/px-core/empresa-context";
-import { calcCubagem, calcPesoCubado, calcPesoTaxado, escolherRegra, calcValorFrete, codigoVolume, type RegraFrete } from "@/lib/tms";
+import { calcCubagem, calcPesoCubado, calcPesoTaxado, escolherRegra, calcularFreteDaTabela, codigoVolume, type TabelaComercial } from "@/lib/tms";
+import { listTabelasFrete } from "@/lib/tms-tabelas.functions";
 import { toast } from "sonner";
 import { Save, Search, MapPin, User, Building2, AlertTriangle, Check, ChevronsUpDown, Pencil, X, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -71,10 +72,11 @@ function NovaSolicitacaoPage() {
   const fnList = useServerFn(listClientes);
   const fnLoad = useServerFn(loadClienteCompleto);
   const fnCredito = useServerFn(getCreditoCliente);
+  const fnTabelas = useServerFn(listTabelasFrete);
   const fnLiberar = useServerFn(liberarBloqueio);
 
   const [clientes, setClientes] = useState<{ id: string; razao_social: string; nome_fantasia?: string; cnpj?: string }[]>([]);
-  const [regras, setRegras] = useState<RegraFrete[]>([]);
+  const [regras, setRegras] = useState<TabelaComercial[]>([]);
   const [saving, setSaving] = useState(false);
   const [novoClienteOpen, setNovoClienteOpen] = useState(false);
 
@@ -106,10 +108,10 @@ function NovaSolicitacaoPage() {
     (async () => {
       const [c, r] = await Promise.all([
         fnList({ data: { sistema: "pxlog" } }).catch(() => []),
-        supabase.from("tms_tabela_frete").select("*").eq("ativo", true),
+        fnTabelas({ data: { apenasAtivas: true } }).catch(() => ({ tabelas: [] as any[] })),
       ]);
       setClientes((c as any[]) ?? []);
-      setRegras(((r.data ?? []) as any[]));
+      setRegras(((r as any).tabelas ?? []) as TabelaComercial[]);
     })();
   }, []);
 
@@ -169,11 +171,17 @@ function NovaSolicitacaoPage() {
       regras, cliente_id: tmsClienteId,
       origem, destino, peso_taxado, cubagem,
     });
-    const valor_frete = calcValorFrete(regra, peso_taxado, cubagem);
+    const composicao = calcularFreteDaTabela(regra, {
+      cliente_id: tmsClienteId, origem, destino,
+      peso: merc.peso, peso_taxado, cubagem,
+      volumes: merc.qtd_volumes, valor_nota: merc.valor_mercadoria,
+    });
     return {
-      cubagem, peso_cubado, peso_taxado, valor_frete,
+      cubagem, peso_cubado, peso_taxado,
+      valor_frete: composicao.total,
+      composicao,
       prazo: regra?.prazo_dias ?? contratante?.prazo_padrao_dias ?? 1,
-      tabela_nome: regra ? `${regra.tipo_cobranca}` : null,
+      tabela_nome: regra?.nome ?? null,
     };
   }, [merc, regras, tmsClienteId, origem, destino, contratante]);
 
