@@ -3,7 +3,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ArrowLeft, Loader2, Plus, Save, Send, Trash2, Calculator, Share2, Copy } from "lucide-react";
+import { ArrowLeft, Loader2, Plus, Save, Send, Trash2, Calculator, Share2, Copy, Upload } from "lucide-react";
+import { ImportarConfigTabelaDialog } from "@/components/pxsales/importar-config-tabela-dialog";
 import { PxSalesShell } from "@/components/pxsales/pxsales-shell";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -132,6 +133,7 @@ function TabelaDetalhe() {
   const [sim, setSim] = useState<Record<string, any>>({ peso: "100", cubagem: "0.5", qtd_volumes: "2", valor_mercadoria: "5000" });
   const [resultado, setResultado] = useState<any>(null);
   const [salvando, setSalvando] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
 
   const fetchTabela = useServerFn(getTabela);
   const fetchVersao = useServerFn(getVersao);
@@ -259,6 +261,9 @@ function TabelaDetalhe() {
       subtitle="Escolha os componentes, configure cada regra e publique a versão"
       headerActions={
         <div className="flex gap-1.5">
+          <Button size="sm" variant="secondary" onClick={() => setImportOpen(true)}>
+            <Upload className="size-4 mr-1" /> Importar
+          </Button>
           <Button size="sm" variant="secondary" onClick={onNovaVersao}>
             <Copy className="size-4 mr-1" /> Nova versão
           </Button>
@@ -271,6 +276,18 @@ function TabelaDetalhe() {
         </div>
       }
     >
+      <ImportarConfigTabelaDialog
+        open={importOpen}
+        onOpenChange={setImportOpen}
+        componentesAtuais={componentes}
+        nomeTabela={(tabela as any)?.tabela?.nome ?? "tabela"}
+        bloqueado={publicada}
+        onAplicar={(comps) => {
+          setComponentes(comps);
+          setSelecionado(comps[0]?.codigo ?? "");
+        }}
+      />
+
       <Link to="/sales/tabelas" className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:underline mb-3">
         <ArrowLeft className="size-3.5" /> Voltar para tabelas
       </Link>
