@@ -251,7 +251,9 @@ export const deleteTabela = createServerFn({ method: "POST" })
     const { data: versoes } = await sb.from("pxsales_tabela_versoes").select("id").eq("tabela_id", data.id);
     const versaoIds = (versoes ?? []).map((v: any) => v.id);
     if (versaoIds.length) {
-      await sb.from("pxsales_tabela_faixas").delete().in("versao_id", versaoIds);
+      const { data: comps } = await sb.from("pxsales_tabela_componentes").select("id").in("versao_id", versaoIds);
+      const compIds = (comps ?? []).map((c: any) => c.id);
+      if (compIds.length) await sb.from("pxsales_tabela_faixas").delete().in("componente_id", compIds);
       await sb.from("pxsales_tabela_componentes").delete().in("versao_id", versaoIds);
       await sb.from("pxsales_tabela_versoes").delete().in("id", versaoIds);
     }
