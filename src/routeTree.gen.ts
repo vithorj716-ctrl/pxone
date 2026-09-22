@@ -63,6 +63,7 @@ import { Route as AuthenticatedSalesFollowupsRouteImport } from './routes/_authe
 import { Route as AuthenticatedSalesContatosRouteImport } from './routes/_authenticated/sales.contatos'
 import { Route as AuthenticatedSalesConfiguracoesRouteImport } from './routes/_authenticated/sales.configuracoes'
 import { Route as AuthenticatedSalesComissoesRouteImport } from './routes/_authenticated/sales.comissoes'
+import { Route as AuthenticatedSalesCapturaRouteImport } from './routes/_authenticated/sales.captura'
 import { Route as AuthenticatedSalesAgendaRouteImport } from './routes/_authenticated/sales.agenda'
 import { Route as AuthenticatedRegistryClientesRouteImport } from './routes/_authenticated/registry.clientes'
 import { Route as AuthenticatedFinancialIntelligenceDreRouteImport } from './routes/_authenticated/financial-intelligence.dre'
@@ -425,6 +426,12 @@ const AuthenticatedSalesComissoesRoute =
   AuthenticatedSalesComissoesRouteImport.update({
     id: '/sales/comissoes',
     path: '/sales/comissoes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSalesCapturaRoute =
+  AuthenticatedSalesCapturaRouteImport.update({
+    id: '/sales/captura',
+    path: '/sales/captura',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedSalesAgendaRoute =
@@ -886,6 +893,7 @@ export interface FileRoutesByFullPath {
   '/financial-intelligence/dre': typeof AuthenticatedFinancialIntelligenceDreRoute
   '/registry/clientes': typeof AuthenticatedRegistryClientesRoute
   '/sales/agenda': typeof AuthenticatedSalesAgendaRoute
+  '/sales/captura': typeof AuthenticatedSalesCapturaRoute
   '/sales/comissoes': typeof AuthenticatedSalesComissoesRoute
   '/sales/configuracoes': typeof AuthenticatedSalesConfiguracoesRoute
   '/sales/contatos': typeof AuthenticatedSalesContatosRoute
@@ -1011,6 +1019,7 @@ export interface FileRoutesByTo {
   '/financial-intelligence/dre': typeof AuthenticatedFinancialIntelligenceDreRoute
   '/registry/clientes': typeof AuthenticatedRegistryClientesRoute
   '/sales/agenda': typeof AuthenticatedSalesAgendaRoute
+  '/sales/captura': typeof AuthenticatedSalesCapturaRoute
   '/sales/comissoes': typeof AuthenticatedSalesComissoesRoute
   '/sales/configuracoes': typeof AuthenticatedSalesConfiguracoesRoute
   '/sales/contatos': typeof AuthenticatedSalesContatosRoute
@@ -1138,6 +1147,7 @@ export interface FileRoutesById {
   '/_authenticated/financial-intelligence/dre': typeof AuthenticatedFinancialIntelligenceDreRoute
   '/_authenticated/registry/clientes': typeof AuthenticatedRegistryClientesRoute
   '/_authenticated/sales/agenda': typeof AuthenticatedSalesAgendaRoute
+  '/_authenticated/sales/captura': typeof AuthenticatedSalesCapturaRoute
   '/_authenticated/sales/comissoes': typeof AuthenticatedSalesComissoesRoute
   '/_authenticated/sales/configuracoes': typeof AuthenticatedSalesConfiguracoesRoute
   '/_authenticated/sales/contatos': typeof AuthenticatedSalesContatosRoute
@@ -1266,6 +1276,7 @@ export interface FileRouteTypes {
     | '/financial-intelligence/dre'
     | '/registry/clientes'
     | '/sales/agenda'
+    | '/sales/captura'
     | '/sales/comissoes'
     | '/sales/configuracoes'
     | '/sales/contatos'
@@ -1391,6 +1402,7 @@ export interface FileRouteTypes {
     | '/financial-intelligence/dre'
     | '/registry/clientes'
     | '/sales/agenda'
+    | '/sales/captura'
     | '/sales/comissoes'
     | '/sales/configuracoes'
     | '/sales/contatos'
@@ -1517,6 +1529,7 @@ export interface FileRouteTypes {
     | '/_authenticated/financial-intelligence/dre'
     | '/_authenticated/registry/clientes'
     | '/_authenticated/sales/agenda'
+    | '/_authenticated/sales/captura'
     | '/_authenticated/sales/comissoes'
     | '/_authenticated/sales/configuracoes'
     | '/_authenticated/sales/contatos'
@@ -1998,6 +2011,13 @@ declare module '@tanstack/react-router' {
       path: '/sales/comissoes'
       fullPath: '/sales/comissoes'
       preLoaderRoute: typeof AuthenticatedSalesComissoesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/sales/captura': {
+      id: '/_authenticated/sales/captura'
+      path: '/sales/captura'
+      fullPath: '/sales/captura'
+      preLoaderRoute: typeof AuthenticatedSalesCapturaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/sales/agenda': {
@@ -2624,6 +2644,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedFinanceiroRelatoriosRoute: typeof AuthenticatedFinanceiroRelatoriosRoute
   AuthenticatedRegistryClientesRoute: typeof AuthenticatedRegistryClientesRoute
   AuthenticatedSalesAgendaRoute: typeof AuthenticatedSalesAgendaRoute
+  AuthenticatedSalesCapturaRoute: typeof AuthenticatedSalesCapturaRoute
   AuthenticatedSalesComissoesRoute: typeof AuthenticatedSalesComissoesRoute
   AuthenticatedSalesConfiguracoesRoute: typeof AuthenticatedSalesConfiguracoesRoute
   AuthenticatedSalesContatosRoute: typeof AuthenticatedSalesContatosRoute
@@ -2719,6 +2740,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedFinanceiroRelatoriosRoute,
   AuthenticatedRegistryClientesRoute: AuthenticatedRegistryClientesRoute,
   AuthenticatedSalesAgendaRoute: AuthenticatedSalesAgendaRoute,
+  AuthenticatedSalesCapturaRoute: AuthenticatedSalesCapturaRoute,
   AuthenticatedSalesComissoesRoute: AuthenticatedSalesComissoesRoute,
   AuthenticatedSalesConfiguracoesRoute: AuthenticatedSalesConfiguracoesRoute,
   AuthenticatedSalesContatosRoute: AuthenticatedSalesContatosRoute,

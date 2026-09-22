@@ -6,7 +6,7 @@ import { useServerFn } from "@tanstack/react-start";
 import {
   LayoutDashboard, Sparkles, Building2, Users, Target, FileSpreadsheet, FileSignature,
   CalendarClock, CalendarDays, Percent, Share2, Search, BarChart3, Settings,
-  Grid3x3, LogOut, Menu, X, Bell, ChevronDown, MoreHorizontal, Table2,
+  Grid3x3, LogOut, Menu, X, Bell, ChevronDown, MoreHorizontal, Table2, Zap,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSystem } from "@/px-platform/system-context";
@@ -20,7 +20,9 @@ type NavItem = { to: string; label: string; icon: any; exact?: boolean; group: s
 
 export const PXSALES_NAV: NavItem[] = [
   { to: "/sales", label: "Dashboard", icon: LayoutDashboard, exact: true, group: "Comercial" },
+  { to: "/sales/captura", label: "Captura rápida", icon: Zap, group: "Comercial" },
   { to: "/sales/leads", label: "Leads", icon: Sparkles, group: "Comercial" },
+
   { to: "/sales/clientes", label: "Empresas", icon: Building2, group: "Comercial" },
   { to: "/sales/contatos", label: "Contatos", icon: Users, group: "Comercial" },
   { to: "/sales/oportunidades", label: "Oportunidades", icon: Target, group: "Comercial" },
@@ -37,8 +39,9 @@ export const PXSALES_NAV: NavItem[] = [
 ];
 
 const BOTTOM_NAV = PXSALES_NAV.filter((i) =>
-  ["/sales", "/sales/leads", "/sales/clientes", "/sales/cotacoes"].includes(i.to),
+  ["/sales", "/sales/captura", "/sales/leads", "/sales/clientes"].includes(i.to),
 );
+
 
 interface Props {
   children: ReactNode;
