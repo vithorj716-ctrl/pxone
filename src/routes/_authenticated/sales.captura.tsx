@@ -52,7 +52,8 @@ const TEMPERATURAS = [
 
 function CapturaRapida() {
   const enviar = useServerFn(capturarLeadRapido);
-  const [f, setF] = useState<Record<string, string>>({ ...VAZIO });
+  const { empresa } = useEmpresaAtiva();
+
   const [geo, setGeo] = useState<{ lat: number; lng: number } | null>(null);
   const [pendentes, setPendentes] = useState(0);
   const [online, setOnline] = useState(true);
@@ -130,6 +131,8 @@ function CapturaRapida() {
       latitude: geo?.lat ?? null,
       longitude: geo?.lng ?? null,
       capturado_em: new Date().toISOString(),
+      empresa_id: empresa?.id ?? null,
+
     };
 
     setSalvando(true);
