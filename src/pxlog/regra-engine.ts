@@ -1,7 +1,17 @@
 // Motor ÚNICO de cálculo das tabelas comerciais de frete do PXLog/PXSales.
 // A fórmula vem SEMPRE da configuração estruturada da regra — nunca do nome dela.
 
-import { arred2, numOuNulo } from "./num";
+import { numOuNulo } from "./num";
+import {
+  avaliarRegra,
+  calcularKernel,
+  type BaseKernel,
+  type GrupoRegra,
+  type LinhaKernel,
+  type ModoRegra,
+  type ContextoKernel,
+  type RegraKernel,
+} from "@/pxsales/calc-kernel";
 
 export type ModoCobranca =
   | "valor_fixo"
