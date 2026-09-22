@@ -1,9 +1,22 @@
-// PXSales — motor de cálculo das TABELAS COMERCIAIS.
-// Função pura, usada no servidor (valor oficial gravado) e na prévia da tela.
-// Não duplica o TMS: o PXLog continua sendo a fonte operacional; aqui fica a camada comercial.
+// PXSales — TABELA COMERCIAL: fonte única de verdade das regras de preço.
+// A avaliação NUNCA acontece aqui: este módulo apenas traduz os componentes
+// configurados na tabela para o motor único (src/pxsales/calc-kernel.ts).
+// O PXLog/TMS consome a tabela publicada; não existe segunda tabela comercial.
+
+import {
+  calcularKernel,
+  cubagemDeVolumes,
+  pesoTaxavel,
+  type BaseKernel,
+  type ModoRegra,
+  type RegraKernel,
+  type VolumeDimensao,
+} from "./calc-kernel";
+import { numOuNulo } from "@/pxlog/num";
 
 export type ComponenteTipo =
   | "frete_base"
+  | "frete_minimo"
   | "faixa_peso"
   | "excedente_peso"
   | "cubagem"
@@ -27,10 +40,11 @@ export const COMPONENTES_CATALOGO: {
   grupo: string;
   descricao: string;
 }[] = [
+  { tipo: "cubagem", codigo: "cubagem", nome: "Cubagem", grupo: "Frete", descricao: "Fator de cubagem e regra de peso taxado." },
   { tipo: "frete_base", codigo: "frete_base", nome: "Frete base", grupo: "Frete", descricao: "Valor principal do transporte." },
+  { tipo: "frete_minimo", codigo: "frete_minimo", nome: "Frete mínimo", grupo: "Frete", descricao: "Piso comercial: fixo, por kg, por faixa ou por rota." },
   { tipo: "faixa_peso", codigo: "faixa_peso", nome: "Faixas de peso", grupo: "Frete", descricao: "Valor por faixa de peso taxado." },
   { tipo: "excedente_peso", codigo: "excedente_peso", nome: "Excedente de peso", grupo: "Frete", descricao: "Cobrança acima de um peso inicial." },
-  { tipo: "cubagem", codigo: "cubagem", nome: "Cubagem", grupo: "Frete", descricao: "Fator de cubagem e regra de peso taxado." },
   { tipo: "pedagio", codigo: "pedagio", nome: "Pedágio", grupo: "Adicionais", descricao: "Fixo, por eixo, por 100 kg ou percentual." },
   { tipo: "gris", codigo: "gris", nome: "GRIS", grupo: "Adicionais", descricao: "Gerenciamento de risco." },
   { tipo: "advalorem", codigo: "advalorem", nome: "Ad Valorem", grupo: "Adicionais", descricao: "Percentual sobre o valor da mercadoria." },
@@ -62,6 +76,7 @@ export const ORDEM_PADRAO: string[] = [
   "taxa_espera",
   "taxa_estadia",
   "taxa_personalizada",
+  "frete_minimo",
 ];
 
 export type Faixa = {
@@ -93,10 +108,15 @@ export type VersaoCalculo = {
 
 export type EntradaCotacao = {
   peso: number;
-  cubagem: number;
+  /** cubagem informada (LEGACY). Prefira volumes_dim: o sistema calcula o m³. */
+  cubagem?: number;
+  /** dimensões reais dos volumes — origem correta da cubagem */
+  volumes_dim?: VolumeDimensao[];
   qtd_volumes: number;
   valor_mercadoria: number;
   eixos?: number;
+  distancia_km?: number;
+  rota_id?: string | null;
   horas_espera?: number;
   diarias?: number;
   desconto_percentual?: number;
@@ -115,28 +135,25 @@ export type LinhaCalculo = {
 };
 
 export type ResultadoCalculo = {
+  cubagem: number;
   peso_cubado: number;
   peso_taxado: number;
+  fator_cubagem: number;
   linhas: LinhaCalculo[];
+  frete_calculado: number;
+  frete_minimo: number | null;
+  frete_aplicado: number;
+  minimo_aplicado: number | null;
+  minimo_motivo: string | null;
   subtotal: number;
   desconto: number;
   total: number;
   avisos: string[];
 };
 
-const num = (v: unknown, d = 0) => {
-  const n = typeof v === "number" ? v : parseFloat(String(v ?? "").replace(",", "."));
-  return Number.isFinite(n) ? n : d;
-};
+const num = (v: unknown, d = 0) => numOuNulo(v) ?? d;
+const opt = (v: unknown) => numOuNulo(v);
 const r2 = (n: number) => Math.round(n * 100) / 100;
-const limitar = (v: number, min?: unknown, max?: unknown) => {
-  let x = v;
-  const mn = num(min);
-  const mx = num(max);
-  if (mn > 0 && x < mn) x = mn;
-  if (mx > 0 && x > mx) x = mx;
-  return x;
-};
 
 export const FATOR_CUBAGEM_PADRAO = 300;
 
@@ -152,184 +169,293 @@ export function validarFaixas(faixas: Faixa[]): string[] {
   return erros;
 }
 
-function baseDe(config: Record<string, any>, ctx: { mercadoria: number; frete: number; subtotal: number }) {
-  switch (String(config?.base ?? "mercadoria")) {
-    case "frete":
-      return ctx.frete;
-    case "subtotal":
-      return ctx.subtotal;
-    default:
-      return ctx.mercadoria;
+const BASE_CFG: Record<string, BaseKernel> = {
+  mercadoria: "valor_mercadoria",
+  valor_mercadoria: "valor_mercadoria",
+  nota: "valor_mercadoria",
+  frete: "valor_frete",
+  valor_frete: "valor_frete",
+  subtotal: "subtotal",
+  peso: "peso_taxado",
+  peso_taxado: "peso_taxado",
+};
+
+const baseDe = (cfg: Record<string, any>, padrao: BaseKernel = "valor_mercadoria"): BaseKernel =>
+  BASE_CFG[String(cfg?.base ?? "")] ?? padrao;
+
+const MODO_CFG: Record<string, ModoRegra> = {
+  fixo: "fixo",
+  valor_fixo: "fixo",
+  percentual: "percentual",
+  por_kg: "por_kg",
+  por_ton: "por_ton",
+  por_tonelada: "por_ton",
+  por_m3: "por_m3",
+  por_km: "por_km",
+  por_volume: "por_volume",
+  por_nota: "fixo",
+  por_eixo: "por_eixo",
+  por_100kg: "por_100kg",
+  por_hora: "por_hora",
+  por_diaria: "por_diaria",
+};
+
+/** Traduz um componente da tabela em regras do motor único. */
+function regrasDoComponente(
+  c: Componente,
+  ctxPeso: { peso_taxado: number; cubagem: number },
+  ordem: number,
+  avisos: string[],
+): RegraKernel[] {
+  const cfg = c.config ?? {};
+  const comum = {
+    id: c.id ?? null,
+    codigo: c.codigo,
+    nome: c.nome,
+    ordem,
+    ativo: c.ativo !== false,
+    piso: opt(cfg.minimo),
+    teto: opt(cfg.maximo),
+    rota_id: (cfg.rota_id as string | undefined) ?? null,
+  };
+
+  switch (c.tipo) {
+    case "cubagem":
+      return [];
+
+    case "frete_base": {
+      const modo = String(cfg.modo ?? "fixo");
+      if (modo === "maior") {
+        const porKg = (opt(cfg.valor) ?? 0) * ctxPeso.peso_taxado;
+        const porM3 = (opt(cfg.valor_m3) ?? 0) * ctxPeso.cubagem;
+        const escolhido = Math.max(porKg, porM3);
+        return [
+          {
+            ...comum,
+            grupo: "frete",
+            modo: "fixo",
+            valor: r2(escolhido),
+            base: "nenhuma",
+            piso: opt(cfg.valor_minimo) ?? comum.piso,
+            meta: { modo: "maior", por_kg: r2(porKg), por_m3: r2(porM3) },
+          },
+        ];
+      }
+      return [
+        {
+          ...comum,
+          grupo: "frete",
+          modo: MODO_CFG[modo] ?? "fixo",
+          valor: opt(cfg.valor),
+          base: modo === "percentual" ? baseDe(cfg) : "peso_taxado",
+          piso: opt(cfg.valor_minimo) ?? comum.piso,
+          meta: { modo },
+        },
+      ];
+    }
+
+    case "frete_minimo": {
+      const modo = String(cfg.modo ?? "fixo");
+      const faixas = (c.faixas ?? []).map((f) => ({
+        min: num(f.peso_min),
+        max: num(f.peso_max),
+        modo: (f.tipo_valor === "por_kg" ? "por_kg" : "fixo") as ModoRegra,
+        valor: opt(f.valor),
+        max_inclusive: false,
+      }));
+      return [
+        {
+          ...comum,
+          grupo: "minimo",
+          modo: "minimo",
+          valor: opt(cfg.valor),
+          base: modo === "por_kg" ? "peso_taxado" : "nenhuma",
+          faixas: modo === "faixa" ? faixas : [],
+          faixa_campo: "peso_taxado",
+          aplicar_em: cfg.aplicar_em === "total" ? "total" : "frete",
+          meta: { modo },
+        },
+      ];
+    }
+
+    case "faixa_peso": {
+      const faixas = (c.faixas ?? []).slice().sort((a, b) => num(a.peso_min) - num(b.peso_min));
+      if (!faixas.length) avisos.push(`"${c.nome}": nenhuma faixa cadastrada.`);
+      return [
+        {
+          ...comum,
+          grupo: "frete",
+          modo: "faixa",
+          valor: null,
+          base: "valor_mercadoria",
+          faixa_campo: "peso_taxado",
+          faixas: faixas.map((f) => ({
+            min: num(f.peso_min),
+            max: num(f.peso_max),
+            modo: (f.tipo_valor === "por_kg" ? "por_kg" : f.tipo_valor === "percentual" ? "percentual" : "fixo") as ModoRegra,
+            valor: opt(f.valor),
+            piso: opt(f.valor_minimo),
+            max_inclusive: false,
+          })),
+        },
+      ];
+    }
+
+    case "excedente_peso": {
+      const modo = String(cfg.modo ?? "por_kg");
+      return [
+        {
+          ...comum,
+          grupo: "frete",
+          modo: modo === "fixo" ? "fixo" : modo === "percentual" ? "percentual" : "excedente",
+          valor: opt(cfg.valor),
+          base: modo === "percentual" ? "valor_frete" : "peso_taxado",
+          peso_inicial: opt(cfg.peso_inicial) ?? 0,
+          faixa_campo: "peso_taxado",
+          faixa_min: opt(cfg.peso_inicial),
+          meta: { modo, peso_inicial: num(cfg.peso_inicial) },
+        },
+      ];
+    }
+
+    case "pedagio": {
+      const modo = String(cfg.modo ?? "fixo");
+      return [
+        {
+          ...comum,
+          grupo: "adicional",
+          modo: MODO_CFG[modo] ?? "fixo",
+          valor: opt(cfg.valor),
+          base: modo === "percentual" ? baseDe(cfg, "valor_frete") : "nenhuma",
+          meta: { modo },
+        },
+      ];
+    }
+
+    case "gris":
+    case "advalorem":
+      return [
+        {
+          ...comum,
+          grupo: "adicional",
+          modo: "percentual",
+          valor: opt(cfg.percentual ?? cfg.valor),
+          base: baseDe(cfg),
+          meta: { percentual: opt(cfg.percentual ?? cfg.valor) },
+        },
+      ];
+
+    case "taxa_espera":
+      return [{ ...comum, grupo: "taxa", modo: "por_hora", valor: opt(cfg.valor), base: "nenhuma" }];
+
+    case "taxa_estadia":
+      return [{ ...comum, grupo: "taxa", modo: "por_diaria", valor: opt(cfg.valor), base: "nenhuma" }];
+
+    default: {
+      const modo = String(cfg.modo ?? "fixo");
+      const condicao =
+        c.tipo === "taxa_reentrega" ? "reentrega"
+        : c.tipo === "taxa_devolucao" ? "devolucao"
+        : c.tipo === "taxa_area_risco" ? "area_risco"
+        : c.tipo === "taxa_dificuldade" ? "dificuldade"
+        : null;
+      return [
+        {
+          ...comum,
+          grupo: c.tipo === "taxa_personalizada" && cfg.grupo === "desconto" ? "desconto" : "taxa",
+          modo: MODO_CFG[modo] ?? "fixo",
+          valor: opt(cfg.valor),
+          base: modo === "percentual" ? baseDe(cfg) : "nenhuma",
+          condicao,
+          meta: { modo },
+        },
+      ];
+    }
   }
 }
 
-function valorGenerico(
-  config: Record<string, any>,
-  ctx: { mercadoria: number; frete: number; subtotal: number; peso: number; volumes: number },
-): { valor: number; base: number; detalhe: Record<string, any> } {
-  const modo = String(config?.modo ?? "fixo");
-  const v = num(config?.valor);
-  let base = 0;
-  let valor = 0;
-  if (modo === "percentual") {
-    base = baseDe(config, ctx);
-    valor = (base * v) / 100;
-  } else if (modo === "por_volume") {
-    base = ctx.volumes;
-    valor = base * v;
-  } else if (modo === "por_kg") {
-    base = ctx.peso;
-    valor = base * v;
-  } else {
-    base = 1;
-    valor = v;
-  }
-  valor = limitar(valor, config?.minimo, config?.maximo);
-  return { valor: r2(valor), base: r2(base), detalhe: { modo, parametro: v } };
-}
-
+/** Calcula uma versão da tabela. Delegado integralmente ao motor único. */
 export function calcularTabela(versao: VersaoCalculo, entrada: EntradaCotacao): ResultadoCalculo {
   const avisos: string[] = [];
   const ativos = (versao.componentes ?? []).filter((c) => c.ativo);
   const mapa = new Map(ativos.map((c) => [c.codigo, c]));
+
   const ordem = (versao.ordem_calculo?.length ? versao.ordem_calculo : ORDEM_PADRAO).slice();
   for (const c of ativos) if (!ordem.includes(c.codigo)) ordem.push(c.codigo);
 
-  const peso = num(entrada.peso);
-  const cubagem = num(entrada.cubagem);
-  const volumes = Math.max(1, num(entrada.qtd_volumes, 1));
-  const mercadoria = num(entrada.valor_mercadoria);
+  // 1. cubagem real: dimensões dos volumes têm prioridade sobre m³ digitado
+  const dims = entrada.volumes_dim?.length ? cubagemDeVolumes(entrada.volumes_dim) : null;
+  const cubagem = dims ? dims.cubagem : num(entrada.cubagem);
+  const volumes = Math.max(1, dims?.volumes || num(entrada.qtd_volumes, 1));
+  if (!dims && !entrada.cubagem) avisos.push("Cubagem não informada: informe as dimensões dos volumes para o peso cubado.");
 
-  // 1. peso real x cubado
   const compCub = mapa.get("cubagem");
   const fator = compCub ? num(compCub.config?.fator, FATOR_CUBAGEM_PADRAO) : FATOR_CUBAGEM_PADRAO;
-  const pesoCubado = r2(cubagem * fator);
-  const regra = String(compCub?.config?.regra ?? "maior");
-  const pesoTaxado =
-    regra === "real" ? r2(peso) : regra === "cubado" ? r2(pesoCubado) : r2(Math.max(peso, pesoCubado));
+  const regraPeso = String(compCub?.config?.regra ?? "maior") as "maior" | "real" | "cubado";
+  const { peso_cubado, peso_taxado } = pesoTaxavel(num(entrada.peso), cubagem, fator, regraPeso);
 
-  const linhas: LinhaCalculo[] = [];
-  let frete = 0; // acumulado de frete (base + faixa + excedente)
-  let subtotal = 0;
-
-  const push = (c: Componente, valor: number, base: number, detalhe: Record<string, any>) => {
-    if (!valor && !detalhe?.sempre) return;
-    linhas.push({ codigo: c.codigo, nome: c.nome, base: r2(base), valor: r2(valor), detalhe });
-    subtotal = r2(subtotal + valor);
-  };
-
-  for (const codigo of ordem) {
+  // 2. componentes -> regras do motor único, na ordem configurada
+  const regras: RegraKernel[] = [];
+  ordem.forEach((codigo, idx) => {
     const c = mapa.get(codigo);
-    if (!c || c.codigo === "cubagem") continue;
-    const cfg = c.config ?? {};
-    const ctx = { mercadoria, frete, subtotal, peso: pesoTaxado, volumes };
+    if (!c) return;
+    regras.push(...regrasDoComponente(c, { peso_taxado, cubagem }, (idx + 1) * 10, avisos));
+  });
 
-    switch (c.tipo) {
-      case "frete_base": {
-        const modo = String(cfg.modo ?? "fixo");
-        let valor = 0;
-        let base = 1;
-        if (modo === "por_kg") { base = pesoTaxado; valor = base * num(cfg.valor); }
-        else if (modo === "por_m3") { base = cubagem; valor = base * num(cfg.valor); }
-        else if (modo === "maior") {
-          base = pesoTaxado;
-          valor = Math.max(pesoTaxado * num(cfg.valor), cubagem * num(cfg.valor_m3));
-        } else valor = num(cfg.valor);
-        const minimo = num(cfg.valor_minimo);
-        const aplicouMinimo = minimo > 0 && valor < minimo;
-        if (aplicouMinimo) valor = minimo;
-        frete = r2(frete + valor);
-        push(c, valor, base, { modo, aplicou_minimo: aplicouMinimo, sempre: true, rota: cfg.rota ?? null, servico: cfg.servico ?? null, modalidade: cfg.modalidade ?? null });
-        break;
-      }
-      case "faixa_peso": {
-        const faixas = (c.faixas ?? []).slice().sort((a, b) => num(a.peso_min) - num(b.peso_min));
-        const f = faixas.find((x) => pesoTaxado >= num(x.peso_min) && pesoTaxado < num(x.peso_max));
-        if (!f) {
-          avisos.push("Peso taxado fora das faixas cadastradas na tabela.");
-          break;
-        }
-        let valor = f.tipo_valor === "por_kg" ? pesoTaxado * num(f.valor)
-          : f.tipo_valor === "percentual" ? (mercadoria * num(f.valor)) / 100
-          : num(f.valor);
-        if (num(f.valor_minimo) > 0 && valor < num(f.valor_minimo)) valor = num(f.valor_minimo);
-        frete = r2(frete + valor);
-        push(c, valor, pesoTaxado, { faixa: `${f.peso_min}–${f.peso_max} kg`, tipo_valor: f.tipo_valor, sempre: true });
-        break;
-      }
-      case "excedente_peso": {
-        const inicial = num(cfg.peso_inicial);
-        const excedente = Math.max(0, pesoTaxado - inicial);
-        if (excedente <= 0) break;
-        const modo = String(cfg.modo ?? "por_kg");
-        const valor = modo === "fixo" ? num(cfg.valor)
-          : modo === "percentual" ? (frete * num(cfg.valor)) / 100
-          : excedente * num(cfg.valor);
-        frete = r2(frete + valor);
-        push(c, valor, excedente, { modo, peso_inicial: inicial });
-        break;
-      }
-      case "pedagio": {
-        const modo = String(cfg.modo ?? "fixo");
-        let valor = 0;
-        let base = 1;
-        if (modo === "por_eixo") { base = Math.max(1, num(entrada.eixos, num(cfg.eixos, 1))); valor = base * num(cfg.valor); }
-        else if (modo === "por_100kg") { base = Math.ceil(pesoTaxado / 100); valor = base * num(cfg.valor); }
-        else if (modo === "percentual") { base = frete; valor = (frete * num(cfg.valor)) / 100; }
-        else valor = num(cfg.valor);
-        valor = limitar(valor, cfg.minimo, cfg.maximo);
-        push(c, valor, base, { modo });
-        break;
-      }
-      case "gris":
-      case "advalorem": {
-        const base = baseDe(cfg, { mercadoria, frete, subtotal });
-        let valor = (base * num(cfg.percentual ?? cfg.valor)) / 100;
-        valor = limitar(valor, cfg.minimo, cfg.maximo);
-        push(c, valor, base, { percentual: num(cfg.percentual ?? cfg.valor), base: cfg.base ?? "mercadoria" });
-        break;
-      }
-      case "taxa_reentrega":
-        if (!entrada.reentrega) break;
-        { const g = valorGenerico(cfg, ctx); push(c, g.valor, g.base, g.detalhe); }
-        break;
-      case "taxa_devolucao":
-        if (!entrada.devolucao) break;
-        { const g = valorGenerico(cfg, ctx); push(c, g.valor, g.base, g.detalhe); }
-        break;
-      case "taxa_area_risco":
-        if (!entrada.area_risco) break;
-        { const g = valorGenerico(cfg, ctx); push(c, g.valor, g.base, g.detalhe); }
-        break;
-      case "taxa_dificuldade":
-        if (!entrada.dificuldade) break;
-        { const g = valorGenerico(cfg, ctx); push(c, g.valor, g.base, g.detalhe); }
-        break;
-      case "taxa_espera": {
-        const horas = num(entrada.horas_espera);
-        if (horas <= 0) break;
-        const valor = limitar(horas * num(cfg.valor), cfg.minimo, cfg.maximo);
-        push(c, valor, horas, { modo: "por_hora" });
-        break;
-      }
-      case "taxa_estadia": {
-        const dias = num(entrada.diarias);
-        if (dias <= 0) break;
-        const valor = limitar(dias * num(cfg.valor), cfg.minimo, cfg.maximo);
-        push(c, valor, dias, { modo: "por_diaria" });
-        break;
-      }
-      default: {
-        const g = valorGenerico(cfg, ctx);
-        push(c, g.valor, g.base, g.detalhe);
-        break;
-      }
-    }
+  const res = calcularKernel(regras, {
+    peso: num(entrada.peso),
+    peso_cubado,
+    peso_taxado,
+    cubagem,
+    volumes,
+    valor_mercadoria: num(entrada.valor_mercadoria),
+    distancia_km: num(entrada.distancia_km),
+    eixos: num(entrada.eixos),
+    horas_espera: num(entrada.horas_espera),
+    diarias: num(entrada.diarias),
+    rota_id: entrada.rota_id ?? null,
+    flags: {
+      reentrega: !!entrada.reentrega,
+      devolucao: !!entrada.devolucao,
+      area_risco: !!entrada.area_risco,
+      dificuldade: !!entrada.dificuldade,
+    },
+  });
+
+  const desconto = r2((res.total * num(entrada.desconto_percentual)) / 100);
+  const total = r2(Math.max(0, res.total - desconto));
+
+  const linhas: LinhaCalculo[] = res.linhas.map((l) => ({
+    codigo: l.codigo,
+    nome: l.nome,
+    base: l.base,
+    valor: l.valor,
+    detalhe: { grupo: l.grupo, modo: l.modo, base_calculo: l.base_calculo, parametro: l.parametro, ...l.detalhe },
+  }));
+  if (res.ajuste_minimo > 0) {
+    linhas.push({
+      codigo: "ajuste_frete_minimo",
+      nome: "Ajuste para o frete mínimo",
+      base: res.frete_minimo ?? 0,
+      valor: res.ajuste_minimo,
+      detalhe: { grupo: "minimo", motivo: res.minimo_motivo },
+    });
   }
 
-  const descontoPct = num(entrada.desconto_percentual);
-  const desconto = r2((subtotal * descontoPct) / 100);
-  const total = r2(Math.max(0, subtotal - desconto));
-
-  return { peso_cubado: pesoCubado, peso_taxado: pesoTaxado, linhas, subtotal: r2(subtotal), desconto, total, avisos };
+  return {
+    cubagem,
+    peso_cubado,
+    peso_taxado,
+    fator_cubagem: fator,
+    linhas,
+    frete_calculado: res.frete_calculado,
+    frete_minimo: res.frete_minimo,
+    frete_aplicado: res.frete_aplicado,
+    minimo_aplicado: res.minimo_aplicado,
+    minimo_motivo: res.minimo_motivo,
+    subtotal: res.total,
+    desconto,
+    total,
+    avisos: [...avisos, ...res.avisos],
+  };
 }

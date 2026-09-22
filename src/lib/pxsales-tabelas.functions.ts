@@ -600,9 +600,22 @@ async function carregarVersao(sb: any, versaoId: string) {
 const entradaDe = (d: any): EntradaCotacao => ({
   peso: n(d.peso),
   cubagem: n(d.cubagem),
+  volumes_dim: Array.isArray(d.volumes_dim)
+    ? d.volumes_dim
+        .map((v: any) => ({
+          qtd: i(v?.qtd, 1),
+          comprimento: n(v?.comprimento),
+          largura: n(v?.largura),
+          altura: n(v?.altura),
+          unidade: v?.unidade === "cm" || v?.unidade === "mm" ? v.unidade : "m",
+        }))
+        .filter((v: any) => v.comprimento > 0 && v.largura > 0 && v.altura > 0)
+    : [],
   qtd_volumes: i(d.qtd_volumes, 1),
   valor_mercadoria: n(d.valor_mercadoria),
   eixos: i(d.eixos, 0),
+  distancia_km: n(d.distancia_km),
+  rota_id: d.rota_id ?? null,
   horas_espera: n(d.horas_espera),
   diarias: n(d.diarias),
   desconto_percentual: n(d.desconto_percentual),
@@ -611,6 +624,7 @@ const entradaDe = (d: any): EntradaCotacao => ({
   area_risco: !!d.area_risco,
   dificuldade: !!d.dificuldade,
 });
+
 
 /** Prévia oficial: o cálculo roda no servidor, com a versão real da tabela. */
 export const calcularCotacao = createServerFn({ method: "POST" })

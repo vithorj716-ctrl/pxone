@@ -111,8 +111,19 @@ function camposDe(tipo: string): CampoDef[] {
         { k: "minimo", label: "Mínimo", tipo: "num" },
         { k: "maximo", label: "Máximo", tipo: "num" },
       ];
+    case "frete_minimo":
+      return [
+        { k: "modo", label: "Como calcular o mínimo", tipo: "select", opcoes: [
+          { v: "fixo", l: "Valor fixo" }, { v: "por_kg", l: "Por kg taxado" }, { v: "faixa", l: "Por faixa de peso" },
+        ] },
+        { k: "valor", label: "Valor do mínimo", tipo: "num" },
+        { k: "aplicar_em", label: "Aplicar sobre", tipo: "select", opcoes: [
+          { v: "frete", l: "Frete (sem adicionais)" }, { v: "total", l: "Total da cotação" },
+        ] },
+      ];
     case "faixa_peso":
       return [];
+
     default:
       return [
         { k: "modo", label: "Forma de cobrança", tipo: "select", opcoes: MODOS_TAXA },
@@ -234,8 +245,19 @@ function TabelaDetalhe() {
 
   async function onCalcular() {
     try {
-      const r = await calcular({ data: { versao_id: versaoId, ...sim } });
+      const dim =
+        Number(sim["dim_c"]) > 0 && Number(sim["dim_l"]) > 0 && Number(sim["dim_a"]) > 0
+          ? [{
+              qtd: Number(sim["dim_qtd"]) || 1,
+              comprimento: Number(sim["dim_c"]),
+              largura: Number(sim["dim_l"]),
+              altura: Number(sim["dim_a"]),
+              unidade: "m",
+            }]
+          : [];
+      const r = await calcular({ data: { versao_id: versaoId, ...sim, volumes_dim: dim } });
       setResultado(r);
+
     } catch (e: any) {
       toast.error(e?.message ?? "Não foi possível calcular.");
     }
@@ -406,7 +428,7 @@ function TabelaDetalhe() {
                   ))}
                 </div>
 
-                {compSel.tipo === "faixa_peso" && (
+                {(compSel.tipo === "faixa_peso" || (compSel.tipo === "frete_minimo" && compSel.config?.modo === "faixa")) && (
                   <div className="mt-4">
                     <div className="flex items-center justify-between mb-2">
                       <div className="text-xs font-medium">Faixas de peso</div>
@@ -543,6 +565,31 @@ function TabelaDetalhe() {
                 </div>
               ))}
             </div>
+
+            <div className="mt-3 rounded-lg ring-1 ring-border p-3">
+              <div className="text-[10px] text-muted-foreground mb-2">
+                Dimensões dos volumes (em metros) — quando preenchidas, a cubagem é calculada aqui.
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {[
+                  { k: "dim_qtd", l: "Qtd. volumes" },
+                  { k: "dim_c", l: "Comprimento" },
+                  { k: "dim_l", l: "Largura" },
+                  { k: "dim_a", l: "Altura" },
+                ].map((f) => (
+                  <div key={f.k}>
+                    <Label className="text-[10px]">{f.l}</Label>
+                    <Input
+                      className="h-9"
+                      inputMode="decimal"
+                      value={String(sim[f.k] ?? "")}
+                      onChange={(e) => setSim((s) => ({ ...s, [f.k]: e.target.value.replace(",", ".") }))}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
             <div className="flex flex-wrap gap-3 mt-3">
               {[
                 { k: "reentrega", l: "Reentrega" },
@@ -563,7 +610,7 @@ function TabelaDetalhe() {
             {resultado && (
               <div className="mt-4 rounded-lg ring-1 ring-border overflow-hidden">
                 <div className="px-3 py-2 text-[11px] text-muted-foreground bg-muted/30">
-                  Peso taxado {resultado.peso_taxado} kg · cubado {resultado.peso_cubado} kg
+                  Peso taxado {resultado.peso_taxado} kg · cubado {resultado.peso_cubado} kg · cubagem {resultado.cubagem} m³
                 </div>
                 <div className="divide-y divide-border">
                   {resultado.linhas.map((l: any, i: number) => (
@@ -572,6 +619,21 @@ function TabelaDetalhe() {
                       <span className="tabular-nums">{brl(l.valor)}</span>
                     </div>
                   ))}
+                </div>
+                <div className="px-3 py-2 text-[11px] text-muted-foreground border-t border-border space-y-0.5">
+                  <div className="flex justify-between">
+                    <span>Frete calculado</span>
+                    <span className="tabular-nums">{brl(resultado.frete_calculado)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Frete mínimo da tabela</span>
+                    <span className="tabular-nums">{resultado.frete_minimo === null ? "não configurado" : brl(resultado.frete_minimo)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Frete aplicado</span>
+                    <span className="tabular-nums">{brl(resultado.frete_aplicado)}</span>
+                  </div>
+                  {resultado.minimo_motivo && <div className="text-amber-600">{resultado.minimo_motivo}</div>}
                 </div>
                 <div className="px-3 py-2 flex items-center justify-between text-sm font-medium bg-muted/30">
                   <span>Total</span>
@@ -582,6 +644,7 @@ function TabelaDetalhe() {
                 )}
               </div>
             )}
+
           </div>
 
           {t?.tabela?.cliente_id ? (

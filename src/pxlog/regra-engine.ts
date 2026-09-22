@@ -1,7 +1,17 @@
 // Motor ÚNICO de cálculo das tabelas comerciais de frete do PXLog/PXSales.
 // A fórmula vem SEMPRE da configuração estruturada da regra — nunca do nome dela.
 
-import { arred2, numOuNulo } from "./num";
+import { numOuNulo } from "./num";
+import {
+  avaliarRegra,
+  calcularKernel,
+  type BaseKernel,
+  type GrupoRegra,
+  type LinhaKernel,
+  type ModoRegra,
+  type ContextoKernel,
+  type RegraKernel,
+} from "@/pxsales/calc-kernel";
 
 export type ModoCobranca =
   | "valor_fixo"
@@ -122,199 +132,124 @@ export const TIPOS_REGRA: { value: TipoRegra; label: string }[] = [
 
 const n0 = (v: unknown) => numOuNulo(v) ?? 0;
 
-function valorDaBase(
-  base: string,
-  ctx: ContextoFrete,
-  acum: { frete: number; subtotal: number },
-): number {
-  switch (base) {
-    case "valor_nota":
-      return n0(ctx.valor_nota);
-    case "valor_frete":
-      return acum.frete;
-    case "subtotal":
-      return acum.subtotal;
-    case "peso":
-      return n0(ctx.peso);
-    case "peso_taxado":
-      return n0(ctx.peso_taxado ?? ctx.peso);
-    case "cubagem":
-      return n0(ctx.cubagem);
-    case "volumes":
-      return n0(ctx.volumes);
-    case "distancia":
-      return n0(ctx.distancia_km);
-    default:
-      return 0;
-  }
+const MODO_KERNEL: Record<string, ModoRegra> = {
+  valor_fixo: "fixo",
+  fixo: "fixo",
+  percentual: "percentual",
+  por_kg: "por_kg",
+  por_ton: "por_ton",
+  por_m3: "por_m3",
+  por_km: "por_km",
+  por_volume: "por_volume",
+  por_eixo: "por_eixo",
+  por_100kg: "por_100kg",
+  faixa: "faixa",
+  minimo: "minimo",
+};
+
+const BASE_KERNEL: Record<string, BaseKernel> = {
+  nenhuma: "nenhuma",
+  valor_nota: "valor_mercadoria",
+  valor_mercadoria: "valor_mercadoria",
+  valor_frete: "valor_frete",
+  subtotal: "subtotal",
+  peso: "peso",
+  peso_taxado: "peso_taxado",
+  cubagem: "cubagem",
+  volumes: "volumes",
+  distancia: "distancia",
+};
+
+const BASE_LEGADO: Record<string, string> = { valor_mercadoria: "valor_nota" };
+const MODO_LEGADO: Record<string, string> = { fixo: "valor_fixo" };
+
+const grupoDe = (tipo: unknown): GrupoRegra => {
+  const t = String(tipo ?? "taxa");
+  return (["frete", "adicional", "taxa", "servico", "desconto", "minimo"] as const).includes(t as GrupoRegra)
+    ? (t as GrupoRegra)
+    : "taxa";
+};
+
+/** Converte a regra comercial (formato legado do PXLog) para o motor único. */
+export function paraKernel(regra: RegraComercial): RegraKernel {
+  const modo = MODO_KERNEL[String(regra.modo)] ?? ("desconhecido" as ModoRegra);
+  const base = BASE_KERNEL[String(regra.base_calculo ?? "nenhuma")] ?? "nenhuma";
+  const faixasCfg = (regra.config?.["faixas"] as FaixaRegra[] | undefined) ?? [];
+  return {
+    id: regra.id ?? null,
+    codigo: regra.nome,
+    nome: regra.nome,
+    grupo: grupoDe(regra.tipo),
+    modo,
+    valor: numOuNulo(regra.valor),
+    base,
+    unidade: regra.unidade ?? null,
+    faixas: faixasCfg.map((f) => ({
+      min: numOuNulo(f.min),
+      max: numOuNulo(f.max),
+      modo: MODO_KERNEL[String(f.modo)] ?? "fixo",
+      valor: numOuNulo(f.valor),
+      max_inclusive: true,
+    })),
+    faixa_campo: regra.faixa_campo ? (BASE_KERNEL[String(regra.faixa_campo)] ?? null) : null,
+    faixa_min: numOuNulo(regra.faixa_min),
+    faixa_max: numOuNulo(regra.faixa_max),
+    rota_id: regra.rota_id ?? null,
+    piso: numOuNulo(regra.valor_minimo),
+    teto: numOuNulo(regra.valor_maximo),
+    ordem: regra.ordem ?? 100,
+    ativo: regra.ativo !== false,
+    aplicar_em: "total",
+  };
 }
 
-function campoFaixa(campo: string | null | undefined, ctx: ContextoFrete): number | null {
-  if (!campo) return null;
-  return valorDaBase(campo, ctx, { frete: 0, subtotal: 0 });
+function paraContexto(ctx: ContextoFrete): ContextoKernel {
+  return {
+    peso: ctx.peso ?? null,
+    peso_taxado: ctx.peso_taxado ?? ctx.peso ?? null,
+    cubagem: ctx.cubagem ?? null,
+    volumes: ctx.volumes ?? null,
+    valor_mercadoria: ctx.valor_nota ?? null,
+    distancia_km: ctx.distancia_km ?? null,
+    rota_id: ctx.rota_id ?? null,
+  };
 }
 
-function aplicarLimites(valor: number, regra: RegraComercial): number {
-  let v = valor;
-  const min = numOuNulo(regra.valor_minimo);
-  const max = numOuNulo(regra.valor_maximo);
-  if (min !== null && v < min) v = min;
-  if (max !== null && v > max) v = max;
-  return v;
+function paraLinha(l: LinhaKernel): LinhaCalculo {
+  return {
+    regra_id: l.regra_id,
+    nome: l.nome,
+    tipo: l.grupo,
+    modo: MODO_LEGADO[l.modo] ?? l.modo,
+    base_calculo: BASE_LEGADO[l.base_calculo] ?? l.base_calculo,
+    base: l.base,
+    parametro: l.parametro,
+    valor: l.valor,
+  };
 }
 
-/** Calcula uma regra isolada. Retorna null quando a regra não se aplica ao contexto. */
+/** Compatibilidade: cálculo de uma regra isolada pelo motor único. */
 export function calcularRegra(
   regra: RegraComercial,
   ctx: ContextoFrete,
   acum: { frete: number; subtotal: number },
   avisos: string[],
 ): LinhaCalculo | null {
-  if (regra.ativo === false) return null;
-  if (regra.rota_id && ctx.rota_id && regra.rota_id !== ctx.rota_id) return null;
-
-  // Filtro de faixa de aplicação (quando a regra só vale dentro de um intervalo).
-  if (regra.faixa_campo) {
-    const atual = campoFaixa(regra.faixa_campo, ctx) ?? 0;
-    const min = numOuNulo(regra.faixa_min);
-    const max = numOuNulo(regra.faixa_max);
-    if (min !== null && atual < min) return null;
-    if (max !== null && atual > max) return null;
-  }
-
-  const modo = String(regra.modo);
-  const parametro = numOuNulo(regra.valor);
-
-  if (modo === "faixa") {
-    const faixas = (regra.config?.["faixas"] as FaixaRegra[] | undefined) ?? [];
-    const campo = regra.faixa_campo || regra.base_calculo || "peso_taxado";
-    const atual = valorDaBase(campo, ctx, acum);
-    const faixa = faixas.find((f) => {
-      const min = numOuNulo(f.min);
-      const max = numOuNulo(f.max);
-      return (min === null || atual >= min) && (max === null || atual <= max);
-    });
-    if (!faixa) {
-      avisos.push(`"${regra.nome}": nenhuma faixa cobre ${atual}.`);
-      return null;
-    }
-    const sub = calcularRegra(
-      { ...regra, modo: faixa.modo, valor: faixa.valor, faixa_campo: null, config: null },
-      ctx,
-      acum,
-      avisos,
-    );
-    return sub ? { ...sub, modo: "faixa" } : null;
-  }
-
-  if (modo === "minimo") {
-    if (parametro === null) return null;
-    return {
-      regra_id: regra.id ?? null,
-      nome: regra.nome,
-      tipo: "minimo",
-      modo,
-      base_calculo: "nenhuma",
-      base: 0,
-      parametro,
-      valor: 0, // o piso é aplicado ao final, não soma como componente
-    };
-  }
-
-  if (parametro === null) return null; // não configurado (≠ zero)
-
-  let base = 0;
-  let valor = 0;
-
-  switch (modo) {
-    case "valor_fixo":
-      base = 1;
-      valor = parametro; // valor fixo NUNCA ganha base automática
-      break;
-    case "percentual": {
-      const b = String(regra.base_calculo ?? "nenhuma");
-      if (b === "nenhuma") {
-        avisos.push(`"${regra.nome}": percentual sem base de cálculo definida — ignorado.`);
-        return null;
-      }
-      base = valorDaBase(b, ctx, acum);
-      valor = (base * parametro) / 100;
-      break;
-    }
-    case "por_kg":
-      base = valorDaBase(regra.base_calculo === "peso" ? "peso" : "peso_taxado", ctx, acum);
-      valor = base * parametro;
-      break;
-    case "por_m3":
-      base = n0(ctx.cubagem);
-      valor = base * parametro;
-      break;
-    case "por_km":
-      base = n0(ctx.distancia_km);
-      valor = base * parametro;
-      break;
-    case "por_volume":
-      base = n0(ctx.volumes);
-      valor = base * parametro;
-      break;
-    default:
-      avisos.push(`"${regra.nome}": modo de cobrança "${modo}" desconhecido.`);
-      return null;
-  }
-
-  valor = aplicarLimites(valor, regra);
-  if (String(regra.tipo) === "desconto") valor = -Math.abs(valor);
-
-  return {
-    regra_id: regra.id ?? null,
-    nome: regra.nome,
-    tipo: String(regra.tipo),
-    modo,
-    base_calculo: String(regra.base_calculo ?? "nenhuma"),
-    base: arred2(base),
-    parametro,
-    valor: arred2(valor),
-  };
+  const linha = avaliarRegra(paraKernel(regra), paraContexto(ctx), acum, avisos);
+  return linha ? paraLinha(linha) : null;
 }
 
-/** Motor único: executa exatamente a configuração das regras da tabela. */
+/** Tabela legada do PXLog avaliada pelo motor único do Grupo PX. */
 export function calcularTabelaFrete(regras: RegraComercial[], ctx: ContextoFrete): ResultadoFrete {
-  const avisos: string[] = [];
-  const ordenadas = [...(regras ?? [])].sort((a, b) => (a.ordem ?? 100) - (b.ordem ?? 100));
-
-  const linhas: LinhaCalculo[] = [];
-  const acum = { frete: 0, subtotal: 0 };
-  let minimo: number | null = null;
-
-  for (const regra of ordenadas) {
-    const linha = calcularRegra(regra, ctx, acum, avisos);
-    if (!linha) continue;
-    if (linha.modo === "minimo") {
-      const p = linha.parametro ?? 0;
-      minimo = minimo === null ? p : Math.max(minimo, p);
-      continue;
-    }
-    linhas.push(linha);
-    if (linha.tipo === "frete") acum.frete = arred2(acum.frete + linha.valor);
-    acum.subtotal = arred2(acum.subtotal + linha.valor);
-  }
-
-  const subtotal = arred2(acum.subtotal);
-  let total = subtotal;
-  let minimoAplicado: number | null = null;
-  if (minimo !== null && total < minimo) {
-    total = minimo;
-    minimoAplicado = minimo;
-  }
-
+  const res = calcularKernel((regras ?? []).map(paraKernel), paraContexto(ctx));
   return {
-    linhas,
-    frete_base: arred2(acum.frete),
-    adicionais: arred2(subtotal - acum.frete),
-    subtotal,
-    minimo_aplicado: minimoAplicado,
-    total: arred2(total),
-    avisos,
+    linhas: res.linhas.map(paraLinha),
+    frete_base: res.frete_calculado,
+    adicionais: res.adicionais,
+    subtotal: res.subtotal,
+    minimo_aplicado: res.minimo_aplicado,
+    total: res.total,
+    avisos: res.avisos,
   };
 }
 
