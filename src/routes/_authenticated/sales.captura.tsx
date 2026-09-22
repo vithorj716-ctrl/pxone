@@ -142,7 +142,9 @@ function CapturaRapida() {
       );
       setF({ ...VAZIO });
       setGeo(null);
-    } catch {
+    } catch (e: any) {
+      console.error("captura", e?.message ?? e);
+
       const fila = [...lerFila(), entrada];
       gravarFila(fila);
       setPendentes(fila.length);
