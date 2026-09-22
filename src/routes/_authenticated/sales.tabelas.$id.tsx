@@ -111,8 +111,19 @@ function camposDe(tipo: string): CampoDef[] {
         { k: "minimo", label: "Mínimo", tipo: "num" },
         { k: "maximo", label: "Máximo", tipo: "num" },
       ];
+    case "frete_minimo":
+      return [
+        { k: "modo", label: "Como calcular o mínimo", tipo: "select", opcoes: [
+          { v: "fixo", l: "Valor fixo" }, { v: "por_kg", l: "Por kg taxado" }, { v: "faixa", l: "Por faixa de peso" },
+        ] },
+        { k: "valor", label: "Valor do mínimo", tipo: "num" },
+        { k: "aplicar_em", label: "Aplicar sobre", tipo: "select", opcoes: [
+          { v: "frete", l: "Frete (sem adicionais)" }, { v: "total", l: "Total da cotação" },
+        ] },
+      ];
     case "faixa_peso":
       return [];
+
     default:
       return [
         { k: "modo", label: "Forma de cobrança", tipo: "select", opcoes: MODOS_TAXA },
