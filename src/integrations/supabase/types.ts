@@ -3862,6 +3862,7 @@ export type Database = {
       }
       pxsales_leads: {
         Row: {
+          captura_key: string | null
           cidade: string | null
           cliente_id: string | null
           cnpj: string | null
@@ -3876,6 +3877,8 @@ export type Database = {
           empresa_id: string
           etapa: string
           id: string
+          latitude: number | null
+          longitude: number | null
           motivo_perda: string | null
           nome_fantasia: string | null
           observacoes: string | null
@@ -3893,6 +3896,7 @@ export type Database = {
           updated_by: string | null
         }
         Insert: {
+          captura_key?: string | null
           cidade?: string | null
           cliente_id?: string | null
           cnpj?: string | null
@@ -3907,6 +3911,8 @@ export type Database = {
           empresa_id: string
           etapa?: string
           id?: string
+          latitude?: number | null
+          longitude?: number | null
           motivo_perda?: string | null
           nome_fantasia?: string | null
           observacoes?: string | null
@@ -3924,6 +3930,7 @@ export type Database = {
           updated_by?: string | null
         }
         Update: {
+          captura_key?: string | null
           cidade?: string | null
           cliente_id?: string | null
           cnpj?: string | null
@@ -3938,6 +3945,8 @@ export type Database = {
           empresa_id?: string
           etapa?: string
           id?: string
+          latitude?: number | null
+          longitude?: number | null
           motivo_perda?: string | null
           nome_fantasia?: string | null
           observacoes?: string | null
