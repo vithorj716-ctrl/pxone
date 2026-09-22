@@ -417,7 +417,7 @@ function TabelaDetalhe() {
                   ))}
                 </div>
 
-                {compSel.tipo === "faixa_peso" && (
+                {(compSel.tipo === "faixa_peso" || (compSel.tipo === "frete_minimo" && compSel.config?.modo === "faixa")) && (
                   <div className="mt-4">
                     <div className="flex items-center justify-between mb-2">
                       <div className="text-xs font-medium">Faixas de peso</div>
