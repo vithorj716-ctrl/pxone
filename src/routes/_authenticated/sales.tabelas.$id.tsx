@@ -245,8 +245,19 @@ function TabelaDetalhe() {
 
   async function onCalcular() {
     try {
-      const r = await calcular({ data: { versao_id: versaoId, ...sim } });
+      const dim =
+        Number(sim["dim_c"]) > 0 && Number(sim["dim_l"]) > 0 && Number(sim["dim_a"]) > 0
+          ? [{
+              qtd: Number(sim["dim_qtd"]) || 1,
+              comprimento: Number(sim["dim_c"]),
+              largura: Number(sim["dim_l"]),
+              altura: Number(sim["dim_a"]),
+              unidade: "m",
+            }]
+          : [];
+      const r = await calcular({ data: { versao_id: versaoId, ...sim, volumes_dim: dim } });
       setResultado(r);
+
     } catch (e: any) {
       toast.error(e?.message ?? "Não foi possível calcular.");
     }
