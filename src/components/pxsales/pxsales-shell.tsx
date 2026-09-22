@@ -39,8 +39,9 @@ export const PXSALES_NAV: NavItem[] = [
 ];
 
 const BOTTOM_NAV = PXSALES_NAV.filter((i) =>
-  ["/sales", "/sales/leads", "/sales/clientes", "/sales/cotacoes"].includes(i.to),
+  ["/sales", "/sales/captura", "/sales/leads", "/sales/clientes"].includes(i.to),
 );
+
 
 interface Props {
   children: ReactNode;
