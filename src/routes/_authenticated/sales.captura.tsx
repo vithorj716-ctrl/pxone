@@ -149,8 +149,12 @@ function CapturaRapida() {
       setF({ ...VAZIO });
       setGeo(null);
     } catch (e: any) {
-      console.error("captura", e?.message ?? e);
-
+      const msg = String(e?.message ?? e);
+      const semRede = msg === "offline" || !navigator.onLine || /fetch|network|Failed/i.test(msg);
+      if (!semRede) {
+        toast.error(msg);
+        return;
+      }
       const fila = [...lerFila(), entrada];
       gravarFila(fila);
       setPendentes(fila.length);
@@ -158,6 +162,7 @@ function CapturaRapida() {
       toast.message("Sem internet: a visita ficou guardada e será enviada sozinha.");
       setF({ ...VAZIO });
       setGeo(null);
+
     } finally {
       setSalvando(false);
     }
