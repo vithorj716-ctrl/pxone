@@ -11,6 +11,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { capturarLeadRapido, type CapturaEntrada } from "@/lib/pxsales-captura.functions";
+import { useEmpresaAtiva } from "@/px-core/empresa-context";
+
 
 export const Route = createFileRoute("/_authenticated/sales/captura")({
   component: CapturaRapida,
@@ -53,6 +55,7 @@ const TEMPERATURAS = [
 function CapturaRapida() {
   const enviar = useServerFn(capturarLeadRapido);
   const { empresa } = useEmpresaAtiva();
+  const [f, setF] = useState<Record<string, string>>({ ...VAZIO });
 
   const [geo, setGeo] = useState<{ lat: number; lng: number } | null>(null);
   const [pendentes, setPendentes] = useState(0);
