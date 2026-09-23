@@ -79,10 +79,18 @@ export function PXLogo({
       if (reducedMotion || !animate) {
         gsap.set([p, ...xParts, wordmark, stage, parallaxLayer], { clearProps: "all" });
       } else {
-        const timeline = gsap.timeline({ defaults: { overwrite: "auto" } });
+        const timeline = gsap.timeline({
+          defaults: { overwrite: "auto" },
+          repeat: 5,
+          repeatDelay: 2,
+          yoyo: true,
+          onComplete: () => {
+            gsap.set([p, ...xParts, wordmark], { xPercent: 0, clearProps: "willChange" });
+          },
+        });
         timeline
-          .set([p, ...xParts, wordmark], { xPercent: mobile ? -72 : -101, willChange: "transform" })
-          .to(p, { xPercent: 0, duration: mobile ? 0.7 : 1, ease: "power2.out" })
+          .set([p, ...xParts, wordmark], { xPercent: -101, willChange: "transform" })
+          .to(p, { xPercent: 0, duration: mobile ? 0.8 : 1, ease: "power2.out" })
           .to(
             xParts,
             {
@@ -93,8 +101,7 @@ export function PXLogo({
             },
             "-=0.65",
           )
-          .to(wordmark, { xPercent: 0, duration: mobile ? 0.65 : 0.9, ease: "power2.out" }, "-=0.45")
-          .set([p, ...xParts, wordmark], { clearProps: "willChange" });
+          .to(wordmark, { xPercent: 0, duration: mobile ? 0.75 : 0.9, ease: "power2.out" }, "-=0.45");
       }
 
       if (!reducedMotion && shouldScroll) {
