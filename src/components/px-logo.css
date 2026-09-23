@@ -1,8 +1,9 @@
 .px-logo {
+  --px-logo-width: 42px;
   --px-logo-height: 28px;
   display: inline-flex;
   height: var(--px-logo-height);
-  width: calc(var(--px-logo-height) * 1.5);
+  width: var(--px-logo-width);
   flex: 0 0 auto;
   perspective: 700px;
   transform-origin: center;
