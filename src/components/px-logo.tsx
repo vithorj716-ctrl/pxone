@@ -63,7 +63,6 @@ export function PXLogo({
     const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
     const mobile = window.matchMedia("(max-width: 767px)").matches;
     const tablet = window.matchMedia("(max-width: 1023px)").matches;
-    const symbol = root.querySelector<SVGGElement>('[data-logo-part="symbol"]');
     const p = root.querySelector<SVGPathElement>('[data-logo-part="p"]');
     const xParts = gsap.utils.toArray<SVGPathElement>(root.querySelectorAll('[data-logo-part^="x-"]'));
     const letters = ["g", "r", "u", "p", "o"]
@@ -71,34 +70,31 @@ export function PXLogo({
       .filter((letter): letter is SVGPathElement => Boolean(letter));
     const stage = root.querySelector<SVGGElement>('[data-logo-part="stage"]');
     const parallaxLayer = root.querySelector<SVGGElement>('[data-logo-part="parallax"]');
-    if (!symbol || !p || xParts.length !== 3 || letters.length !== 5 || !stage || !parallaxLayer) return;
+    const wordmark = root.querySelector<SVGGElement>('[data-logo-part="wordmark"]');
+    if (!p || xParts.length !== 3 || letters.length !== 5 || !stage || !parallaxLayer || !wordmark) return;
 
     const context = gsap.context(() => {
-      gsap.set([symbol, p, ...xParts, ...letters, stage, parallaxLayer], { transformOrigin: "50% 50%", transformBox: "fill-box" });
+      gsap.set([p, ...xParts, wordmark, stage, parallaxLayer], { transformOrigin: "50% 50%", transformBox: "fill-box" });
 
       if (reducedMotion || !animate) {
-        gsap.set([symbol, p, ...xParts, ...letters, stage, parallaxLayer], { clearProps: "all" });
+        gsap.set([p, ...xParts, wordmark, stage, parallaxLayer], { clearProps: "all" });
       } else {
-        const distance = mobile ? 10 : 18;
         const timeline = gsap.timeline({ defaults: { overwrite: "auto" } });
         timeline
-          .set([symbol, p, ...xParts, ...letters], { willChange: "transform,opacity" })
-          .set(symbol, { opacity: 0, scale: mobile ? 0.9 : 0.86, x: mobile ? -5 : -9 })
-          .set(p, { opacity: 0, x: -distance, scale: 0.82, rotation: mobile ? -1.5 : -3 })
-          .set(xParts[0], { opacity: 0, x: distance, y: -distance * 0.35, rotation: mobile ? 1 : 2 })
-          .set(xParts[1], { opacity: 0, x: -distance * 0.8, y: distance * 0.25, rotation: mobile ? -1 : -2 })
-          .set(xParts[2], { opacity: 0, x: distance * 0.65, y: distance * 0.35, rotation: mobile ? 1 : 2 })
-          .set(letters, { opacity: 0, y: mobile ? 12 : 24, filter: mobile ? "blur(3px)" : "blur(7px)" })
-          .to(symbol, { opacity: 1, scale: 1, x: 0, duration: mobile ? 0.42 : 0.7, ease: "back.out(1.6)" })
-          .to(p, { opacity: 1, x: 0, scale: 1, rotation: 0, duration: mobile ? 0.42 : 0.7, ease: "back.out(1.6)" }, "<")
-          .to(xParts[0], { opacity: 1, x: 0, y: 0, rotation: 0, duration: mobile ? 0.34 : 0.52, ease: "power3.out" }, "-=0.2")
-          .to(xParts[1], { opacity: 1, x: 0, y: 0, rotation: 0, duration: mobile ? 0.34 : 0.5, ease: "power3.out" }, "-=0.34")
-          .to(xParts[2], { opacity: 1, x: 0, y: 0, rotation: 0, duration: mobile ? 0.34 : 0.5, ease: "power3.out" }, "-=0.34")
-          .to(symbol, { scale: 0.992, duration: 0.12, ease: "power2.out" })
-          .to(symbol, { scale: 1, duration: 0.18, ease: "power2.out" })
-          .to(letters, { opacity: 1, y: 0, filter: "blur(0px)", stagger: 0.035, duration: mobile ? 0.34 : 0.5, ease: "power3.out" }, "-=0.12")
-          .to(stage, { scale: 1.015, duration: 0.13, ease: "power2.out" })
-          .to(stage, { scale: 1, duration: 0.2, ease: "power2.inOut", clearProps: "willChange" });
+          .set([p, ...xParts, wordmark], { xPercent: mobile ? -72 : -101, willChange: "transform" })
+          .to(p, { xPercent: 0, duration: mobile ? 0.7 : 1, ease: "power2.out" })
+          .to(
+            xParts,
+            {
+              xPercent: 0,
+              duration: mobile ? 0.7 : 1,
+              stagger: mobile ? 0.055 : 0.08,
+              ease: "power2.out",
+            },
+            "-=0.65",
+          )
+          .to(wordmark, { xPercent: 0, duration: mobile ? 0.65 : 0.9, ease: "power2.out" }, "-=0.45")
+          .set([p, ...xParts, wordmark], { clearProps: "willChange" });
       }
 
       if (!reducedMotion && shouldScroll) {
@@ -164,7 +160,7 @@ export function PXLogo({
   } as CSSProperties;
 
   return (
-    <span ref={rootRef} className={`px-logo ${className}`} style={style} data-px-logo>
+    <span ref={rootRef} className={`px-logo ${className}`} style={style} data-px-logo data-animate={animate ? "true" : "false"}>
       <svg
         className="px-logo__svg"
         version="1.0"
