@@ -1,0 +1,33 @@
+.px-logo {
+  --px-logo-height: 28px;
+  display: inline-flex;
+  height: var(--px-logo-height);
+  width: calc(var(--px-logo-height) * 1.5);
+  flex: 0 0 auto;
+  perspective: 700px;
+  transform-origin: center;
+  transform-style: preserve-3d;
+  vertical-align: middle;
+}
+
+.px-logo__svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.px-logo [data-logo-part] {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .px-logo,
+  .px-logo [data-logo-part] {
+    transform: none !important;
+    filter: none !important;
+    opacity: 1 !important;
+  }
+}
